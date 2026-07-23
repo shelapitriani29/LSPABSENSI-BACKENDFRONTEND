@@ -1,0 +1,500 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+@import './components/sidebar.css';
+@import './components/navbar.css';
+@import './components/card.css';
+@import './components/table.css';
+@import './components/button.css';
+@import './components/form.css';
+
+@import './pages/login.css';
+@import './pages/dashboard.css';
+@import './pages/peserta.css';
+
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import './theme.css';
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.login-page{
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg);
+    padding: 20px;
+}
+
+.login-card{
+    width: 100%;
+    max-width: 420px;
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 40px;
+    box-shadow: var(--shadow);
+}
+
+.logo{
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    background: var(--primary);
+    margin: 0 auto 20px;
+}
+
+.login-card h2{
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.login-card p{
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+}
+
+.form-control{
+    height: 48px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+
+.form-control:focus{
+    border-color: var(--primary);
+    box-shadow: 0 0 0 .2rem rgba(37,99,235,.2);
+}
+
+.login-card a{
+    text-decoration: none;
+    color: var(--primary);
+    font-size: 14px;
+    transition: .3s;
+}
+
+.login-card a:hover{
+    color: var(--primary-hover);
+}
+
+.btn-primary{
+    background: var(--primary);
+    border-color: var(--primary);
+    border-radius: 10px;
+    height: 48px;
+    font-weight: 600;
+    transition: .3s;
+}
+
+.btn-primary:hover{
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.form-label{
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.form-check-label{
+    font-size: 14px;
+}
+
+.form-check-input:checked{
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.wrapper{
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar{
+    width: 260px;
+    background: #2B6B92;
+    color: white;
+    padding: 25px;
+}
+
+.sidebar .logo{
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 35px;
+}
+
+.sidebar ul{
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li{
+    padding: 15px 0;
+    cursor: pointer;
+    font-size: 17px;
+}
+
+.sidebar li:hover{
+    color: #FFD54F;
+}
+
+.main{
+    flex: 1;
+    background: #F5F7FB;
+}
+
+.navbar-custom{
+    height: 70px;
+    background: white;
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.05);
+}
+
+.content{
+    padding: 30px;
+}
+
+.sidebar{
+    width:270px;
+    background:#2C6C90;
+    color:white;
+    min-height:100vh;
+}
+
+.sidebar-header{
+
+    padding:25px;
+    border-bottom:1px solid rgba(255,255,255,.1);
+
+}
+
+.sidebar-header h3{
+
+    font-weight:bold;
+
+    margin:0;
+
+}
+
+.sidebar-header span{
+
+    font-size:13px;
+
+}
+
+.profile{
+
+    padding:25px;
+
+    text-align:center;
+
+}
+
+.profile-image{
+
+    width:80px;
+
+    height:80px;
+
+    border-radius:50%;
+
+    background:white;
+
+    margin:auto;
+
+    margin-bottom:15px;
+
+}
+
+.profile h5{
+
+    margin-bottom:5px;
+
+}
+
+.profile p{
+
+    color:#dbeafe;
+
+}
+
+.menu-title{
+
+    font-size:13px;
+
+    color:#dbeafe;
+
+    padding:0 25px;
+
+    margin-bottom:10px;
+
+}
+
+.sidebar-menu{
+
+    list-style:none;
+
+    padding:0;
+
+}
+
+.sidebar-menu>li{
+
+    padding:15px 25px;
+
+    cursor:pointer;
+
+}
+
+.sidebar-menu>li:hover{
+
+    background:rgba(255,255,255,.08);
+
+}
+
+.sidebar-menu ul{
+
+    list-style:none;
+
+    margin-top:10px;
+
+    padding-left:20px;
+
+}
+
+.sidebar-menu ul li{
+
+    padding:8px 0;
+
+    font-size:15px;
+
+}
+
+.active{
+
+    background:rgba(255,255,255,.15);
+
+}
+
+.stat-card{
+    border-radius:15px;
+    padding:25px;
+    color:white;
+    text-align:center;
+    transition:.3s;
+    box-shadow:0 8px 18px rgba(0,0,0,.08);
+}
+
+.stat-card:hover{
+    transform:translateY(-5px);
+}
+
+.stat-card h4{
+    font-size:22px;
+    font-weight:500;
+}
+
+.stat-card h2{
+    margin-top:10px;
+    font-size:38px;
+    font-weight:bold;
+}
+
+.blue{
+    background:#2F6FED;
+}
+
+.red{
+    background:#F44336;
+}
+
+.green{
+    background:#28C76F;
+}
+
+.orange{
+    background:#F5A623;
+}
+
+.navbar-custom{
+
+    height:90px;
+
+    background:white;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 35px;
+
+    border-bottom:1px solid #ececec;
+
+}
+
+.page-title{
+
+    font-weight:700;
+
+    margin-bottom:3px;
+
+}
+
+.stat-card{
+
+    height:140px;
+
+    border-radius:15px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:white;
+
+    box-shadow:0 10px 20px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+}
+
+.stat-card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+.stat-card h4{
+
+    font-weight:500;
+
+}
+
+.stat-card h2{
+
+    font-size:36px;
+
+    font-weight:bold;
+
+}
+
+.blue{
+
+    background:#2F6FED;
+
+}
+
+.red{
+
+    background:#EF4444;
+
+}
+
+.green{
+
+    background:#22C55E;
+
+}
+
+.orange{
+
+    background:#F59E0B;
+
+}
+
+.dashboard-card{
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:25px;
+
+    margin-top:25px;
+
+    box-shadow:0 10px 20px rgba(0,0,0,.05);
+
+}
+
+.dashboard-card h4{
+
+    font-weight:600;
+
+    margin-bottom:20px;
+
+}
+
+.chart-placeholder{
+
+    height:250px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#f4f6fb;
+
+    border-radius:12px;
+
+    font-size:28px;
+
+}
+
+.activity-list{
+
+    list-style:none;
+
+    padding:0;
+
+}
+
+.activity-list li{
+
+    padding:12px 0;
+
+    border-bottom:1px solid #eee;
+
+}
+
+.sidebar-menu a{
+
+    color:white;
+
+    text-decoration:none;
+
+    display:block;
+
+    padding:12px 20px;
+
+    border-radius:8px;
+
+    transition:.3s;
+
+}
+
+.sidebar-menu a:hover{
+
+    background:rgba(255,255,255,.15);
+
+}
