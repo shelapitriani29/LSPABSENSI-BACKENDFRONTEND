@@ -1,15 +1,28 @@
 <div class="dashboard-card">
 
-    <h4>Aktivitas Terbaru</h4>
+<h5>
+    Aktivitas Terbaru
+</h5>
 
-    <ul class="activity-list">
+<hr>
 
-        <li>Budi melakukan absensi</li>
 
-        <li>Admin menambahkan jadwal</li>
+<ul class="activity-list">
 
-        <li>Asesor menginput penilaian</li>
+<li>
+    Peserta baru ditambahkan
+</li>
 
-    </ul>
+<li>
+    Jadwal asesmen diperbarui
+</li>
+
+<li>
+    Sertifikat berhasil diterbitkan
+</li>
+
+
+</ul>
+
 
 </div>

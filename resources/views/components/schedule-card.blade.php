@@ -1,49 +1,36 @@
 <div class="dashboard-card">
 
-    <h4>Jadwal Hari Ini</h4>
+<h5>
+    Jadwal Asesmen
+</h5>
 
-    <table class="table table-bordered mt-3">
+<hr>
 
-        <thead>
 
-            <tr>
+<div class="schedule-item">
 
-                <th>Jam</th>
+    <b>
+        Web Developer
+    </b>
 
-                <th>Jadwal</th>
+    <p>
+        25 Juli 2026
+    </p>
 
-            </tr>
+</div>
 
-        </thead>
 
-        <tbody>
+<div class="schedule-item">
 
-            <tr>
+    <b>
+        UI/UX Designer
+    </b>
 
-                <td>08.00</td>
+    <p>
+        28 Juli 2026
+    </p>
 
-                <td>Skema Web Developer</td>
+</div>
 
-            </tr>
-
-            <tr>
-
-                <td>10.00</td>
-
-                <td>Network Engineer</td>
-
-            </tr>
-
-            <tr>
-
-                <td>13.00</td>
-
-                <td>UI / UX Designer</td>
-
-            </tr>
-
-        </tbody>
-
-    </table>
 
 </div>

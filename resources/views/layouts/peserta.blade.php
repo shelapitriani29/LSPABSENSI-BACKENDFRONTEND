@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'Dashboard Admin - LSP SMKN 1 Garut' }}</title>
+    <title>{{ $title ?? 'Dashboard Peserta - LSP SMKN 1 Garut' }}</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -34,7 +34,7 @@
         .sidebar { 
             width: 280px; 
             height: calc(100vh - 48px); 
-            background-color: #1b6ca8; 
+            background-color: #1b6ca8; /* Warna Biru Awal */
             color: white; 
             position: fixed; 
             top: 48px; 
@@ -87,7 +87,7 @@
 </head>
 <body>
 
-    <!-- Header Atas -->
+    <!-- Header Atas Memanjang -->
     <div class="top-header-brand">
         <div class="d-flex align-items-center">
             <span class="fw-bold text-dark me-2" style="font-size: 1rem;">LSP</span> 
@@ -98,17 +98,17 @@
         </div>
     </div>
 
-    <!-- Sidebar Admin -->
+    <!-- Sidebar Peserta -->
     <div class="sidebar d-flex flex-column pb-4 pt-3">
         
         <!-- User Profile Section -->
         <div class="px-3 py-2 mb-2 d-flex align-items-center">
-            <div class="bg-white rounded-circle me-3 shadow-sm flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
-                <i class="bi bi-person-fill text-secondary fs-4"></i>
+            <div class="bg-white text-secondary rounded-circle me-3 shadow-sm flex-shrink-0 d-flex align-items-center justify-content-center fw-bold" style="width: 42px; height: 42px; font-size: 0.95rem;">
+                SP
             </div>
-            <div>
-                <h6 class="fw-bold mb-0 text-white" style="font-size: 0.9rem;">Administrator</h6>
-                <small class="text-white-50" style="font-size: 0.75rem;">admin@smkn1garut.sch.id</small>
+            <div class="overflow-hidden">
+                <h6 class="fw-bold mb-0 text-white text-truncate" style="font-size: 0.9rem;">Shela Pitriani</h6>
+                <small class="text-white-50 text-truncate d-block" style="font-size: 0.75rem;">Peserta Uji</small>
             </div>
         </div>
 
@@ -116,7 +116,7 @@
         <div class="small fw-bold text-white-50 px-3 mb-1 text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">MAIN MENU</div>
         <ul class="nav flex-column mb-2">
             <li class="nav-item">
-                <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }} d-flex align-items-center">
+                <a href="{{ route('peserta.dashboard') }}" class="nav-link {{ request()->routeIs('peserta.dashboard') ? 'active' : '' }} d-flex align-items-center">
                     <i class="bi bi-speedometer2 me-2 fs-6"></i> Dashboard
                 </a>
             </li>
@@ -126,57 +126,31 @@
         <div class="small fw-bold text-white-50 px-3 mb-1 text-uppercase" style="font-size: 0.7rem; letter-spacing: 1px;">PILIHAN MENU</div>
         <ul class="nav flex-column mb-auto">
             
-            <!-- Dropdown Referensi -->
-            @php $isReferensi = request()->routeIs('admin.user.*') || request()->routeIs('admin.peserta.*') || request()->routeIs('admin.asesor.*') || request()->routeIs('admin.skema.*'); @endphp
-            <li class="nav-item mb-1">
-                <a class="nav-link d-flex justify-content-between align-items-center {{ $isReferensi ? 'active' : '' }}" data-bs-toggle="collapse" href="#menuReferensi" role="button" aria-expanded="{{ $isReferensi ? 'true' : 'false' }}">
-                    <span><i class="bi bi-folder2-open me-2"></i>Referensi</span>
-                    <i class="bi bi-chevron-down small"></i>
-                </a>
-                <div class="collapse {{ $isReferensi ? 'show' : '' }}" id="menuReferensi">
-                    <ul class="submenu my-1">
-                        <li><a href="{{ route('admin.user.index') }}" class="{{ request()->routeIs('admin.user.*') ? 'active' : '' }}">Manajemen User</a></li>
-                        <li><a href="{{ route('admin.peserta.index') }}" class="{{ request()->routeIs('admin.peserta.*') ? 'active' : '' }}">Data Peserta</a></li>
-                        <li><a href="{{ route('admin.asesor.index') }}" class="{{ request()->routeIs('admin.asesor.*') ? 'active' : '' }}">Data Asesor</a></li>
-                        <li><a href="{{ route('admin.skema.index') }}" class="{{ request()->routeIs('admin.skema.*') ? 'active' : '' }}">Data Skema Sertifikasi</a></li>
-                    </ul>
-                </div>
-            </li>
-
             <!-- Dropdown Sertifikasi -->
-            @php $isSertifikasi = request()->routeIs('admin.sertifikasi.*'); @endphp
+            @php $isSertifikasi = request()->routeIs('peserta.sertifikasi.*') || request()->routeIs('peserta.jadwal.*') || request()->routeIs('peserta.penilaian.*'); @endphp
             <li class="nav-item mb-1">
-                <a class="nav-link d-flex justify-content-between align-items-center {{ $isSertifikasi ? 'active' : '' }}" data-bs-toggle="collapse" href="#menuSertifikasi" role="button" aria-expanded="{{ $isSertifikasi ? 'true' : 'false' }}">
+                <a class="nav-link d-flex justify-content-between align-items-center {{ $isSertifikasi ? 'active' : '' }}" data-bs-toggle="collapse" href="#menuSertifikasiPeserta" role="button" aria-expanded="{{ $isSertifikasi ? 'true' : 'false' }}">
                     <span><i class="bi bi-award me-2"></i>Sertifikasi</span>
                     <i class="bi bi-chevron-down small"></i>
                 </a>
-                <div class="collapse {{ $isSertifikasi ? 'show' : '' }}" id="menuSertifikasi">
+                <div class="collapse {{ $isSertifikasi ? 'show' : '' }}" id="menuSertifikasiPeserta">
                     <ul class="submenu my-1">
-                        <li><a href="{{ route('admin.sertifikasi.jadwal.index') }}" class="{{ request()->routeIs('admin.sertifikasi.jadwal.*') ? 'active' : '' }}">Jadwal Uji</a></li>
-                        <li><a href="{{ route('admin.sertifikasi.penilaian.index') }}" class="{{ request()->routeIs('admin.sertifikasi.penilaian.*') ? 'active' : '' }}">Penilaian</a></li>
-                        <li><a href="{{ route('admin.sertifikasi.absensi.index') }}" class="{{ request()->routeIs('admin.sertifikasi.absensi.*') ? 'active' : '' }}">Absensi Peserta</a></li>
-                        <li><a href="{{ route('admin.sertifikasi.sertifikat.index') }}" class="{{ request()->routeIs('admin.sertifikasi.sertifikat.*') ? 'active' : '' }}">Sertifikat</a></li>
+                        <li><a href="{{ route('peserta.jadwal.index') }}" class="{{ request()->routeIs('peserta.jadwal.*') ? 'active' : '' }}">Jadwal Uji</a></li>
+                        <li><a href="{{ route('peserta.penilaian.index') }}" class="{{ request()->routeIs('peserta.penilaian.*') ? 'active' : '' }}">Hasil Penilaian</a></li>
                     </ul>
                 </div>
             </li>
 
-            <!-- Menu Laporan Sistem -->
-            @php $isLaporan = request()->routeIs('admin.laporan.*'); @endphp
+            <!-- Absensi Menu -->
             <li class="nav-item mb-1">
-                <a class="nav-link d-flex justify-content-between align-items-center {{ $isLaporan ? 'active' : '' }}" data-bs-toggle="collapse" href="#menuLaporan" role="button" aria-expanded="{{ $isLaporan ? 'true' : 'false' }}">
-                    <span><i class="bi bi-file-earmark-text me-2"></i>Laporan</span>
-                    <i class="bi bi-chevron-down small"></i>
+                <a href="{{ route('peserta.absensi') }}" class="nav-link {{ request()->routeIs('peserta.absensi*') ? 'active' : '' }} d-flex align-items-center">
+                    <i class="bi bi-qr-code-scan me-2 fs-6"></i> Absensi
                 </a>
-                <div class="collapse {{ $isLaporan ? 'show' : '' }}" id="menuLaporan">
-                    <ul class="submenu my-1">
-                        <li><a href="{{ route('admin.laporan.sistem') }}" class="{{ request()->routeIs('admin.laporan.sistem') ? 'active' : '' }}">Laporan Sistem</a></li>
-                    </ul>
-                </div>
             </li>
 
-            <!-- Menu Pengaturan (Langsung ke Profil Admin) -->
+            <!-- Pengaturan / Profil -->
             <li class="nav-item mb-1">
-                <a href="{{ route('admin.profil') }}" class="nav-link {{ request()->routeIs('admin.profil') ? 'active' : '' }} d-flex align-items-center">
+                <a href="{{ route('peserta.profil') }}" class="nav-link {{ request()->routeIs('peserta.profil*') ? 'active' : '' }} d-flex align-items-center">
                     <i class="bi bi-gear me-2 fs-6"></i> Pengaturan
                 </a>
             </li>

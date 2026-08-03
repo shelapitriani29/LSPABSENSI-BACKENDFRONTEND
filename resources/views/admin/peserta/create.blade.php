@@ -1,68 +1,77 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Peserta')
-@section('page-title', 'Tambah Peserta')
-
 @section('content')
-
-<div class="card shadow-sm border-0">
-
-    <div class="card-header bg-white">
-        <h4 class="mb-0 fw-bold">Tambah Data Peserta</h4>
+<div class="container-fluid p-4">
+    <!-- Header Title & Subtitle -->
+    <div class="mb-3">
+        <h1 class="fw-bold text-dark mb-0" style="font-size: 2.2rem;">Data Peserta</h1>
+        <small class="text-muted d-block fw-semibold mb-2" style="font-size: 0.85rem;">LSP P1 – SMK NEGERI 1 GARUT</small>
+        
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-transparent p-0 mb-0" style="font-size: 0.95rem;">
+                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" class="text-decoration-none text-muted">Dashboard</a></li>
+                <li class="breadcrumb-item text-muted">Referensi</li>
+                <li class="breadcrumb-item"><a href="{{ route('admin.peserta.index') }}" class="text-decoration-none text-muted">Data Peserta</a></li>
+                <li class="breadcrumb-item active fw-medium text-secondary" aria-current="page">Tambah Peserta</li>
+            </ol>
+        </nav>
     </div>
 
-    <div class="card-body">
-
-        <form>
-
-            <div class="row">
-
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Nama Peserta</label>
-                    <input type="text" class="form-control">
+    <!-- Form Container Card -->
+    <div class="card border border-2 p-4 bg-white mx-auto" style="border-color: #d1d5db !important; border-radius: 4px; max-width: 800px;">
+        <h4 class="fw-bold mb-4 text-center text-dark">Tambah Peserta</h4>
+        
+        <form action="{{ route('admin.peserta.index') }}" method="GET">
+            <div class="row mb-3 align-items-center">
+                <label class="col-sm-3 col-form-label fw-bold text-dark">NIK :</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control border-secondary" placeholder="Masukkan NIK . . ." required>
                 </div>
-
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">NIS</label>
-                    <input type="text" class="form-control">
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Kelas</label>
-                    <select class="form-select">
-                        <option>Pilih Kelas</option>
-                        <option>XII RPL 1</option>
-                        <option>XII RPL 2</option>
-                    </select>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Skema Sertifikasi</label>
-                    <select class="form-select">
-                        <option>Pilih Skema</option>
-                        <option>Web Developer</option>
-                        <option>UI/UX Designer</option>
-                    </select>
-                </div>
-
             </div>
 
-            <div class="mt-4">
+            <div class="row mb-3 align-items-center">
+                <label class="col-sm-3 col-form-label fw-bold text-dark">Nama :</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control border-secondary" placeholder="Masukkan Nama . . ." required>
+                </div>
+            </div>
 
-                <button class="btn btn-success">
-                    Simpan
+            <div class="row mb-3 align-items-center">
+                <label class="col-sm-3 col-form-label fw-bold text-dark">Instansi :</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control border-secondary" placeholder="Masukkan Instansi . . ." required>
+                </div>
+            </div>
+
+            <div class="row mb-3 align-items-center">
+                <label class="col-sm-3 col-form-label fw-bold text-dark">No Ponsel :</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control border-secondary" placeholder="Masukkan nomor ponsel . . ." required>
+                </div>
+            </div>
+
+            <div class="row mb-4 align-items-center">
+                <label class="col-sm-3 col-form-label fw-bold text-dark">Status :</label>
+                <div class="col-sm-9">
+                    <select class="form-select border-secondary" required>
+                        <option value="" selected disabled>Pilih Opsi</option>
+                        <option value="Aktif">Aktif</option>
+                        <option value="Nonaktif">Nonaktif</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button type="submit" class="btn text-white fw-bold px-4 py-2" style="background-color: #20C997; border-radius: 6px;">
+                    Tambah
                 </button>
-
-                <a href="/peserta" class="btn btn-danger">
+                <a href="{{ route('admin.peserta.index') }}" class="btn text-white fw-bold px-4 py-2" style="background-color: #FF4D4D; border-radius: 6px;">
                     Batal
                 </a>
-
             </div>
-
         </form>
-
     </div>
-
 </div>
-
 @endsection

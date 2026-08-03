@@ -1,7 +1,19 @@
 <div class="dashboard-card">
 
-    <h4>Grafik Statistik Sertifikasi</h4>
+    <div class="d-flex justify-content-between align-items-center mb-3">
 
-    <canvas id="sertifikasiChart" height="120"></canvas>
+        <h5>
+            Grafik Sertifikasi
+        </h5>
+
+        <span class="badge bg-primary">
+            2026
+        </span>
+
+    </div>
+
+
+    <canvas id="sertifikasiChart"></canvas>
+
 
 </div>
