@@ -2,140 +2,153 @@
 
 @section('content')
 <div class="container-fluid px-0">
+    
+    <!-- Header & Breadcrumb -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold text-dark mb-1" style="font-size: 1.3rem;">Manajemen User</h3>
-            <p class="text-secondary small mb-1">LSP P1 – SMK NEGERI 1 GARUT</p>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 small">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" class="text-secondary text-decoration-none">Dashboard</a></li>
-                    <li class="breadcrumb-item text-secondary">Referensi</li>
-                    <li class="breadcrumb-item text-secondary">Manajemen User</li>
-                    <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Edit User</li>
-                </ol>
-            </nav>
+            <h3 class="fw-bold mb-1" style="color: #212529;">Manajemen User</h3>
+            <p class="text-muted mb-0" style="font-size: 0.85rem;">LSP P1 – SMK NEGERI 1 GARUT &bull; <span class="text-secondary">Dashboard / Referensi / Manajemen User / Edit User</span></p>
         </div>
-        <div>
-            <a href="{{ route('admin.user.index') }}" class="btn text-white fw-semibold px-3 shadow-sm" style="background-color: #1b6ca8; border-color: #1b6ca8;">
-                <i class="bi bi-arrow-left me-1"></i> Kembali
-            </a>
-        </div>
+        <a href="{{ route('admin.user.index') }}" class="btn btn-primary btn-sm px-3 py-2 fw-semibold shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> Kembali
+        </a>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-3">
-        <div class="card-body p-4">
-            <form action="#" method="POST">
-                @csrf
-                @method('PUT')
+    <form action="{{ route('admin.user.update', $user->id) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-                <div class="mb-3">
-                    <label for="role" class="form-label fw-semibold text-dark" style="font-size: 0.9rem;">Pilih Role</label>
-                    <select class="form-select" id="roleSelect" name="role" required>
-                        <option value="peserta" selected>Peserta</option>
-                        <option value="asesor">Asesor</option>
-                        <option value="admin">Admin</option>
-                    </select>
+        <div class="row">
+            <!-- Kolom Kiri (Identitas & Detail) -->
+            <div class="col-lg-8">
+                
+                <!-- Section 1: Identitas Pengguna -->
+                <div class="card border-0 shadow-sm mb-4 rounded-3">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-primary mb-3 d-flex align-items-center">
+                            <i class="bi bi-person-fill me-2 fs-5"></i> 1. IDENTITAS PENGGUNA
+                        </h6>
+                        <hr class="text-muted opacity-25 mb-4">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Nama Lengkap & Gelar *</label>
+                            <input type="text" name="name" class="form-control" value="{{ old('name', $user->name) }}" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold small">NIP / NIPTK / NISN</label>
+                                <input type="text" name="nisn" class="form-control" value="{{ old('nisn', $user->nisn ?? '') }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold small">NIK</label>
+                                <input type="text" name="nik" class="form-control" value="{{ old('nik', $user->nik ?? '') }}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold small">Tempat Lahir</label>
+                                <input type="text" name="tempat_lahir" class="form-control" value="{{ old('tempat_lahir', $user->tempat_lahir ?? '') }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold small">Tanggal Lahir</label>
+                                <input type="date" name="tanggal_lahir" class="form-control" value="{{ old('tanggal_lahir', $user->tanggal_lahir ?? '') }}">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold small">Jenis Kelamin</label>
+                                <select name="jenis_kelamin" class="form-select">
+                                    <option value="">Pilih Jenis Kelamin</option>
+                                    <option value="Laki-laki" {{ (old('jenis_kelamin', $user->jenis_kelamin ?? '') == 'Laki-laki') ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="Perempuan" {{ (old('jenis_kelamin', $user->jenis_kelamin ?? '') == 'Perempuan') ? 'selected' : '' }}>Perempuan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold small">No. HP / WhatsApp</label>
+                                <input type="text" name="no_hp" class="form-control" value="{{ old('no_hp', $user->no_hp ?? '') }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold small">Alamat Lengkap</label>
+                            <textarea name="alamat" class="form-control" rows="3">{{ old('alamat', $user->alamat ?? '') }}</textarea>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold text-dark" style="font-size: 0.9rem;">Nama Lengkap</label>
-                        <input type="text" class="form-control" name="nama" value="Jenisa" placeholder="Masukkan nama..." required>
-                    </div>
-                    <div class="col-md-6 mb-3" id="field-identifier">
-                        <label class="form-label fw-semibold text-dark" id="label-identifier" style="font-size: 0.9rem;">NISN</label>
-                        <input type="text" class="form-control" name="identifier" id="input-identifier" value="2310012345" placeholder="Masukkan NISN...">
+                <!-- Section 3: Data Detail & Keasesoran -->
+                <div class="card border-0 shadow-sm mb-4 rounded-3">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-primary mb-3 d-flex align-items-center">
+                            <i class="bi bi-shield-check me-2 fs-5"></i> 3. DATA DETAIL & KEASESORAN
+                        </h6>
+                        <hr class="text-muted opacity-25 mb-4">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold small">Kelas</label>
+                                <input type="text" name="kelas" class="form-control" value="{{ old('kelas', $user->kelas ?? '') }}" placeholder="Contoh: XI AKL 2">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold small">Jurusan</label>
+                                <input type="text" name="jurusan" class="form-control" value="{{ old('jurusan', $user->jurusan ?? '') }}" placeholder="Masukkan Nama Jurusan">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3" id="extra-nohp">
-                        <label class="form-label fw-semibold text-dark" style="font-size: 0.9rem;">No HP</label>
-                        <input type="text" class="form-control" name="no_hp" value="081234567890" placeholder="Masukkan No HP...">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold text-dark" style="font-size: 0.9rem;">Password <small class="text-muted fw-normal">(Kosongkan jika tidak ingin mengubah)</small></label>
-                        <input type="password" class="form-control" name="password" placeholder="Masukkan password baru...">
-                    </div>
-                </div>
+            </div>
 
-                <div id="extra-peserta">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold text-dark" style="font-size: 0.9rem;">Kelas</label>
-                            <select class="form-select" name="kelas">
-                                <option value="">Pilih Kelas</option>
-                                <option value="10">Kelas X</option>
-                                <option value="11" selected>Kelas XI</option>
-                                <option value="12">Kelas XII</option>
+            <!-- Kolom Kanan (Akun Sistem & Tombol Aksi) -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-3 sticky-top" style="top: 70px;">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-primary mb-3 d-flex align-items-center">
+                            <i class="bi bi-lock-fill me-2 fs-5"></i> 2. AKUN SISTEM
+                        </h6>
+                        <hr class="text-muted opacity-25 mb-4">
+
+                        <!-- Field Pilih Role sudah dihilangkan dari sini -->
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Username / ID Login *</label>
+                            <input type="text" name="username" class="form-control" value="{{ old('username', $user->username ?? $user->name) }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Email *</label>
+                            <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small">Password Baru <span class="text-muted fw-normal">(Kosongkan jika tidak ingin mengubah)</span></label>
+                            <input type="password" name="password" class="form-control" placeholder="Masukkan password baru...">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold small">Status Akun Sistem</label>
+                            <select name="status" class="form-select">
+                                <option value="Aktif" {{ (old('status', $user->status ?? 'Aktif') == 'Aktif') ? 'selected' : '' }}>Aktif</option>
+                                <option value="Non-Aktif" {{ (old('status', $user->status ?? '') == 'Non-Aktif') ? 'selected' : '' }}>Non-Aktif</option>
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold text-dark" style="font-size: 0.9rem;">Jurusan</label>
-                            <input type="text" class="form-control" name="jurusan" value="Rekayasa Perangkat Lunak" placeholder="Masukkan Nama Jurusan...">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success fw-semibold py-2">
+                                <i class="bi bi-check-circle me-1"></i> Simpan Perubahan
+                            </button>
+                            <a href="{{ route('admin.user.index') }}" class="btn btn-light border fw-semibold py-2 text-secondary">
+                                Batal
+                            </a>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="mb-3 d-none" id="extra-asesor">
-                    <label class="form-label fw-semibold text-dark" style="font-size: 0.9rem;">Bidang Kompetensi</label>
-                    <input type="text" class="form-control" name="bidang_kompetensi" placeholder="Masukkan bidang kompetensi...">
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-semibold text-dark" style="font-size: 0.9rem;">Status</label>
-                    <select class="form-select" name="status">
-                        <option value="aktif" selected>Aktif</option>
-                        <option value="nonaktif">Nonaktif</option>
-                    </select>
-                </div>
-
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn text-white px-4 fw-semibold shadow-sm" style="background-color: #28a745; border-color: #28a745;">Simpan Perubahan</button>
-                    <a href="{{ route('admin.user.index') }}" class="btn text-white px-4 fw-semibold shadow-sm" style="background-color: #dc3545; border-color: #dc3545;">Batal</a>
-                </div>
-            </form>
         </div>
-    </div>
+    </form>
 </div>
-
-<!-- JavaScript untuk Mengubah Form Secara Dinamis Berdasarkan Role -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const roleSelect = document.getElementById('roleSelect');
-        const labelIdentifier = document.getElementById('label-identifier');
-        const inputIdentifier = document.getElementById('input-identifier');
-        
-        const extraPeserta = document.getElementById('extra-peserta');
-        const extraAsesor = document.getElementById('extra-asesor');
-        const extraNohp = document.getElementById('extra-nohp');
-
-        function updateFormFields() {
-            const selectedRole = roleSelect.value;
-
-            if (selectedRole === 'peserta') {
-                labelIdentifier.textContent = 'NISN';
-                inputIdentifier.placeholder = 'Masukkan NISN...';
-                extraPeserta.classList.remove('d-none');
-                extraAsesor.classList.add('d-none');
-                extraNohp.classList.remove('d-none');
-            } else if (selectedRole === 'asesor') {
-                labelIdentifier.textContent = 'NIP';
-                inputIdentifier.placeholder = 'Masukkan NIP...';
-                extraPeserta.classList.add('d-none');
-                extraAsesor.classList.remove('d-none');
-                extraNohp.classList.remove('d-none');
-            } else if (selectedRole === 'admin') {
-                labelIdentifier.textContent = 'Username';
-                inputIdentifier.placeholder = 'Masukkan Username...';
-                extraPeserta.classList.add('d-none');
-                extraAsesor.classList.add('d-none');
-                extraNohp.classList.add('d-none');
-            }
-        }
-
-        roleSelect.addEventListener('change', updateFormFields);
-        updateFormFields();
-    });
-</script>
 @endsection

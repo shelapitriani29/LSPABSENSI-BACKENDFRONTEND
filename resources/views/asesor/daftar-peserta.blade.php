@@ -4,9 +4,16 @@
 <div class="container-fluid px-0">
     <!-- Judul Halaman, Sub-judul, dan Breadcrumb Sesuai Contoh Data Asesor -->
     <div class="mb-4">
-        <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: 0.5px;">Daftar Peserta</h4>
-        <small class="text-muted d-block mb-2">LSP P1 – SMK NEGERI 1 GARUT</small>
-        
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white shadow-sm" style="width: 44px; height: 44px;">
+                <i class="bi bi-people-fill fs-5"></i>
+            </div>
+            <div>
+                <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: 0.5px;">Daftar Peserta</h4>
+                <small class="text-muted">LSP P1 – SMK NEGERI 1 GARUT</small>
+            </div>
+        </div>
+
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0" style="font-size: 0.85rem;">
@@ -26,147 +33,86 @@
         <div class="card-body p-4">
             
             <!-- Filter & Search Bar -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="text-muted small">show</span>
-                    <select class="form-select form-select-sm w-auto">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
+            <form action="{{ route('asesor.daftar-peserta') }}" method="GET" class="row row-cols-lg-auto g-3 align-items-center mb-3">
+                <div class="col-auto d-flex align-items-center gap-2">
+                    <span class="text-muted small">Show</span>
+                    <select name="per_page" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
                     </select>
-                    <span class="text-muted small">antrian</span>
+                    <span class="text-muted small">entries</span>
                 </div>
-                <div class="d-flex align-items-center gap-2">
+                <div class="col-auto d-flex align-items-center gap-2">
                     <span class="text-muted small">Search:</span>
-                    <input type="text" class="form-control form-control-sm" placeholder="">
+                    <div class="input-group input-group-sm" style="width: 220px;">
+                        <input type="text" name="search" class="form-control" placeholder="Cari nama/username/kelas..." value="{{ request('search') }}">
+                        <button class="btn btn-primary" type="submit" style="background-color: #2b70c9; border-color: #2b70c9;"><i class="bi bi-search"></i></button>
+                    </div>
                 </div>
-            </div>
+            </form>
 
             <!-- Tabel Data -->
             <div class="table-responsive">
-                <table class="table table-hover align-middle border">
-                    <thead class="table-light">
+                <table class="table table-bordered align-middle mb-0" width="100%" cellspacing="0">
+                    <thead class="table-light text-dark fw-bold small">
                         <tr>
-                            <th>Nama Peserta <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                            <th>Nik <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                            <th>Skema <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                            <th>Kehadiran <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                            <th>Status Penilaian <i class="bi bi-arrow-down-up small text-muted"></i></th>
-                            <th class="text-center">Nilai</th>
-                            <th class="text-center">Aksi</th>
+                            <th class="py-3 text-center" style="width: 5%;">No.</th>
+                            <th class="py-3">NIK / Username</th>
+                            <th class="py-3">Nama</th>
+                            <th class="py-3">Instansi</th>
+                            <th class="py-3">Kelas</th>
+                            <th class="py-3">No. HP</th>
+                            <th class="py-3 text-center">Status</th>
+                            <th class="py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="fw-semibold">Aulia</td>
-                            <td>3201</td>
-                            <td>JWD</td>
-                            <td><span class="badge bg-success">Hadir</span></td>
-                            <td><span class="text-success fw-bold">Kompeten</span></td>
-                            <td class="text-center fw-bold">90</td>
-                            <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="btn btn-primary btn-sm px-3 shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #2b70c9; border-color: #2b70c9;">
-                                        <i class="bi bi-list"></i>
-                                    </button>
-                                    <ul class="dropdown-menu shadow border-0" style="font-size: 0.85rem;">
-                                        <li><a class="dropdown-item py-2" href="{{ route('asesor.daftar-peserta.detail', 1) }}"><i class="bi bi-eye me-2 text-primary"></i> Detail Peserta</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-semibold">Haura</td>
-                            <td>3202</td>
-                            <td>JWD</td>
-                            <td><span class="badge bg-success">Hadir</span></td>
-                            <td><span class="text-muted">Belum Dinilai</span></td>
-                            <td class="text-center">-</td>
-                            <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="btn btn-primary btn-sm px-3 shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #2b70c9; border-color: #2b70c9;">
-                                        <i class="bi bi-list"></i>
-                                    </button>
-                                    <ul class="dropdown-menu shadow border-0" style="font-size: 0.85rem;">
-                                        <li><a class="dropdown-item py-2" href="{{ route('asesor.daftar-peserta.detail', 2) }}"><i class="bi bi-eye me-2 text-primary"></i> Detail Peserta</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-semibold">Jenisa</td>
-                            <td>3203</td>
-                            <td>JP</td>
-                            <td><span class="badge bg-danger">Tidak Hadir</span></td>
-                            <td><span class="text-muted">Belum Dinilai</span></td>
-                            <td class="text-center">-</td>
-                            <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="btn btn-primary btn-sm px-3 shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #2b70c9; border-color: #2b70c9;">
-                                        <i class="bi bi-list"></i>
-                                    </button>
-                                    <ul class="dropdown-menu shadow border-0" style="font-size: 0.85rem;">
-                                        <li><a class="dropdown-item py-2" href="{{ route('asesor.daftar-peserta.detail', 3) }}"><i class="bi bi-eye me-2 text-primary"></i> Detail Peserta</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-semibold">Shela</td>
-                            <td>3204</td>
-                            <td>DBA</td>
-                            <td><span class="badge bg-success">Hadir</span></td>
-                            <td><span class="text-success fw-bold">Kompeten</span></td>
-                            <td class="text-center fw-bold">88</td>
-                            <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="btn btn-primary btn-sm px-3 shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #2b70c9; border-color: #2b70c9;">
-                                        <i class="bi bi-list"></i>
-                                    </button>
-                                    <ul class="dropdown-menu shadow border-0" style="font-size: 0.85rem;">
-                                        <li><a class="dropdown-item py-2" href="{{ route('asesor.daftar-peserta.detail', 4) }}"><i class="bi bi-eye me-2 text-primary"></i> Detail Peserta</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-semibold">Nafis</td>
-                            <td>3205</td>
-                            <td>NA</td>
-                            <td><span class="badge bg-success">Hadir</span></td>
-                            <td><span class="text-danger fw-bold">Belum Kompeten</span></td>
-                            <td class="text-center fw-bold">70</td>
-                            <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="btn btn-primary btn-sm px-3 shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #2b70c9; border-color: #2b70c9;">
-                                        <i class="bi bi-list"></i>
-                                    </button>
-                                    <ul class="dropdown-menu shadow border-0" style="font-size: 0.85rem;">
-                                        <li><a class="dropdown-item py-2" href="{{ route('asesor.daftar-peserta.detail', 5) }}"><i class="bi bi-eye me-2 text-primary"></i> Detail Peserta</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="fw-semibold">Sinta</td>
-                            <td>3206</td>
-                            <td>DM</td>
-                            <td><span class="badge bg-warning text-dark">Terlambat</span></td>
-                            <td><span class="text-muted">Belum Dinilai</span></td>
-                            <td class="text-center">-</td>
-                            <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="btn btn-primary btn-sm px-3 shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #2b70c9; border-color: #2b70c9;">
-                                        <i class="bi bi-list"></i>
-                                    </button>
-                                    <ul class="dropdown-menu shadow border-0" style="font-size: 0.85rem;">
-                                        <li><a class="dropdown-item py-2" href="{{ route('asesor.daftar-peserta.detail', 6) }}"><i class="bi bi-eye me-2 text-primary"></i> Detail Peserta</a></li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
+                        @forelse($pesertas as $key => $peserta)
+                            <tr>
+                                <td class="text-center fw-semibold">{{ $pesertas->firstItem() + $key }}.</td>
+                                <td>{{ $peserta->username ?? $peserta->nik ?? '-' }}</td>
+                                <td class="fw-medium text-dark">{{ $peserta->name ?? '-' }}</td>
+                                <td>{{ $peserta->instansi ?? 'SMK NEGERI 1 GARUT' }}</td>
+                                <td>{{ $peserta->kelas ?? '-' }}</td>
+                                <td>{{ $peserta->no_hp ?? '-' }}</td>
+                                <td class="text-center">
+                                    @php $status = strtolower($peserta->status ?? 'aktif'); @endphp
+                                    @if($status === 'aktif')
+                                        <span class="badge rounded-pill text-white px-3 py-2" style="background-color: #20c997;">Aktif</span>
+                                    @else
+                                        <span class="badge rounded-pill text-white px-3 py-2" style="background-color: #ff4d4d;">Nonaktif</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm text-white rounded-2 shadow-sm border-0 d-inline-flex align-items-center justify-content-center" 
+                                                type="button" 
+                                                id="dropdownMenuButton{{ $peserta->id }}"
+                                                data-bs-toggle="dropdown" 
+                                                aria-expanded="false" 
+                                                style="background-color: #2b70c9; width: 38px; height: 34px;">
+                                            <i class="bi bi-list"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2" aria-labelledby="dropdownMenuButton{{ $peserta->id }}" style="min-width: 160px; z-index: 1050;">
+                                            <li><a class="dropdown-item py-2 small d-flex align-items-center gap-2 text-dark fw-medium" href="{{ route('asesor.daftar-peserta.detail', $peserta->id) }}"><i class="bi bi-eye text-info" style="width: 16px;"></i> Detail Peserta</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                    Data peserta belum tersedia atau tidak ditemukan.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
+            </div>
+            <div class="d-flex justify-content-center mt-4">
+                {{ $pesertas->appends(request()->query())->links('pagination::bootstrap-5') }}
             </div>
 
             <!-- Paginasi di Tengah -->

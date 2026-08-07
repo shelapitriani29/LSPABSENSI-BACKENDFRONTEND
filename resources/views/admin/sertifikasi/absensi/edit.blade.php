@@ -26,34 +26,39 @@
             <h2 class="fw-bold text-dark mb-4 text-center" style="font-size: 1.75rem;">Edit Data Absensi</h2>
 
             <!-- Form Edit Absensi -->
-            <form action="{{ route('admin.sertifikasi.absensi.index') }}" method="GET">
+            <form action="{{ route('admin.sertifikasi.absensi.update', $attendance->id) }}" method="POST">
                 @csrf
+                @method('PUT')
                 
                 <div class="row align-items-center mb-4">
                     <label for="nama" class="col-sm-3 col-form-label fw-bold text-dark fs-6">Nama Peserta :</label>
                     <div class="col-sm-9">
-                        <input type="text" name="nama" id="nama" class="form-control bg-light border-secondary-subtle py-2 px-3" value="Haura" style="border-radius: 8px;">
+                        <input type="text" name="nama" id="nama" class="form-control bg-light border-secondary-subtle py-2 px-3" value="{{ $attendance->user->name ?? '' }}" style="border-radius: 8px;" readonly>
                     </div>
                 </div>
 
                 <div class="row align-items-center mb-4">
                     <label for="jadwal" class="col-sm-3 col-form-label fw-bold text-dark fs-6">Jadwal Uji :</label>
                     <div class="col-sm-9">
-                        <input type="text" name="jadwal" id="jadwal" class="form-control bg-light border-secondary-subtle py-2 px-3" value="JWD-01" style="border-radius: 8px;">
+                        <select name="jadwal_id" id="jadwal" class="form-select bg-light border-secondary-subtle py-2 px-3" style="border-radius: 8px;">
+                            @foreach($jadwals as $jadwal)
+                                <option value="{{ $jadwal->id }}" {{ $attendance->jadwal_id == $jadwal->id ? 'selected' : '' }}>{{ $jadwal->kode_jadwal }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
 
                 <div class="row align-items-center mb-4">
                     <label for="check_in" class="col-sm-3 col-form-label fw-bold text-dark fs-6">Check In :</label>
                     <div class="col-sm-9">
-                        <input type="text" name="check_in" id="check_in" class="form-control bg-light border-secondary-subtle py-2 px-3" value="08.00" style="border-radius: 8px;">
+                        <input type="time" name="check_in" id="check_in" class="form-control bg-light border-secondary-subtle py-2 px-3" value="{{ $attendance->check_in ? \Carbon\Carbon::parse($attendance->check_in)->format('H:i') : '' }}" style="border-radius: 8px;">
                     </div>
                 </div>
 
                 <div class="row align-items-center mb-4">
                     <label for="check_out" class="col-sm-3 col-form-label fw-bold text-dark fs-6">Check Out :</label>
                     <div class="col-sm-9">
-                        <input type="text" name="check_out" id="check_out" class="form-control bg-light border-secondary-subtle py-2 px-3" value="09.00" style="border-radius: 8px;">
+                        <input type="time" name="check_out" id="check_out" class="form-control bg-light border-secondary-subtle py-2 px-3" value="{{ $attendance->check_out ? \Carbon\Carbon::parse($attendance->check_out)->format('H:i') : '' }}" style="border-radius: 8px;">
                     </div>
                 </div>
 
@@ -61,12 +66,12 @@
                     <label for="status" class="col-sm-3 col-form-label fw-bold text-dark fs-6">Status :</label>
                     <div class="col-sm-9">
                         <select name="status" id="status" class="form-select bg-light border-secondary-subtle py-2 px-3" style="border-radius: 8px;">
-                            <option value="Hadir" selected>Hadir</option>
-                            <option value="Tidak Hadir">Tidak Hadir</option>
-                            <option value="Terlambat">Terlambat</option>
-                            <option value="Izin">Izin</option>
-                            <option value="Sakit">Sakit</option>
-                            <option value="Belum Absen">Belum Absen</option>
+                            <option value="Hadir" {{ $attendance->status === 'Hadir' ? 'selected' : '' }}>Hadir</option>
+                            <option value="Tidak Hadir" {{ $attendance->status === 'Tidak Hadir' ? 'selected' : '' }}>Tidak Hadir</option>
+                            <option value="Terlambat" {{ $attendance->status === 'Terlambat' ? 'selected' : '' }}>Terlambat</option>
+                            <option value="Izin" {{ $attendance->status === 'Izin' ? 'selected' : '' }}>Izin</option>
+                            <option value="Sakit" {{ $attendance->status === 'Sakit' ? 'selected' : '' }}>Sakit</option>
+                            <option value="Belum Absen" {{ $attendance->status === 'Belum Absen' ? 'selected' : '' }}>Belum Absen</option>
                         </select>
                     </div>
                 </div>
@@ -74,7 +79,7 @@
                 <div class="row align-items-start mb-4">
                     <label for="catatan" class="col-sm-3 col-form-label fw-bold text-dark fs-6 pt-2">Catatan :</label>
                     <div class="col-sm-9">
-                        <textarea name="catatan" id="catatan" class="form-control bg-light border-secondary-subtle py-2 px-3" rows="3" placeholder="Keterangan atau alasan (opsional)..." style="border-radius: 8px;"></textarea>
+                        <textarea name="keterangan" id="catatan" class="form-control bg-light border-secondary-subtle py-2 px-3" rows="3" placeholder="Keterangan atau alasan (opsional)..." style="border-radius: 8px;">{{ $attendance->keterangan }}</textarea>
                     </div>
                 </div>
 

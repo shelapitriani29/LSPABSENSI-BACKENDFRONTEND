@@ -29,31 +29,31 @@
             <h5 class="fw-bold text-dark mb-4">Detail Jadwal Uji</h5>
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Kode Jadwal</div>
-                <div class="col-sm-9 fw-semibold text-dark">: JWD-001</div>
+                <div class="col-sm-9 fw-semibold text-dark">: {{ $jadwal->kode_jadwal }}</div>
             </div>
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Status</div>
-                <div class="col-sm-9">: <span class="badge bg-warning text-white px-3 py-1 rounded-pill">Akan Datang</span></div>
+                <div class="col-sm-9">: <span class="badge {{ $jadwal->status == 'Akan Mendatang' ? 'bg-warning text-dark' : ($jadwal->status == 'Mulai' ? 'bg-success' : 'bg-secondary') }} text-white px-3 py-1 rounded-pill">{{ $jadwal->status }}</span></div>
             </div>
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Skema Sertifikasi</div>
-                <div class="col-sm-9 fw-semibold text-dark">: Junior Web Developer</div>
+                <div class="col-sm-9 fw-semibold text-dark">: {{ $jadwal->skema->nama_skema ?? '-' }}</div>
             </div>
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Kelas & Peserta</div>
-                <div class="col-sm-9">: XI RPL 1 (36 Peserta)</div>
+                <div class="col-sm-9">: {{ $jadwal->kelas }} ({{ $pesertas->count() }} Peserta)</div>
             </div>
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Asesor Penguji</div>
-                <div class="col-sm-9">: Budi Santoso</div>
+                <div class="col-sm-9">: {{ $jadwal->asesor->name ?? '-' }}</div>
             </div>
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Tanggal & Waktu</div>
-                <div class="col-sm-9">: 30 Juli 2026 (08:00 - 12:00 WIB)</div>
+                <div class="col-sm-9">: {{ \Carbon\Carbon::parse($jadwal->tanggal)->translatedFormat('j F Y') }} ({{ \Carbon\Carbon::parse($jadwal->jam_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($jadwal->jam_selesai)->format('H:i') }} WIB)</div>
             </div>
             <div class="row mb-0">
                 <div class="col-sm-3 text-muted small">Lokasi</div>
-                <div class="col-sm-9">: Lab Komputer 1</div>
+                <div class="col-sm-9">: {{ $jadwal->lokasi }}</div>
             </div>
         </div>
     </div>
@@ -73,24 +73,18 @@
                         </tr>
                     </thead>
                     <tbody class="small">
+                        @forelse($pesertas as $index => $peserta)
                         <tr>
-                            <td class="px-3">1.</td>
-                            <td class="fw-bold text-dark">Jenisa Nurfadillah</td>
-                            <td>123456789</td>
+                            <td class="px-3">{{ $index + 1 }}.</td>
+                            <td class="fw-bold text-dark">{{ $peserta->name }}</td>
+                            <td>{{ $peserta->nisn ?? '-' }}</td>
                             <td class="text-center"><span class="badge bg-light text-secondary border px-2 py-1">-</span></td>
                         </tr>
+                        @empty
                         <tr>
-                            <td class="px-3">2.</td>
-                            <td class="fw-bold text-dark">Aulia</td>
-                            <td>123456790</td>
-                            <td class="text-center"><span class="badge bg-light text-secondary border px-2 py-1">-</span></td>
+                            <td colspan="4" class="text-center py-4 text-muted">Belum ada peserta untuk kelas ini.</td>
                         </tr>
-                        <tr>
-                            <td class="px-3">3.</td>
-                            <td class="fw-bold text-dark">Siti</td>
-                            <td>123456791</td>
-                            <td class="text-center"><span class="badge bg-light text-secondary border px-2 py-1">-</span></td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

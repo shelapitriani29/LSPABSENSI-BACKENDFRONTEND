@@ -32,39 +32,38 @@
         <div class="col-lg-8 mb-4">
             <div class="card border-0 shadow-sm rounded-3 h-100">
                 <div class="card-body p-4">
-                    <!-- Judul di dalam kartu sudah dihapus sesuai permintaan -->
                     <div class="row g-3">
                         <div class="col-md-6">
                             <p class="text-muted mb-1 small fw-semibold">SKEMA</p>
-                            <h5 class="fw-bold text-dark">Network Administrator (NA)</h5>
+                            <h5 class="fw-bold text-dark">{{ optional($jadwal->skema)->nama_skema ?? '-' }}</h5>
                         </div>
                         <div class="col-md-6">
                             <p class="text-muted mb-1 small fw-semibold">KELAS</p>
-                            <h5 class="fw-bold text-dark">XI RPL 1</h5>
+                            <h5 class="fw-bold text-dark">{{ $jadwal->kelas ?? '-' }}</h5>
                         </div>
                         <div class="col-md-6">
                             <p class="text-muted mb-1 small fw-semibold">ASESOR</p>
-                            <p class="text-dark mb-0 fw-semibold">Budi Santoso</p>
+                            <p class="text-dark mb-0 fw-semibold">{{ optional($jadwal->asesor)->name ?? '-' }}</p>
                         </div>
                         <div class="col-md-6">
                             <p class="text-muted mb-1 small fw-semibold">STATUS JADWAL</p>
-                            <p class="mb-0"><span class="badge bg-success">Aktif</span></p>
+                            <p class="mb-0"><span class="badge {{ $jadwal->status == 'Mulai' ? 'bg-success' : ($jadwal->status == 'Akan Mendatang' ? 'bg-warning text-dark' : 'bg-secondary text-white') }}">{{ $jadwal->status ?? 'Tidak diketahui' }}</span></p>
                         </div>
                         <div class="col-md-6">
                             <p class="text-muted mb-1 small fw-semibold">TANGGAL</p>
-                            <p class="text-dark mb-0">27 Juli 2026</p>
+                            <p class="text-dark mb-0">{{ $jadwal->tanggal ? \Carbon\Carbon::parse($jadwal->tanggal)->translatedFormat('d F Y') : '-' }}</p>
                         </div>
                         <div class="col-md-6">
                             <p class="text-muted mb-1 small fw-semibold">JAM</p>
-                            <p class="text-dark mb-0">09.00 - 11.00</p>
+                            <p class="text-dark mb-0">{{ $jadwal->jam_mulai ?? '-' }} - {{ $jadwal->jam_selesai ?? '-' }}</p>
                         </div>
                         <div class="col-md-6">
                             <p class="text-muted mb-1 small fw-semibold">LOKASI</p>
-                            <p class="text-dark mb-0">Lab Komputer 3</p>
+                            <p class="text-dark mb-0">{{ $jadwal->lokasi ?? '-' }}</p>
                         </div>
                         <div class="col-md-6">
                             <p class="text-muted mb-1 small fw-semibold">JUMLAH PESERTA</p>
-                            <p class="text-dark mb-0 fw-semibold">28 Orang</p>
+                            <p class="text-dark mb-0 fw-semibold">{{ $pesertaCount }} Orang</p>
                         </div>
                     </div>
                 </div>
@@ -80,20 +79,20 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between small mb-1">
                             <span class="text-muted">Verifikasi Kehadiran</span>
-                            <span class="fw-bold text-success">✅ 25 / 28</span>
+                            <span class="fw-bold text-success">✅ {{ $hadirCount }} / {{ $pesertaCount }}</span>
                         </div>
                         <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 89%;"></div>
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ $pesertaCount ? round($hadirCount / $pesertaCount * 100) : 0 }}%;"></div>
                         </div>
                     </div>
 
                     <div>
                         <div class="d-flex justify-content-between small mb-1">
                             <span class="text-muted">Input Penilaian</span>
-                            <span class="fw-bold text-warning">🟡 12 / 28</span>
+                            <span class="fw-bold text-warning">🟡 {{ $penilaianCount }} / {{ $pesertaCount }}</span>
                         </div>
                         <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 42%;"></div>
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ $pesertaCount ? round($penilaianCount / $pesertaCount * 100) : 0 }}%;"></div>
                         </div>
                     </div>
                 </div>
@@ -106,17 +105,25 @@
         <div class="card-body p-4">
             <h6 class="fw-bold text-dark mb-3">Aksi Asesor</h6>
             <div class="d-flex flex-wrap gap-2">
-                <a href="#" class="btn btn-outline-dark">
+                <a href="{{ route('asesor.daftar-peserta') }}" class="btn btn-outline-dark">
                     <i class="bi bi-file-earmark-text me-1"></i> Daftar Peserta
                 </a>
-                
-                <a href="{{ route('asesor.verifikasi-kehadiran', ['id' => 'SK003']) }}" class="btn btn-success">
-                    <i class="bi bi-people me-1"></i> Verifikasi Kehadiran
-                </a>
 
-                <a href="{{ route('asesor.input-penilaian.index', ['id' => 'SK003']) }}" class="btn btn-primary" style="background-color: #2b70c9; border-color: #2b70c9;">
+                @php
+                    $canInputPenilaian = $hadirCount > 0;
+                @endphp
+                <a href="{{ $canInputPenilaian ? route('asesor.input-penilaian.index', ['jadwal_id' => $jadwal->id]) : 'javascript:void(0)' }}"
+                   class="btn {{ $canInputPenilaian ? 'btn-primary' : 'btn-secondary disabled' }}"
+                   style="{{ $canInputPenilaian ? 'background-color: #2b70c9; border-color: #2b70c9;' : '' }}"
+                   role="button"
+                   aria-disabled="{{ $canInputPenilaian ? 'false' : 'true' }}">
                     <i class="bi bi-pencil-square me-1"></i> Input Penilaian
                 </a>
+                @unless($canInputPenilaian)
+                    <div class="text-muted small mt-2">
+                        Input Penilaian akan aktif setelah setidaknya satu peserta hadir menggunakan QR Code.
+                    </div>
+                @endunless
             </div>
         </div>
     </div>

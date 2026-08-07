@@ -31,9 +31,9 @@
                         <small class="fw-bold">LSP P1</small>
                     </div>
                 </div>
-                <h1 class="display-4 fw-bold mb-1">125</h1>
+                <h1 class="display-4 fw-bold mb-1">{{ $totalPeserta }}</h1>
                 <p class="mb-0 text-white-50" style="font-size: 0.85rem;">
-                    <span class="badge bg-white text-primary fw-bold me-1">+12%</span> dibanding bulan lalu
+                    Total peserta terdaftar
                 </p>
             </div>
         </div>
@@ -54,9 +54,9 @@
                         <small class="fw-bold">Aktif</small>
                     </div>
                 </div>
-                <h1 class="display-4 fw-bold mb-1">15</h1>
+                <h1 class="display-4 fw-bold mb-1">{{ $totalAsesor }}</h1>
                 <p class="mb-0 text-white-50" style="font-size: 0.85rem;">
-                    <span class="badge bg-white text-danger fw-bold me-1">100%</span> Asesor Terkompetensi
+                    Asesor aktif terdaftar
                 </p>
             </div>
         </div>
@@ -77,7 +77,7 @@
                         <small class="fw-bold">BNSP</small>
                     </div>
                 </div>
-                <h1 class="display-4 fw-bold mb-1">8</h1>
+                <h1 class="display-4 fw-bold mb-1">{{ $totalSkema }}</h1>
                 <p class="mb-0 text-white-50" style="font-size: 0.85rem;">
                     <span class="badge bg-white text-success fw-bold me-1">Tersedia</span> Skema Keahlian
                 </p>
@@ -100,9 +100,9 @@
                         <small class="fw-bold">Terbit</small>
                     </div>
                 </div>
-                <h1 class="display-4 fw-bold mb-1">98</h1>
+                <h1 class="display-4 fw-bold mb-1">{{ $totalSertifikat }}</h1>
                 <p class="mb-0 text-white-50" style="font-size: 0.85rem;">
-                    <span class="badge bg-white text-warning fw-bold me-1">78%</span> Tingkat Kelulusan
+                    Sertifikat diterbitkan
                 </p>
             </div>
         </div>
@@ -139,82 +139,31 @@
         </div>
     </div>
 
-    <!-- 3. Row Jadwal Hari Ini & Aktivitas Terbaru -->
-    <div class="row g-4">
-        <!-- Jadwal Hari Ini -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px;">
-                <table class="table table-borderless align-middle mb-0">
-                    <thead class="table-light">
-                        <tr class="text-center text-muted">
-                            <th style="width: 25%;">Jam</th>
-                            <th>Jadwal Hari Ini</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-bottom">
-                            <td class="text-center fw-bold py-3 bg-light">08.00</td>
-                            <td class="ps-3 bg-light">Skema Web Developer</td>
-                        </tr>
-                        <tr class="border-bottom">
-                            <td class="text-center fw-bold py-3 bg-light">10.00</td>
-                            <td class="ps-3 bg-light">Skema Network Engineer</td>
-                        </tr>
-                        <tr>
-                            <td class="text-center fw-bold py-3 bg-light">13.00</td>
-                            <td class="ps-3 bg-light">Skema UI/UX Designer</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Aktivitas Terbaru -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 12px;">
-                <table class="table table-borderless align-middle mb-0">
-                    <thead class="table-light">
-                        <tr class="text-center text-muted">
-                            <th>Aktivitas Terbaru</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-bottom">
-                            <td class="py-3 bg-light ps-3">Budi melakukan absensi</td>
-                        </tr>
-                        <tr class="border-bottom">
-                            <td class="py-3 bg-light ps-3">Admin menambahkan jadwal</td>
-                        </tr>
-                        <tr>
-                            <td class="py-3 bg-light ps-3">Asesor menginput penilaian</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Script Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        const persentaseLulus = {{ $persentaseLulus }};
+        const persentaseTidakLulus = {{ $persentaseTidakLulus }};
+
         // 1. Bar Chart Sertifikasi
         const ctxBar = document.getElementById('barChartSertifikasi').getContext('2d');
         new Chart(ctxBar, {
             type: 'bar',
             data: {
-                labels: ['2023', '2024', '2025', '2026'],
+                labels: @json($grafikSertifikasi['labels']),
                 datasets: [
                     {
                         label: 'Lulus',
-                        data: [100, 90, 100, 85],
+                        data: @json($grafikSertifikasi['lulus']),
                         backgroundColor: '#20C997',
                         borderRadius: 4
                     },
                     {
                         label: 'Tidak Lulus',
-                        data: [25, 40, 10, 15],
+                        data: @json($grafikSertifikasi['tidak_lulus']),
                         backgroundColor: '#FF4D4D',
                         borderRadius: 4
                     }
@@ -234,13 +183,13 @@
             }
         });
 
-        // 2. Doughnut Chart Lulus (80%)
+        // 2. Doughnut Chart Lulus
         const ctxLulus = document.getElementById('doughnutLulus').getContext('2d');
         new Chart(ctxLulus, {
             type: 'doughnut',
             data: {
                 datasets: [{
-                    data: [80, 20],
+                    data: [persentaseLulus, persentaseTidakLulus],
                     backgroundColor: ['#20C997', '#E9ECEF'],
                     borderWidth: 0
                 }]
@@ -259,7 +208,7 @@
                     ctx.font = "bold 16px sans-serif";
                     ctx.textBaseline = "middle";
                     ctx.fillStyle = "#20C997";
-                    var text = "80%",
+                    var text = persentaseLulus + "%",
                         textX = Math.round((width - ctx.measureText(text).width) / 2),
                         textY = height / 2;
                     ctx.fillText(text, textX, textY);
@@ -268,13 +217,13 @@
             }]
         });
 
-        // 3. Doughnut Chart Tidak Lulus (20%)
+        // 3. Doughnut Chart Tidak Lulus
         const ctxTidakLulus = document.getElementById('doughnutTidakLulus').getContext('2d');
         new Chart(ctxTidakLulus, {
             type: 'doughnut',
             data: {
                 datasets: [{
-                    data: [20, 80],
+                    data: [persentaseTidakLulus, persentaseLulus],
                     backgroundColor: ['#FF4D4D', '#E9ECEF'],
                     borderWidth: 0
                 }]
@@ -292,8 +241,8 @@
                     ctx.restore();
                     ctx.font = "bold 16px sans-serif";
                     ctx.textBaseline = "middle";
-                    ctx.fillStyle = "#333";
-                    var text = "20%",
+                    ctx.fillStyle = "#FF4D4D";
+                    var text = persentaseTidakLulus + "%",
                         textX = Math.round((width - ctx.measureText(text).width) / 2),
                         textY = height / 2;
                     ctx.fillText(text, textX, textY);

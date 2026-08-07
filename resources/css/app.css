@@ -1,2 +1,36 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import 'bootstrap-icons/font/bootstrap-icons.css';
+
+/* Override success/green color site-wide to match design */
+:root {
+	--brand-success: #10b981; /* darker green per user request */
+}
+
+.text-success {
+	color: var(--brand-success) !important;
+}
+
+.bg-success {
+	background-color: var(--brand-success) !important;
+}
+
+.badge-success, .bg-success-subtle {
+	background-color: var(--brand-success) !important;
+	color: #ffffff !important;
+}
+
+.btn-success {
+	background-color: var(--brand-success) !important;
+	border-color: var(--brand-success) !important;
+}
+
+.rounded-pill.bg-success, .badge.rounded-pill.bg-success {
+	background-color: var(--brand-success) !important;
+	color: #fff !important;
+}
+
+/* PDF export templates may use .badge-success without bootstrap loaded */
+.badge-success {
+	background: var(--brand-success) !important;
+	color: #fff !important;
+}

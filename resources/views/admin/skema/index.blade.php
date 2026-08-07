@@ -7,7 +7,7 @@
         <h3 class="fw-bold text-dark mb-1">Data Skema Sertifikasi</h3>
         <p class="text-secondary mb-1" style="font-size: 0.9rem;">LSP P1 – SMK NEGERI 1 GARUT</p>
         <div class="text-secondary" style="font-size: 0.85rem;">
-            Dashboard / Referensi / <span class="text-dark">Data Skema Sertifikasi</span>
+            Dashboard / <span class="text-dark">Data Skema Sertifikasi</span>
         </div>
     </div>
 
@@ -33,19 +33,51 @@
 
             <!-- Bagian Atas Tabel: Show Entries di Kiri, Search di Kanan (Sejajar) -->
             <div class="row align-items-center mb-3 g-2">
+                <!-- Dropdown Show Entries Dinamis -->
                 <div class="col-12 col-md-6 d-flex align-items-center" style="font-size: 0.9rem;">
                     show 
-                    <select class="form-select form-select-sm mx-2" style="width: 70px;">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select> 
+                    <form action="{{ route('admin.skema.index') }}" method="GET" id="perPageForm" class="d-inline-block mx-2">
+                        <!-- Pertahankan query search jika sedang ada pencarian -->
+                        @if(request('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                        @endif
+                        
+                        <select name="per_page" class="form-select form-select-sm" style="width: 75px;" onchange="document.getElementById('perPageForm').submit();">
+                            <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                        </select>
+                    </form> 
                     entries
                 </div>
-                <!-- Input Search di sebelah kanan sejajar dengan show entries -->
-                <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center gap-2">
-                    <label for="searchInput" class="small text-secondary mb-0">Search:</label>
-                    <input type="text" id="searchInput" class="form-control form-control-sm" style="max-width: 200px;" placeholder="">
+
+                <!-- Input Search di sebelah kanan -->
+                <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center">
+                    <form action="{{ route('admin.skema.index') }}" method="GET" class="d-flex align-items-center gap-2">
+                        <!-- Pertahankan limit per_page saat melakukan submit pencarian -->
+                        @if(request('per_page'))
+                            <input type="hidden" name="per_page" value="{{ request('per_page') }}">
+                        @endif
+
+                        <label for="searchInput" class="small text-secondary mb-0">Search:</label>
+                        <div class="input-group input-group-sm" style="max-width: 250px;">
+                            <input type="text" 
+                                   name="search" 
+                                   id="searchInput" 
+                                   class="form-control form-control-sm" 
+                                   placeholder="Cari nama, kode, status..." 
+                                   value="{{ request('search') }}">
+                            <button class="btn btn-outline-secondary" type="submit" title="Cari">
+                                <i class="bi bi-search"></i>
+                            </button>
+                            @if(request('search'))
+                                <a href="{{ route('admin.skema.index', request()->only('per_page')) }}" class="btn btn-outline-danger" title="Reset Pencarian">
+                                    <i class="bi bi-x-lg"></i>
+                                </a>
+                            @endif
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -64,49 +96,21 @@
                         </tr>
                     </thead>
                     <tbody style="font-size: 0.9rem;">
-                        @php
-                            $dummySkemas = [
-                                (object)[
-                                    'id' => 1, 
-                                    'nama' => 'Junior Web Developer', 
-                                    'kode' => 'JWD', 
-                                    'kelas' => 'XI RPL 1', 
-                                    'peserta' => '36 Peserta', 
-                                    'status' => 'Aktif'
-                                ],
-                                (object)[
-                                    'id' => 2, 
-                                    'nama' => 'Junior Programmer', 
-                                    'kode' => 'JP', 
-                                    'kelas' => 'XI RPL 2', 
-                                    'peserta' => '34 Peserta', 
-                                    'status' => 'Aktif'
-                                ],
-                                (object)[
-                                    'id' => 3, 
-                                    'nama' => 'UI/UX Designer', 
-                                    'kode' => 'UXD', 
-                                    'kelas' => 'XI RPL 3', 
-                                    'peserta' => '32 Peserta', 
-                                    'status' => 'Nonaktif'
-                                ],
-                            ];
-                        @endphp
-
-                        @foreach($dummySkemas as $key => $skema)
+                        {{-- MENGGUNAKAN VARIABLE $skemas DARI CONTROLLER --}}
+                        @forelse($skemas as $key => $skema)
                         <tr>
-                            <td class="text-center fw-semibold text-secondary">{{ $key + 1 }}.</td>
+                            <td class="text-center fw-semibold text-secondary">{{ $skemas->firstItem() + $key }}.</td>
                             <td>
-                                <span class="fw-bold text-dark d-block">{{ $skema->nama }}</span>
+                                <span class="fw-bold text-dark d-block">{{ $skema->nama_skema }}</span>
                             </td>
                             <td>
-                                <span class="badge bg-light text-dark border">{{ $skema->kode }}</span>
+                                <span class="badge bg-light text-dark border">{{ $skema->kode_skema }}</span>
                             </td>
                             <td>
-                                <span class="text-dark">{{ $skema->kelas }}</span>
+                                <span class="text-dark">{{ $skema->kelas ?? '-' }}</span>
                             </td>
                             <td>
-                                <span class="text-secondary">{{ $skema->peserta }}</span>
+                                <span class="text-secondary">{{ $skema->pesertas_count }} Peserta</span>
                             </td>
                             <td class="text-center">
                                 @if($skema->status == 'Aktif')
@@ -141,26 +145,24 @@
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                @if(request('search'))
+                                    Data skema dengan kata kunci "<strong>{{ request('search') }}</strong>" tidak ditemukan.
+                                @else
+                                    Belum ada data skema sertifikasi.
+                                @endif
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
 
-            <!-- Footer Tabel: Pagination di Tengah -->
+            <!-- Footer Tabel: Pagination Dinamis bawaan Laravel -->
             <div class="d-flex justify-content-center pt-2">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item disabled">
-                            <span class="page-link">Previous</span>
-                        </li>
-                        <li class="page-item active" aria-current="page">
-                            <span class="page-link" style="background-color: #1b6ca8; border-color: #1b6ca8;">1</span>
-                        </li>
-                        <li class="page-item disabled">
-                            <span class="page-link">Next</span>
-                        </li>
-                    </ul>
-                </nav>
+                {{ $skemas->links('pagination::bootstrap-5') }}
             </div>
 
         </div>

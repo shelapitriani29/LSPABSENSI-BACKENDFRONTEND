@@ -102,13 +102,25 @@
     <div class="sidebar d-flex flex-column pb-4 pt-3">
         
         <!-- User Profile Section -->
+        @php
+            $sidebarUser = auth()->user();
+            $sidebarInitials = collect(explode(' ', trim($sidebarUser->name ?? '')))
+                ->filter()
+                ->map(fn($part) => strtoupper(substr($part, 0, 1)))
+                ->take(2)
+                ->implode('');
+        @endphp
         <div class="px-3 py-2 mb-2 d-flex align-items-center">
-            <div class="bg-white text-secondary rounded-circle me-3 shadow-sm flex-shrink-0 d-flex align-items-center justify-content-center fw-bold" style="width: 42px; height: 42px; font-size: 0.95rem;">
-                SP
+            <div class="bg-white text-secondary rounded-circle me-3 shadow-sm flex-shrink-0 d-flex align-items-center justify-content-center fw-bold" style="width: 42px; height: 42px; font-size: 0.95rem; overflow: hidden;">
+                @if($sidebarUser && $sidebarUser->foto)
+                    <img src="{{ asset('storage/' . $sidebarUser->foto) }}" alt="Foto Profil" class="rounded-circle" style="width: 42px; height: 42px; object-fit: cover;">
+                @else
+                    {{ $sidebarInitials ?: 'U' }}
+                @endif
             </div>
             <div class="overflow-hidden">
-                <h6 class="fw-bold mb-0 text-white text-truncate" style="font-size: 0.9rem;">Shela Pitriani</h6>
-                <small class="text-white-50 text-truncate d-block" style="font-size: 0.75rem;">Peserta Uji</small>
+                <h6 class="fw-bold mb-0 text-white text-truncate" style="font-size: 0.9rem;">{{ $sidebarUser->name ?? 'Pengguna' }}</h6>
+                <small class="text-white-50 text-truncate d-block" style="font-size: 0.75rem;">{{ ucfirst($sidebarUser->role ?? 'peserta') }}</small>
             </div>
         </div>
 
@@ -159,7 +171,7 @@
 
         <!-- Logout Section -->
         <div class="px-3 mt-3">
-            <form action="{{ route('login') }}" method="GET">
+            <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="btn w-100 text-danger border-0 d-flex align-items-center fw-semibold text-start px-3 py-2" style="background-color: rgba(255,255,255,0.1); border-radius: 6px;">
                     <i class="bi bi-box-arrow-right me-2 fs-6 text-danger"></i> Logout

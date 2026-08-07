@@ -31,22 +31,24 @@
                 </a>
             </div>
 
-            <!-- Baris Bawah: Show Entries di Kiri & Search di Kanan -->
-            <div class="row align-items-center mb-3 g-2">
-                <div class="col-12 col-md-6 d-flex align-items-center" style="font-size: 0.9rem;">
-                    show 
-                    <select class="form-select form-select-sm mx-2" style="width: 70px;">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select> 
-                    entries
+            <!-- Baris Bawah: Form Search & Per Page Filter -->
+            <form action="{{ route('admin.user.index') }}" method="GET">
+                <div class="row align-items-center mb-3 g-2">
+                    <div class="col-12 col-md-6 d-flex align-items-center" style="font-size: 0.9rem;">
+                        show 
+                        <select name="per_page" class="form-select form-select-sm mx-2" style="width: 70px;" onchange="this.form.submit()">
+                            <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                        </select> 
+                        entries
+                    </div>
+                    <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center gap-2">
+                        <label for="searchInput" class="small text-secondary mb-0">Search:</label>
+                        <input type="text" name="search" id="searchInput" class="form-control form-control-sm" style="max-width: 180px;" value="{{ request('search') }}" placeholder="Cari user..." onchange="this.form.submit()">
+                    </div>
                 </div>
-                <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center gap-2">
-                    <label for="searchInput" class="small text-secondary mb-0">Search:</label>
-                    <input type="text" id="searchInput" class="form-control form-control-sm" style="max-width: 180px;" placeholder="">
-                </div>
-            </div>
+            </form>
 
             <!-- Tabel dengan Garis Pembatas (Bordered) -->
             <div class="table-responsive">
@@ -62,22 +64,20 @@
                         </tr>
                     </thead>
                     <tbody style="font-size: 0.9rem;">
-                        @php
-                            $dummyUsers = [
-                                (object)['id' => 1, 'nama' => 'Jenisa', 'username' => '2310012345', 'role' => 'Peserta', 'status' => 'Aktif'],
-                                (object)['id' => 2, 'nama' => 'Pak Budi', 'username' => '19871234', 'role' => 'Asesor', 'status' => 'Aktif'],
-                                (object)['id' => 3, 'nama' => 'Admin', 'username' => 'admin', 'role' => 'Admin', 'status' => 'Nonaktif'],
-                            ];
-                        @endphp
-
-                        @foreach($dummyUsers as $key => $user)
+                        @forelse($users as $key => $user)
                         <tr>
-                            <td class="text-center fw-semibold text-secondary">{{ $key + 1 }}.</td>
-                            <td><span class="fw-bold text-dark">{{ $user->nama }}</span></td>
+                            <td class="text-center fw-semibold text-secondary">
+                                {{ method_exists($users, 'firstItem') ? $users->firstItem() + $key : $key + 1 }}.
+                            </td>
+                            <td><span class="fw-bold text-dark">{{ $user->name }}</span></td>
                             <td><span class="text-dark">{{ $user->username }}</span></td>
-                            <td><span class="text-secondary">{{ $user->role }}</span></td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    {{ ucfirst($user->role) }}
+                                </span>
+                            </td>
                             <td class="text-center">
-                                @if($user->status == 'Aktif')
+                                @if(!isset($user->status) || $user->status == 'Aktif' || $user->status == 1)
                                     <span class="badge rounded-pill bg-success px-3 py-1 text-white" style="font-size: 0.75rem;">Aktif</span>
                                 @else
                                     <span class="badge rounded-pill bg-danger px-3 py-1 text-white" style="font-size: 0.75rem;">Nonaktif</span>
@@ -99,7 +99,7 @@
                                             <form action="{{ route('admin.user.destroy', $user->id) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="dropdown-item py-2 text-danger border-0 bg-transparent w-100 text-start" onclick="return confirm('Yakin ingin menghapus user ini?')">
+                                                <button type="submit" class="dropdown-item py-2 text-danger border-0 bg-transparent w-100 text-start" onclick="return confirm('Apakah Anda yakin ingin menghapus user {{ $user->name }}?')">
                                                     <i class="bi bi-trash me-2"></i> Hapus
                                                 </button>
                                             </form>
@@ -108,20 +108,23 @@
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                Belum ada data user di database.
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
 
-            <!-- Footer Tabel: Pagination di Tengah -->
+            <!-- Footer Tabel: Pagination -->
             <div class="d-flex justify-content-center pt-2">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item disabled"><span class="page-link">Previous</span></li>
-                        <li class="page-item active" aria-current="page"><span class="page-link" style="background-color: #1b6ca8; border-color: #1b6ca8;">1</span></li>
-                        <li class="page-item disabled"><span class="page-link">Next</span></li>
-                    </ul>
-                </nav>
+                @if(method_exists($users, 'links'))
+                    {{ $users->appends(request()->query())->links() }}
+                @endif
             </div>
 
         </div>

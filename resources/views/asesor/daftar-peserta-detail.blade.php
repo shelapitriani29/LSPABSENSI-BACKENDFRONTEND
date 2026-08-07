@@ -33,33 +33,40 @@
             <h6 class="mb-0 fw-bold"><i class="bi bi-person-badge me-1"></i> INFORMASI DETAIL PESERTA</h6>
         </div>
         <div class="card-body p-4">
+            @php
+                $gender = $peserta->jenis_kelamin;
+                $genderText = $gender === 'L' || strtolower($gender) === 'laki-laki' ? 'Laki-laki' : ($gender === 'P' || strtolower($gender) === 'perempuan' ? 'Perempuan' : ($gender ?? '-'));
+                $attendanceStatus = $lastAbsensi->status ?? 'Belum Hadir';
+                $assessmentStatus = $penilaian ? ($penilaian->hasil ?? 'Sudah Dinilai') : 'Belum Dinilai';
+            @endphp
+
             <div class="row mb-3">
                 <div class="col-md-3 fw-semibold text-muted">Nama</div>
-                <div class="col-md-9 text-dark fw-bold">: Jenisa</div>
+                <div class="col-md-9 text-dark fw-bold">: {{ $peserta->name ?? '-' }}</div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-3 fw-semibold text-muted">NISN / NIK</div>
-                <div class="col-md-9 text-dark">: 23100001</div>
+                <div class="col-md-9 text-dark">: {{ $peserta->nik ?? $peserta->username ?? '-' }}</div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-3 fw-semibold text-muted">Jenis Kelamin</div>
-                <div class="col-md-9 text-dark">: Perempuan</div>
+                <div class="col-md-9 text-dark">: {{ $genderText }}</div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-3 fw-semibold text-muted">Kelas</div>
-                <div class="col-md-9 text-dark">: XI RPL 1</div>
+                <div class="col-md-9 text-dark">: {{ $peserta->kelas ?? '-' }}</div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-3 fw-semibold text-muted">Skema</div>
-                <div class="col-md-9 text-dark">: Junior Web Developer</div>
+                <div class="col-md-9 text-dark">: {{ $peserta->skema_kompetensi ?? '-' }}</div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-3 fw-semibold text-muted">Status Kehadiran</div>
-                <div class="col-md-9">: <span class="badge bg-success">Hadir</span></div>
+                <div class="col-md-9">: <span class="badge {{ $attendanceStatus === 'Hadir' ? 'bg-success' : ($attendanceStatus === 'Terlambat' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ $attendanceStatus }}</span></div>
             </div>
             <div class="row mb-0">
                 <div class="col-md-3 fw-semibold text-muted">Status Penilaian</div>
-                <div class="col-md-9 text-success fw-bold">: Sudah Dinilai</div>
+                <div class="col-md-9 {{ $assessmentStatus === 'Belum Dinilai' ? 'text-muted' : 'text-success fw-bold' }}">: {{ $assessmentStatus }}</div>
             </div>
         </div>
     </div>

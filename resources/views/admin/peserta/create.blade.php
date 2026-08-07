@@ -22,42 +22,70 @@
     <div class="card border border-2 p-4 bg-white mx-auto" style="border-color: #d1d5db !important; border-radius: 4px; max-width: 800px;">
         <h4 class="fw-bold mb-4 text-center text-dark">Tambah Peserta</h4>
         
-        <form action="{{ route('admin.peserta.index') }}" method="GET">
+        <form action="{{ route('admin.peserta.store') }}" method="POST">
+            @csrf
             <div class="row mb-3 align-items-center">
-                <label class="col-sm-3 col-form-label fw-bold text-dark">NIK :</label>
+                <label class="col-sm-3 col-form-label fw-bold text-dark">Username *</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control border-secondary" placeholder="Masukkan NIK . . ." required>
+                    <input type="text" name="username" class="form-control border-secondary" placeholder="Username unik" value="{{ old('username') }}" required>
                 </div>
             </div>
 
             <div class="row mb-3 align-items-center">
-                <label class="col-sm-3 col-form-label fw-bold text-dark">Nama :</label>
+                <label class="col-sm-3 col-form-label fw-bold text-dark">Email *</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control border-secondary" placeholder="Masukkan Nama . . ." required>
+                    <input type="email" name="email" class="form-control border-secondary" placeholder="email@domain.com" value="{{ old('email') }}" required>
                 </div>
             </div>
 
             <div class="row mb-3 align-items-center">
-                <label class="col-sm-3 col-form-label fw-bold text-dark">Instansi :</label>
+                <label class="col-sm-3 col-form-label fw-bold text-dark">Password *</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control border-secondary" placeholder="Masukkan Instansi . . ." required>
+                    <input type="password" name="password" class="form-control border-secondary" placeholder="Min. 6 karakter" required>
                 </div>
             </div>
 
             <div class="row mb-3 align-items-center">
-                <label class="col-sm-3 col-form-label fw-bold text-dark">No Ponsel :</label>
+                <label class="col-sm-3 col-form-label fw-bold text-dark">Nama *</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control border-secondary" placeholder="Masukkan nomor ponsel . . ." required>
+                    <input type="text" name="name" class="form-control border-secondary" placeholder="Masukkan Nama . . ." value="{{ old('name') }}" required>
+                </div>
+            </div>
+
+            <div class="row mb-3 align-items-center">
+                <label class="col-sm-3 col-form-label fw-bold text-dark">Instansi</label>
+                <div class="col-sm-9">
+                    <input type="text" name="instansi" class="form-control border-secondary" placeholder="Masukkan Instansi . . ." value="{{ old('instansi') }}">
+                </div>
+            </div>
+
+            <div class="row mb-3 align-items-center">
+                <label class="col-sm-3 col-form-label fw-bold text-dark">No Ponsel</label>
+                <div class="col-sm-9">
+                    <input type="text" name="no_hp" class="form-control border-secondary" placeholder="Masukkan nomor ponsel . . ." value="{{ old('no_hp') }}">
+                </div>
+            </div>
+
+            <div class="row mb-3 align-items-center">
+                <label class="col-sm-3 col-form-label fw-bold text-dark">Kelas</label>
+                <div class="col-sm-9">
+                    <input type="text" name="kelas" class="form-control border-secondary" placeholder="Masukkan Kelas . . ." value="{{ old('kelas') }}">
+                </div>
+            </div>
+
+            <div class="row mb-3 align-items-center">
+                <label class="col-sm-3 col-form-label fw-bold text-dark">Jurusan</label>
+                <div class="col-sm-9">
+                    <input type="text" name="jurusan" class="form-control border-secondary" placeholder="Masukkan Jurusan . . ." value="{{ old('jurusan') }}">
                 </div>
             </div>
 
             <div class="row mb-4 align-items-center">
-                <label class="col-sm-3 col-form-label fw-bold text-dark">Status :</label>
+                <label class="col-sm-3 col-form-label fw-bold text-dark">Status</label>
                 <div class="col-sm-9">
-                    <select class="form-select border-secondary" required>
-                        <option value="" selected disabled>Pilih Opsi</option>
-                        <option value="Aktif">Aktif</option>
-                        <option value="Nonaktif">Nonaktif</option>
+                    <select name="status" class="form-select border-secondary" required>
+                        <option value="Aktif" {{ old('status', 'Aktif') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                        <option value="Nonaktif" {{ old('status') == 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
                     </select>
                 </div>
             </div>

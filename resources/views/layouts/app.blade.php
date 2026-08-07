@@ -127,7 +127,9 @@
         <ul class="nav flex-column mb-auto">
             
             <!-- Dropdown Referensi -->
-            @php $isReferensi = request()->routeIs('admin.user.*') || request()->routeIs('admin.peserta.*') || request()->routeIs('admin.asesor.*') || request()->routeIs('admin.skema.*'); @endphp
+            @php 
+                $isReferensi = request()->routeIs('admin.user.*') || request()->routeIs('admin.peserta.*') || request()->routeIs('admin.asesor.*') || request()->routeIs('admin.skema.*'); 
+            @endphp
             <li class="nav-item mb-1">
                 <a class="nav-link d-flex justify-content-between align-items-center {{ $isReferensi ? 'active' : '' }}" data-bs-toggle="collapse" href="#menuReferensi" role="button" aria-expanded="{{ $isReferensi ? 'true' : 'false' }}">
                     <span><i class="bi bi-folder2-open me-2"></i>Referensi</span>
@@ -174,7 +176,7 @@
                 </div>
             </li>
 
-            <!-- Menu Pengaturan (Langsung ke Profil Admin) -->
+            <!-- Menu Pengaturan -->
             <li class="nav-item mb-1">
                 <a href="{{ route('admin.profil') }}" class="nav-link {{ request()->routeIs('admin.profil') ? 'active' : '' }} d-flex align-items-center">
                     <i class="bi bi-gear me-2 fs-6"></i> Pengaturan
@@ -185,7 +187,7 @@
 
         <!-- Logout Section -->
         <div class="px-3 mt-3">
-            <form action="{{ route('login') }}" method="GET">
+            <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="btn w-100 text-danger border-0 d-flex align-items-center fw-semibold text-start px-3 py-2" style="background-color: rgba(255,255,255,0.1); border-radius: 6px;">
                     <i class="bi bi-box-arrow-right me-2 fs-6 text-danger"></i> Logout

@@ -27,74 +27,58 @@
     <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-4">
             <h5 class="fw-bold text-dark mb-4">Edit Jadwal Uji</h5>
-            <form action="{{ route('admin.sertifikasi.jadwal.update', 1) }}" method="POST">
+            <form action="{{ route('admin.sertifikasi.jadwal.update', $jadwal->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold small">Kode Jadwal</label>
-                    <input type="text" name="kode_jadwal" class="form-control" value="JWD-001" readonly>
+                    <input type="text" name="kode_jadwal" class="form-control" value="{{ old('kode_jadwal', $jadwal->kode_jadwal) }}" required>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold small">Skema Sertifikasi *</label>
-                    <select name="skema_id" class="form-select">
-                        <option value="1" selected>Junior Web Developer</option>
-                        <option value="2">Junior Programmer</option>
-                        <option value="3">UI/UX Designer</option>
+                    <select name="skema_id" class="form-select" required>
+                        <option value="" disabled {{ old('skema_id', $jadwal->skema_id) ? '' : 'selected' }}>Pilih skema</option>
+                        @foreach($skemas as $skema)
+                            <option value="{{ $skema->id }}" {{ old('skema_id', $jadwal->skema_id) == $skema->id ? 'selected' : '' }}>{{ $skema->nama_skema }}</option>
+                        @endforeach
                     </select>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold small">Kelas *</label>
-                        <select name="kelas" class="form-select">
-                            <option value="XI RPL 1" selected>XI RPL 1</option>
-                            <option value="XI RPL 2">XI RPL 2</option>
-                            <option value="XI RPL 3">XI RPL 3</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold small">Jumlah Peserta</label>
-                        <input type="text" class="form-control-plaintext fw-semibold text-dark" value="36 Peserta" readonly>
-                    </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold small">Asesor *</label>
-                    <select name="asesor" class="form-select">
-                        <option value="Budi Santoso" selected>Budi Santoso</option>
-                        <option value="Andi">Andi</option>
-                        <option value="Siti">Siti</option>
+                    <select name="asesor_id" class="form-select" required>
+                        <option value="" disabled {{ old('asesor_id', $jadwal->asesor_id) ? '' : 'selected' }}>Pilih asesor</option>
+                        @foreach($asesors as $asesor)
+                            <option value="{{ $asesor->id }}" {{ old('asesor_id', $jadwal->asesor_id) == $asesor->id ? 'selected' : '' }}>{{ $asesor->name }}</option>
+                        @endforeach
                     </select>
                 </div>
 
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold small">Tanggal Uji *</label>
-                        <input type="date" name="tanggal" class="form-control" value="2026-07-30">
+                        <input type="date" name="tanggal" class="form-control" value="{{ old('tanggal', $jadwal->tanggal) }}" required>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold small">Jam Mulai *</label>
-                        <input type="time" name="jam_mulai" class="form-control" value="08:00">
+                        <input type="time" name="jam_mulai" class="form-control" value="{{ old('jam_mulai', $jadwal->jam_mulai) }}" required>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold small">Jam Selesai *</label>
-                        <input type="time" name="jam_selesai" class="form-control" value="12:00">
+                        <input type="time" name="jam_selesai" class="form-control" value="{{ old('jam_selesai', $jadwal->jam_selesai) }}" required>
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold small">Lokasi *</label>
-                    <select name="lokasi" class="form-select">
-                        <option value="Lab Komputer 1" selected>Lab Komputer 1</option>
-                        <option value="Lab Komputer 2">Lab Komputer 2</option>
-                    </select>
+                    <input type="text" name="lokasi" class="form-control" value="{{ old('lokasi', $jadwal->lokasi) }}" required>
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label fw-semibold small">Keterangan</label>
-                    <textarea name="keterangan" class="form-control" rows="3" placeholder="Tambahkan keterangan jika ada...">Catatan tambahan jika diperlukan...</textarea>
+                    <textarea name="keterangan" class="form-control" rows="3" placeholder="Tambahkan keterangan jika ada...">{{ old('keterangan', $jadwal->keterangan) }}</textarea>
                 </div>
 
                 <div class="d-flex justify-content-end gap-2">

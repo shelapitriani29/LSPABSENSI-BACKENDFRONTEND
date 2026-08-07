@@ -39,14 +39,14 @@
         <h2 class="fw-bold text-dark mb-4" style="font-size: 1.5rem;">Absensi Peserta</h2>
 
         <!-- Title Header & Search/Filter Form -->
-        <form method="GET" action="#" id="filterForm">
+        <form method="GET" action="{{ route('admin.sertifikasi.absensi.index') }}" id="filterForm">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
                 
                 <!-- Show Entries Dropdown (Kiri) -->
                 <div class="d-inline-flex align-items-center gap-2">
                     <span class="text-dark fw-medium" style="font-size: 0.95rem;">show</span>
                     <select name="per_page" class="form-select form-select-sm border-secondary text-center fw-semibold" 
-                            style="width: 65px; height: 32px; border-radius: 4px; font-size: 0.85rem;">
+                            style="width: 65px; height: 32px; border-radius: 4px; font-size: 0.85rem;" onchange="this.form.submit()">
                         <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
                         <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
                         <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
@@ -64,14 +64,6 @@
                         <i class="bi bi-plus-lg fs-6"></i>
                     </button>
 
-                    <!-- Button Generate QR -->
-                    <button type="button" class="btn text-white fw-medium px-3 py-1-5 d-inline-flex align-items-center gap-2 shadow-sm" 
-                            data-bs-toggle="modal" data-bs-target="#modalGenerateQR"
-                            style="background-color: #20c997; border-radius: 50px; font-size: 0.88rem; border: none;">
-                        <span>Generate QR</span>
-                        <i class="bi bi-plus-lg fs-6"></i>
-                    </button>
-
                     <!-- Search Input Box -->
                     <div class="d-inline-flex align-items-center gap-2">
                         <span class="text-dark fw-medium" style="font-size: 0.95rem;">Search:</span>
@@ -84,20 +76,6 @@
             </div>
         </form>
 
-        @php
-            // Data Dummy tampilan persis seperti Figma
-            $dummyData = collect([
-                (object)['id' => 1, 'nama' => 'Haura', 'jadwal' => 'JWD-01', 'check_in' => '08.00', 'check_out' => '09.00', 'status' => 'Hadir'],
-                (object)['id' => 2, 'nama' => 'Jenisa', 'jadwal' => 'JWD-01', 'check_in' => '09.00', 'check_out' => '10.00', 'status' => 'Tidak Hadir'],
-                (object)['id' => 3, 'nama' => 'Shela', 'jadwal' => 'DM-02', 'check_in' => '09.00', 'check_out' => '11.00', 'status' => 'Terlambat'],
-                (object)['id' => 4, 'nama' => 'Aulia', 'jadwal' => 'DM-02', 'check_in' => '09.00', 'check_out' => '12.00', 'status' => 'Izin'],
-                (object)['id' => 5, 'nama' => 'Nafis', 'jadwal' => 'JWD-01', 'check_in' => '09.00', 'check_out' => '13.00', 'status' => 'Sakit'],
-                (object)['id' => 6, 'nama' => 'Sinta', 'jadwal' => 'DM-02', 'check_in' => '09.00', 'check_out' => '14.00', 'status' => 'Belum Absen'],
-            ]);
-
-            $listData = (isset($attendances) && count($attendances) > 0) ? $attendances : $dummyData;
-        @endphp
-
         <!-- Table Data Absensi -->
         <div class="table-responsive">
             <table class="table table-bordered align-middle text-center mb-0" style="border-color: #a0aec0;">
@@ -105,75 +83,94 @@
                     <tr class="fw-bold text-dark" style="font-size: 0.95rem; height: 45px;">
                         <th style="width: 65px;">NO.</th>
                         <th>Peserta</th>
+                        <th>NIK / Username</th>
+                        <th>Instansi</th>
                         <th>Jadwal</th>
                         <th>Check in</th>
                         <th>Check Out</th>
+                        <th style="width: 100px;">QR</th>
                         <th style="width: 130px;">Status</th>
                         <th style="width: 80px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="text-dark fw-medium" style="font-size: 0.95rem;">
-                    @foreach($listData as $index => $item)
+                    @forelse($pesertas as $index => $item)
+                        @php
+                            $attendance = $item->absensis->first();
+                            $attendanceJadwal = optional($attendance)->jadwal;
+                            $participantJadwal = $attendanceJadwal ?: $item->jadwal;
+                            $status = $attendance->status ?? 'Belum Absen';
+                            $statusBg = match($status) {
+                                'Hadir' => '#20C997',
+                                'Tidak Hadir' => '#FF4D4D',
+                                'Terlambat' => '#FFC107',
+                                'Izin' => '#3182CE',
+                                'Sakit' => '#805AD5',
+                                default => '#2D3748',
+                            };
+                            $qrData = 'Absensi_' . $item->id . '_' . ($participantJadwal->kode_jadwal ?? ($jadwal ? $jadwal->kode_jadwal : 'nojadwal')) . '_' . ($item->username ?? $item->nik ?? 'peserta');
+                        @endphp
                         <tr style="height: 52px;">
                             <td class="fw-bold">
-                                {{ method_exists($listData, 'firstItem') ? $listData->firstItem() + $index : $index + 1 }}.
+                                {{ $pesertas->firstItem() ? $pesertas->firstItem() + $index : $index + 1 }}.
                             </td>
-                            <td class="text-start ps-3">{{ $item->nama ?? $item->user->name ?? $item->nama_peserta }}</td>
-                            <td>{{ $item->jadwal ?? $item->kode_jadwal }}</td>
-                            <td>{{ is_string($item->check_in) ? $item->check_in : ($item->check_in ? \Carbon\Carbon::parse($item->check_in)->format('H.i') : '-') }}</td>
-                            <td>{{ is_string($item->check_out) ? $item->check_out : ($item->check_out ? \Carbon\Carbon::parse($item->check_out)->format('H.i') : '-') }}</td>
+                            <td class="text-start ps-3" style="min-width: 180px; max-width: 220px;">
+                                <div class="fw-semibold text-truncate" style="max-width: 220px;">{{ $item->name ?? '-' }}</div>
+                                <div class="text-muted small text-truncate" style="max-width: 220px;">{{ $item->email ?? $item->no_hp ?? '-' }}</div>
+                            </td>
+                            <td class="text-start" style="min-width: 120px;">
+                                {{ $item->username ?? $item->nik ?? '-' }}
+                            </td>
+                            <td class="text-start" style="min-width: 140px;">
+                                {{ $item->instansi ?? 'SMK NEGERI 1 GARUT' }}
+                            </td>
+                            <td class="text-start" style="min-width: 130px;">
+                                <div class="fw-semibold">{{ optional($participantJadwal)->kode_jadwal ?? ($jadwal ? $jadwal->kode_jadwal : '-') }}</div>
+                                <div class="text-muted small">{{ optional(optional($participantJadwal)->skema)->nama_skema ?? 'Skema belum terpilih' }}</div>
+                            </td>
+                            <td>{{ optional($attendance)->check_in ? \Carbon\Carbon::parse($attendance->check_in)->format('H.i') : '-' }}</td>
+                            <td>{{ optional($attendance)->check_out ? \Carbon\Carbon::parse($attendance->check_out)->format('H.i') : '-' }}</td>
+                            <td class="text-center">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data={{ rawurlencode($qrData) }}" 
+                                     alt="QR Absensi" 
+                                     style="width: 64px; height: 64px; object-fit: cover; border-radius: 12px; border: 1px solid #dee2e6;">
+                            </td>
                             <td>
-                                @php
-                                    $statusBg = match($item->status) {
-                                        'Hadir' => '#20C997',
-                                        'Tidak Hadir' => '#FF4D4D',
-                                        'Terlambat' => '#FFC107',
-                                        'Izin' => '#3182CE',
-                                        'Sakit' => '#805AD5',
-                                        default => '#2D3748',
-                                    };
-                                @endphp
                                 <span class="badge text-white px-2 py-2 fw-semibold w-100" 
                                     style="background-color: {{ $statusBg }}; border-radius: 12px; font-size: 0.8rem; letter-spacing: 0.2px;">
-                                    {{ $item->status }}
+                                    {{ $status }}
                                 </span>
                             </td>
                             <td>
-                                <div class="dropdown">
-                                    <button class="btn btn-primary btn-sm px-2 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 6px; background-color: #2B6CB0; border: none;">
-                                        <i class="bi bi-list fs-6"></i>
+                                @if($participantJadwal)
+                                    @if($attendance)
+                                        <a href="{{ route('admin.sertifikasi.absensi.print-qr', ['id' => $attendance->id]) }}" target="_blank" class="btn btn-sm btn-secondary px-3 py-2" style="border-radius: 8px; font-size: 0.88rem;">
+                                            <i class="bi bi-printer me-1"></i> Cetak
+                                        </a>
+                                    @else
+                                        <a href="{{ route('admin.sertifikasi.absensi.print-qr-user', ['userId' => $item->id]) }}" target="_blank" class="btn btn-sm btn-secondary px-3 py-2" style="border-radius: 8px; font-size: 0.88rem;">
+                                            <i class="bi bi-printer me-1"></i> Cetak
+                                        </a>
+                                    @endif
+                                @else
+                                    <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-2" disabled style="border-radius: 8px; font-size: 0.88rem;">
+                                        Belum Tersedia
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius: 8px; font-size: 0.88rem; min-width: 140px;">
-                                        <li>
-                                            <!-- Pindah Halaman ke View Edit Absensi (Tanpa Modal) -->
-                                            <a href="{{ url('admin/sertifikasi/absensi/edit') }}" class="dropdown-item d-flex align-items-center gap-2 py-2 rounded text-dark text-decoration-none">
-                                                <i class="bi bi-pencil text-warning"></i>
-                                                <span>Edit Data</span>
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider my-1"></li>
-                                        <li>
-                                            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2 rounded text-danger fw-medium text-decoration-none" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
-                                                <i class="bi bi-trash"></i>
-                                                <span>Hapus Peserta</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
+                                @endif
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="10" class="text-center text-muted py-4">Tidak ada peserta.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
 
-        <!-- Custom Pagination Buttons (Kanan Bawah) -->
+        <!-- Pagination -->
         <div class="d-flex justify-content-end align-items-center mt-3">
-            <div class="btn-group border rounded" role="group" style="font-size: 0.85rem; border-color: #cbd5e1 !important;">
-                <button type="button" class="btn btn-light btn-sm text-dark px-3 fw-medium" style="border-right: 1px solid #cbd5e1;">Previous</button>
-                <button type="button" class="btn btn-primary btn-sm px-3 fw-bold" style="background-color: #2B6CB0; border: none;">1</button>
-                <button type="button" class="btn btn-light btn-sm text-dark px-3 fw-medium" style="border-left: 1px solid #cbd5e1;">Next</button>
-            </div>
+            {{ $pesertas->links() }}
         </div>
 
     </div>
@@ -189,15 +186,18 @@
                 <h5 class="modal-title fw-bold">Rekap Data Absensi</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="#" method="POST">
+            <form action="{{ route('admin.sertifikasi.absensi.export') }}" method="POST">
                 @csrf
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Pilih Skema / Jadwal</label>
                         <select name="jadwal_id" class="form-select">
                             <option value="">Semua Jadwal</option>
-                            <option value="1">Junior Web Developer (JWD-01)</option>
-                            <option value="2">Digital Marketing (DM-02)</option>
+                            @foreach($jadwals as $jadwal)
+                                <option value="{{ $jadwal->id }}" {{ request('jadwal_id') == $jadwal->id ? 'selected' : '' }}>
+                                    {{ $jadwal->kode_jadwal }} - {{ optional($jadwal->skema)->nama_skema ?? 'Skema tidak tersedia' }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="mb-3">
@@ -240,11 +240,12 @@
                             <h6 class="fw-bold text-dark mb-3">Konfigurasi QR Code</h6>
                             
                             <div class="mb-3">
-                                <label class="form-label fw-medium text-secondary small mb-1">Nama Sertifikasi</label>
-                                <select name="sertifikasi_id" id="qrSertifikasi" class="form-select border-secondary-subtle py-2" style="border-radius: 8px;">
-                                    <option value="JWD">Junior Web Developer</option>
-                                    <option value="DM">Digital Marketing</option>
-                                    <option value="TKJ">Teknik Komputer & Jaringan</option>
+                                <label class="form-label fw-medium text-secondary small mb-1">Skema</label>
+                                <select name="skema_id" id="qrSertifikasi" class="form-select border-secondary-subtle py-2" style="border-radius: 8px;">
+                                    <option value="">Pilih Skema</option>
+                                    @foreach($skemas as $skema)
+                                        <option value="{{ $skema->id }}">{{ $skema->nama_skema }} ({{ $skema->kode_skema }})</option>
+                                    @endforeach
                                 </select>
                             </div>
 

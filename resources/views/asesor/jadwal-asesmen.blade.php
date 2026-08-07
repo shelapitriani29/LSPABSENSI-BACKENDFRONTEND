@@ -23,85 +23,80 @@
             <!-- Judul di Atas Tabel -->
             <h6 class="fw-bold text-dark mb-3">Jadwal Asesmen</h6>
 
-            <!-- Show Entries & Search Bar -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex align-items-center gap-1 small text-muted">
-                    Show 
-                    <select class="form-select form-select-sm d-inline-block w-auto mx-1">
-                        <option selected>10</option>
-                        <option>25</option>
-                        <option>50</option>
-                    </select> 
-                    entries
+            <!-- Filter Status, Show Entries & Search Bar -->
+            <form action="{{ route('asesor.jadwal-asesmen') }}" method="GET" class="row g-3 align-items-center mb-3">
+                <div class="col-auto d-flex align-items-center gap-1 small text-muted">
+                    <span>Show</span>
+                    <select name="per_page" class="form-select form-select-sm d-inline-block w-auto mx-1">
+                        <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                        <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                    </select>
+                    <span>entries</span>
                 </div>
-                <div class="d-flex align-items-center gap-1 small text-muted">
-                    Search: <input type="text" class="form-control form-control-sm d-inline-block w-auto" placeholder="">
+                <div class="col-auto d-flex align-items-center gap-2 small text-muted">
+                    <span>Status:</span>
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="" {{ !request()->filled('status') ? 'selected' : '' }}>Semua</option>
+                        <option value="Akan Mendatang" {{ request('status') == 'Akan Mendatang' ? 'selected' : '' }}>Akan Mendatang</option>
+                        <option value="Mulai" {{ request('status') == 'Mulai' ? 'selected' : '' }}>Mulai</option>
+                        <option value="Selesai" {{ request('status') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                    </select>
                 </div>
-            </div>
+                <div class="col-auto d-flex align-items-center gap-2">
+                    <span class="small text-muted">Search:</span>
+                    <input type="text" name="search" class="form-control form-control-sm d-inline-block w-auto" placeholder="Cari kode, skema, asesor..." value="{{ request('search') }}">
+                    <button class="btn btn-outline-secondary btn-sm" type="submit"><i class="bi bi-search"></i></button>
+                </div>
+            </form>
 
             <div class="table-responsive">
-                <table class="table table-bordered align-middle">
-                    <thead class="table-light text-center">
+                <table class="table table-hover table-bordered align-middle mb-0">
+                    <thead class="table-light text-secondary small text-uppercase text-center">
                         <tr>
-                            <th>Kode</th>
-                            <th>Skema</th>
-                            <th>Tanggal</th>
-                            <th>Jam</th>
-                            <th>Lokasi</th>
-                            <th>Peserta</th>
-                            <th>Status</th>
-                            <th class="text-center">Aksi</th>
+                            <th class="py-3 px-3" style="width: 5%;">No.</th>
+                            <th class="py-3" style="width: 15%;">Kode</th>
+                            <th class="py-3">Skema</th>
+                            <th class="py-3" style="width: 12%;">Kelas</th>
+                            <th class="py-3" style="width: 18%;">Asesor</th>
+                            <th class="py-3 text-center" style="width: 10%;">Peserta</th>
+                            <th class="py-3 text-center" style="width: 12%;">Status</th>
+                            <th class="py-3 text-center" style="width: 10%;">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="small">
+                        @forelse ($jadwals as $key => $jadwal)
                         <tr>
-                            <td class="fw-semibold">SK001</td>
-                            <td>Junior Web Developer (JWD)</td>
-                            <td class="text-center">20-07-2026</td>
-                            <td class="text-center">08.00 - 10.00</td>
-                            <td>Lab 1</td>
-                            <td class="text-center">20 Orang</td>
-                            <td class="text-center"><span class="badge bg-secondary">Selesai</span></td>
+                            <td class="px-3 text-center">{{ $jadwals->firstItem() + $key }}.</td>
+                            <td><span class="badge bg-light text-dark border px-2 py-1">{{ $jadwal->kode_jadwal }}</span></td>
+                            <td class="fw-bold text-dark">{{ $jadwal->skema->nama_skema ?? '-' }}</td>
+                            <td class="text-center">{{ $jadwal->kelas ?? '-' }}</td>
+                            <td>{{ $jadwal->asesor->name ?? '-' }}</td>
+                            <td class="text-center">{{ $jadwal->pesertas_count }} Orang</td>
+                            <td class="text-center">
+                                <span class="badge {{ $jadwal->status == 'Akan Mendatang' ? 'bg-warning text-dark' : ($jadwal->status == 'Mulai' ? 'bg-success' : 'bg-secondary') }} text-white px-3 py-1 rounded-pill">{{ $jadwal->status }}</span>
+                            </td>
                             <td class="text-center">
                                 <div class="dropdown">
-                                    <button class="btn btn-primary btn-sm px-2 py-1 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #2b70c9; border-color: #2b70c9;">
-                                        <i class="bi bi-list fs-6"></i>
+                                    <button class="btn btn-sm text-white rounded-3 px-3 py-2 border-0 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #2b70c9;">
+                                        <i class="bi bi-list"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="font-size: 0.85rem;">
-                                        <li>
-                                            <a class="dropdown-item py-2" href="{{ route('asesor.jadwal-asesmen.detail', 1) }}">
-                                                <i class="bi bi-list-ul me-2 text-primary"></i> Detail Asesmen
-                                            </a>
-                                        </li>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
+                                        <li><a class="dropdown-item py-2" href="{{ route('asesor.jadwal-asesmen.detail', $jadwal->id) }}"><i class="bi bi-list-ul me-2 text-primary"></i> Detail Asesmen</a></li>
                                     </ul>
                                 </div>
                             </td>
                         </tr>
+                        @empty
                         <tr>
-                            <td class="fw-semibold">SK003</td>
-                            <td>Network Administrator (NA)</td>
-                            <td class="text-center">27-07-2026</td>
-                            <td class="text-center">09.00 - 11.00</td>
-                            <td>Lab 3</td>
-                            <td class="text-center">28 Orang</td>
-                            <td class="text-center"><span class="badge bg-success">Aktif</span></td>
-                            <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="btn btn-primary btn-sm px-2 py-1 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #2b70c9; border-color: #2b70c9;">
-                                        <i class="bi bi-list fs-6"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="font-size: 0.85rem;">
-                                        <li>
-                                            <a class="dropdown-item py-2" href="{{ route('asesor.jadwal-asesmen.detail', 3) }}">
-                                                <i class="bi bi-list-ul me-2 text-primary"></i> Detail Asesmen
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
+                            <td colspan="8" class="text-center py-4 text-muted">Belum ada jadwal asesmen.</td>
                         </tr>
+                        @endforelse
                     </tbody>
                 </table>
+            </div>
+            <div class="d-flex justify-content-center pt-3">
+                {{ $jadwals->links('pagination::bootstrap-5') }}
             </div>
 
             <!-- Pagination Terpusat -->

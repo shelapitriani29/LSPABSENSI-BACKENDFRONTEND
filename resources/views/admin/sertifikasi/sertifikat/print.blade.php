@@ -84,40 +84,34 @@
 </head>
 <body>
 
-    <!-- Tombol Aksi (Tidak ikut tercetak) -->
     <div class="no-print d-flex gap-2">
         <button onclick="window.print()" class="btn btn-primary shadow fw-bold px-4">
             <i class="bi bi-printer"></i> Cetak / Simpan PDF
         </button>
-        <a href="{{ route('admin.sertifikasi.sertifikat.show', $id ?? 1) }}" class="btn btn-light shadow fw-bold border">
+        <a href="{{ route('admin.sertifikasi.sertifikat.show', $sertifikat->id) }}" class="btn btn-light shadow fw-bold border">
             <i class="bi bi-arrow-left"></i> Kembali
         </a>
     </div>
 
-    <!-- Lembar Dokumen Sertifikat -->
     <div class="certificate-container">
         <div class="certificate-inner">
-            
-            <!-- Header Lembaga -->
             <div class="header-title">
                 <h3>LEMBAGA SERTIFIKASI PROFESI PI</h3>
                 <h5>SMK NEGERI 1 GARUT</h5>
-                <p class="text-muted small mb-0">Nomor Sertifikat: LSP-001-2026</p>
+                <p class="text-muted small mb-0">Nomor Sertifikat: {{ $sertifikat->no_sertifikat }}</p>
             </div>
 
-            <!-- Bagian Isi / Penerima -->
             <div class="body-content my-3">
                 <p class="text-uppercase fw-bold text-secondary mb-1" style="font-family: Arial, sans-serif; letter-spacing: 3px;">Sertifikat Ini Diberikan Kepada:</p>
-                <div class="recipient-name">Haura</div>
-                <p class="mt-3 fs-5">Telah dinyatakan <strong>KOMPETEN</strong> dalam Skema Sertifikasi:</p>
-                <h4 class="fw-bold text-dark text-uppercase" style="font-family: Arial, sans-serif; color: #1a365d !important;">Graphic Design</h4>
+                <div class="recipient-name">{{ optional($sertifikat->user)->name ?? 'Nama Peserta' }}</div>
+                <p class="mt-3 fs-5">Telah dinyatakan <strong>{{ strtoupper($sertifikat->status ?? 'KOMPETEN') }}</strong> dalam Skema Sertifikasi:</p>
+                <h4 class="fw-bold text-dark text-uppercase" style="font-family: Arial, sans-serif; color: #1a365d !important;">{{ optional($sertifikat->skema)->nama_skema ?? $sertifikat->skema ?? 'Skema Sertifikasi' }}</h4>
             </div>
 
-            <!-- Footer Tanda Tangan -->
             <div class="row align-items-center mt-4" style="font-family: Arial, sans-serif;">
                 <div class="col-4 text-center">
                     <p class="small text-muted mb-1">Masa Berlaku:</p>
-                    <p class="fw-bold mb-0">15 Juni 2026 – 15 Juni 2029</p>
+                    <p class="fw-bold mb-0">{{ $sertifikat->tanggal_terbit ? \Carbon\Carbon::parse($sertifikat->tanggal_terbit)->addYears(3)->translatedFormat('d F Y') : '-' }}</p>
                 </div>
                 <div class="col-4 text-center">
                     <div class="p-2 border border-dark rounded d-inline-block bg-light">
@@ -125,7 +119,7 @@
                     </div>
                 </div>
                 <div class="col-4 text-center">
-                    <p class="mb-1">Garut, 15 Juni 2026</p>
+                    <p class="mb-1">Garut, {{ $sertifikat->tanggal_terbit ? \Carbon\Carbon::parse($sertifikat->tanggal_terbit)->translatedFormat('d F Y') : now()->translatedFormat('d F Y') }}</p>
                     <p class="small text-muted mb-5">Ketua LSP SMK Negeri 1 Garut</p>
                     <p class="fw-bold text-decoration-underline mb-0">Tim Asesor LSP</p>
                 </div>

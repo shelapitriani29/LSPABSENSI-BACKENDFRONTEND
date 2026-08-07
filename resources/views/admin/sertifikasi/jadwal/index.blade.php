@@ -27,24 +27,25 @@
             </div>
 
             <!-- Filter Status & Search Bar (Sejajar) -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <form action="{{ route('admin.sertifikasi.jadwal.index') }}" method="GET" class="d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex align-items-center gap-2 small text-secondary">
                     <span>Filter Status:</span>
-                    <select class="form-select form-select-sm" style="width: 140px;">
-                        <option value="">Semua</option>
-                        <option value="akan">Akan Datang</option>
-                        <option value="aktif">Aktif</option>
-                        <option value="selesai">Selesai</option>
+                    <select name="status" class="form-select form-select-sm" style="width: 180px;" onchange="this.form.submit()">
+                        <option value="" {{ !request()->filled('status') ? 'selected' : '' }}>Semua</option>
+                        <option value="Akan Mendatang" {{ request('status') == 'Akan Mendatang' ? 'selected' : '' }}>Akan Mendatang</option>
+                        <option value="Mulai" {{ request('status') == 'Mulai' ? 'selected' : '' }}>Mulai</option>
+                        <option value="Selesai" {{ request('status') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
                     </select>
                 </div>
                 
                 <div class="d-flex align-items-center gap-2">
                     <span class="small text-secondary">Search:</span>
-                    <div class="input-group input-group-sm" style="width: 200px;">
-                        <input type="text" class="form-control" placeholder="Cari skema / asesor...">
+                    <div class="input-group input-group-sm" style="width: 260px;">
+                        <input type="text" name="search" class="form-control" placeholder="Cari kode, skema, asesor..." value="{{ request('search') }}">
+                        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
                     </div>
                 </div>
-            </div>
+            </form>
 
             <!-- Tabel dengan Garis Border -->
             <div class="table-responsive">
@@ -61,14 +62,15 @@
                         </tr>
                     </thead>
                     <tbody class="small">
+                        @forelse($jadwals as $key => $jadwal)
                         <tr>
-                            <td class="px-3">1.</td>
-                            <td><span class="badge bg-light text-dark border px-2 py-1">JWD-001</span></td>
-                            <td class="fw-bold text-dark">Junior Web Developer</td>
-                            <td>XI RPL 1</td>
-                            <td>Budi Santoso</td>
+                            <td class="px-3">{{ $jadwals->firstItem() + $key }}.</td>
+                            <td><span class="badge bg-light text-dark border px-2 py-1">{{ $jadwal->kode_jadwal }}</span></td>
+                            <td class="fw-bold text-dark">{{ $jadwal->skema->nama_skema ?? '-' }}</td>
+                            <td>{{ $jadwal->kelas ?? '-' }}</td>
+                            <td>{{ $jadwal->asesor->name ?? '-' }}</td>
                             <td class="text-center">
-                                <span class="badge bg-warning text-white px-3 py-1 rounded-pill">Akan Datang</span>
+                                <span class="badge {{ $jadwal->status == 'Akan Mendatang' ? 'bg-warning text-dark' : ($jadwal->status == 'Mulai' ? 'bg-success' : 'bg-secondary') }} text-white px-3 py-1 rounded-pill">{{ $jadwal->status }}</span>
                             </td>
                             <td class="text-center">
                                 <div class="dropdown">
@@ -76,10 +78,10 @@
                                         <i class="bi bi-list"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
-                                        <li><a class="dropdown-item py-2" href="{{ route('admin.sertifikasi.jadwal.show', 1) }}"><i class="bi bi-eye me-2 text-info"></i> Detail</a></li>
-                                        <li><a class="dropdown-item py-2" href="{{ route('admin.sertifikasi.jadwal.edit', 1) }}"><i class="bi bi-pencil-square me-2 text-warning"></i> Edit</a></li>
+                                        <li><a class="dropdown-item py-2" href="{{ route('admin.sertifikasi.jadwal.show', $jadwal->id) }}"><i class="bi bi-eye me-2 text-info"></i> Detail</a></li>
+                                        <li><a class="dropdown-item py-2" href="{{ route('admin.sertifikasi.jadwal.edit', $jadwal->id) }}"><i class="bi bi-pencil-square me-2 text-warning"></i> Edit</a></li>
                                         <li>
-                                            <form action="{{ route('admin.sertifikasi.jadwal.destroy', 1) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
+                                            <form action="{{ route('admin.sertifikasi.jadwal.destroy', $jadwal->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="dropdown-item py-2 text-danger"><i class="bi bi-trash me-2"></i> Hapus</button>
@@ -89,75 +91,16 @@
                                 </div>
                             </td>
                         </tr>
+                        @empty
                         <tr>
-                            <td class="px-3">2.</td>
-                            <td><span class="badge bg-light text-dark border px-2 py-1">JP-002</span></td>
-                            <td class="fw-bold text-dark">Junior Programmer</td>
-                            <td>XI RPL 2</td>
-                            <td>Andi</td>
-                            <td class="text-center">
-                                <span class="badge bg-success text-white px-3 py-1 rounded-pill">Aktif</span>
-                            </td>
-                            <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm text-white rounded-3 px-3 py-2 border-0 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #337ab7;">
-                                        <i class="bi bi-list"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
-                                        <li><a class="dropdown-item py-2" href="{{ route('admin.sertifikasi.jadwal.show', 2) }}"><i class="bi bi-eye me-2 text-info"></i> Detail</a></li>
-                                        <li><a class="dropdown-item py-2" href="{{ route('admin.sertifikasi.jadwal.edit', 2) }}"><i class="bi bi-pencil-square me-2 text-warning"></i> Edit</a></li>
-                                        <li>
-                                            <form action="{{ route('admin.sertifikasi.jadwal.destroy', 2) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item py-2 text-danger"><i class="bi bi-trash me-2"></i> Hapus</button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
+                            <td colspan="7" class="text-center py-4 text-muted">Belum ada jadwal uji.</td>
                         </tr>
-                        <tr>
-                            <td class="px-3">3.</td>
-                            <td><span class="badge bg-light text-dark border px-2 py-1">UX-003</span></td>
-                            <td class="fw-bold text-dark">UI/UX Designer</td>
-                            <td>XI RPL 3</td>
-                            <td>Siti</td>
-                            <td class="text-center">
-                                <span class="badge bg-secondary text-white px-3 py-1 rounded-pill">Selesai</span>
-                            </td>
-                            <td class="text-center">
-                                <div class="dropdown">
-                                    <button class="btn btn-sm text-white rounded-3 px-3 py-2 border-0 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #337ab7;">
-                                        <i class="bi bi-list"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
-                                        <li><a class="dropdown-item py-2" href="{{ route('admin.sertifikasi.jadwal.show', 3) }}"><i class="bi bi-eye me-2 text-info"></i> Detail</a></li>
-                                        <li><a class="dropdown-item py-2" href="{{ route('admin.sertifikasi.jadwal.edit', 3) }}"><i class="bi bi-pencil-square me-2 text-warning"></i> Edit</a></li>
-                                        <li>
-                                            <form action="{{ route('admin.sertifikasi.jadwal.destroy', 3) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item py-2 text-danger"><i class="bi bi-trash me-2"></i> Hapus</button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
-
-            <!-- Pagination Posisi Tengah -->
-            <div class="d-flex justify-content-center align-items-center mt-4">
-                <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item disabled"><span class="page-link">Previous</span></li>
-                        <li class="page-item active"><span class="page-link text-white border-0" style="background-color: #1b6ca8;">1</span></li>
-                        <li class="page-item disabled"><span class="page-link">Next</span></li>
-                    </ul>
-                </nav>
+            <div class="d-flex justify-content-center pt-3">
+                {{ $jadwals->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>

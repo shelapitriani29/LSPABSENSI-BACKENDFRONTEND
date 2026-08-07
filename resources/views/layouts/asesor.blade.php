@@ -87,12 +87,21 @@
         <!-- Bagian Atas (Profil & Menu) -->
         <div>
             <!-- Profil User -->
+            @php
+                $sidebarUser = auth()->user();
+                $sidebarInitials = $sidebarUser ? collect(explode(' ', trim($sidebarUser->name)))->map(fn($part) => strtoupper(substr($part, 0, 1)))->join('') : 'U';
+                $sidebarPhotoUrl = $sidebarUser && $sidebarUser->foto ? asset('storage/' . $sidebarUser->foto) : null;
+            @endphp
             <div class="user-profile text-center mb-3 pb-3 border-bottom border-light border-opacity-25">
-                <div class="rounded-circle bg-white text-dark fw-bold d-inline-flex align-items-center justify-content-center mb-1 shadow-sm" style="width: 40px; height: 40px; font-size: 1rem;">
-                    BS
+                <div class="rounded-circle bg-white text-dark fw-bold d-inline-flex align-items-center justify-content-center mb-1 shadow-sm overflow-hidden" style="width: 40px; height: 40px; font-size: 1rem;">
+                    @if($sidebarPhotoUrl)
+                        <img src="{{ $sidebarPhotoUrl }}" alt="Foto Profil" class="w-100 h-100 object-fit-cover" style="object-fit: cover;">
+                    @else
+                        {{ $sidebarInitials ?: 'U' }}
+                    @endif
                 </div>
-                <h6 class="fw-bold mb-0 text-white" style="font-size: 0.9rem;">BUDI SANTOSO</h6>
-                <small class="text-white-50" style="font-size: 0.7rem;">Asesor Kompetensi</small>
+                <h6 class="fw-bold mb-0 text-white" style="font-size: 0.9rem;">{{ $sidebarUser->name ?? 'User' }}</h6>
+                <small class="text-white-50" style="font-size: 0.7rem;">{{ $sidebarUser ? ($sidebarUser->role === 'asesor' ? 'Asesor Kompetensi' : ucfirst($sidebarUser->role)) : 'Asesor Kompetensi' }}</small>
             </div>
 
             <!-- List Menu -->
@@ -127,13 +136,6 @@
                     </div>
                 </li>
 
-                <!-- Menu Verifikasi Kehadiran -->
-                <li class="nav-item">
-                    <a href="{{ route('asesor.verifikasi-kehadiran') }}" class="nav-link {{ Request::routeIs('asesor.verifikasi-kehadiran*') ? 'active' : '' }} d-flex align-items-center">
-                        <i class="bi bi-person-check me-2"></i> Verifikasi Kehadiran
-                    </a>
-                </li>
-
                 <!-- Menu Input Penilaian -->
                 <li class="nav-item">
                     <a href="{{ route('asesor.input-penilaian.index') }}" class="nav-link {{ Request::routeIs('asesor.input-penilaian*') ? 'active' : '' }} d-flex align-items-center">
@@ -159,7 +161,7 @@
 
         <!-- Bagian Bawah (Tombol Logout Menempel di Bawah) -->
         <div class="pt-2 border-top border-light border-opacity-25 mt-2">
-            <form action="#" method="POST">
+            <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="nav-link text-danger w-100 text-start d-flex align-items-center bg-transparent border-0" style="font-weight: 500;">
                     <i class="bi bi-box-arrow-right me-2 fs-5"></i> Logout

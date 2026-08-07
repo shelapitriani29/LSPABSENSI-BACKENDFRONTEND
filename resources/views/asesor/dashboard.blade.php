@@ -35,7 +35,7 @@
                         </div>
                         <div>
                             <span class="text-muted small d-block mb-1">Jadwal Uji</span>
-                            <h3 class="fw-bold text-dark mb-1">1</h3>
+                            <h3 class="fw-bold text-dark mb-1">{{ $jadwalHariIniCount }}</h3>
                             <span class="text-muted small d-block mb-2">Jadwal Hari Ini</span>
                         </div>
                     </div>
@@ -57,7 +57,7 @@
                         </div>
                         <div>
                             <span class="text-muted small d-block mb-1">Peserta</span>
-                            <h3 class="fw-bold text-dark mb-1">20</h3>
+                            <h3 class="fw-bold text-dark mb-1">{{ $totalPeserta }}</h3>
                             <span class="text-muted small d-block mb-2">Peserta Terdaftar</span>
                         </div>
                     </div>
@@ -78,13 +78,13 @@
                         </div>
                         <div>
                             <span class="text-muted small d-block mb-1">Absensi</span>
-                            <h3 class="fw-bold text-dark mb-1">18</h3>
+                            <h3 class="fw-bold text-dark mb-1">{{ $absensiHadir }}</h3>
                             <span class="text-muted small d-block mb-2">Peserta Hadir</span>
                         </div>
                     </div>
                     <div class="mt-3 pt-3 border-top text-secondary small d-flex justify-content-between align-items-center">
-                        <span class="d-flex align-items-center gap-1 text-success fw-semibold"><span class="badge bg-success rounded-circle p-1" style="width: 6px; height: 6px;"></span> 18 Hadir</span>
-                        <span class="d-flex align-items-center gap-1 text-danger fw-semibold"><span class="badge bg-danger rounded-circle p-1" style="width: 6px; height: 6px;"></span> 2 Belum Hadir</span>
+                        <span class="d-flex align-items-center gap-1 text-success fw-semibold"><span class="badge bg-success rounded-circle p-1" style="width: 6px; height: 6px;"></span> {{ $absensiHadir }} Hadir</span>
+                        <span class="d-flex align-items-center gap-1 text-danger fw-semibold"><span class="badge bg-danger rounded-circle p-1" style="width: 6px; height: 6px;"></span> {{ $absensiBelum }} Belum Hadir</span>
                     </div>
                 </div>
             </div>
@@ -100,13 +100,13 @@
                         </div>
                         <div>
                             <span class="text-muted small d-block mb-1">Penilaian</span>
-                            <h3 class="fw-bold text-dark mb-1">15</h3>
+                            <h3 class="fw-bold text-dark mb-1">{{ $penilaianDone }}</h3>
                             <span class="text-muted small d-block mb-2">Sudah Dinilai</span>
                         </div>
                     </div>
                     <div class="mt-3 pt-3 border-top text-secondary small d-flex justify-content-between align-items-center">
-                        <span class="d-flex align-items-center gap-1 fw-semibold" style="color: #6f42c1;"><span class="badge rounded-circle p-1" style="width: 6px; height: 6px; background-color: #6f42c1;"></span> 15 Sudah Dinilai</span>
-                        <span class="d-flex align-items-center gap-1 text-muted fw-semibold"><span class="badge bg-secondary rounded-circle p-1" style="width: 6px; height: 6px;"></span> 5 Belum Dinilai</span>
+                        <span class="d-flex align-items-center gap-1 fw-semibold" style="color: #6f42c1;"><span class="badge rounded-circle p-1" style="width: 6px; height: 6px; background-color: #6f42c1;"></span> {{ $penilaianDone }} Sudah Dinilai</span>
+                        <span class="d-flex align-items-center gap-1 text-muted fw-semibold"><span class="badge bg-secondary rounded-circle p-1" style="width: 6px; height: 6px;"></span> {{ $penilaianPending }} Belum Dinilai</span>
                     </div>
                 </div>
             </div>

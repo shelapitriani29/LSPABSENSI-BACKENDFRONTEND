@@ -56,6 +56,35 @@
 
     </div>
 
+    @if(session('success'))
+        <div class="alert alert-success border-0 rounded-4 shadow-sm mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger border-0 rounded-4 shadow-sm mb-4" role="alert">
+            <i class="bi bi-x-circle-fill me-2"></i>
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if(!$attendance)
+        <div class="alert alert-warning border-0 rounded-4 shadow-sm mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Akses kamera dan pindai QR Code asesor untuk merekam kehadiran Anda.
+        </div>
+    @else
+        <div class="alert alert-success border-0 rounded-4 shadow-sm mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            Absensi Anda sudah terkonfirmasi sebagai <strong>{{ $attendance->status ?? 'Hadir' }}</strong>.
+            @if(optional($attendance)->check_in)
+                Check-in pada {{ \Carbon\Carbon::parse($attendance->check_in)->format('H:i') }}.
+            @endif
+        </div>
+    @endif
+
 
     <!-- =========================
          CARD DETAIL ABSENSI
@@ -95,7 +124,7 @@
                         </span>
 
                         <h4 class="fw-bold text-dark mb-0">
-                            Junior Web Developer
+                            {{ optional(optional($nextJadwal)->skema)->nama_skema ?? ($user->skema_kompetensi ?? 'Belum terdaftar') }}
                         </h4>
 
                     </div>
@@ -105,148 +134,82 @@
 
                 <!-- Status -->
                 <div>
-
-                    <span class="badge bg-danger bg-opacity-10
-                                 text-danger px-3 py-2
-                                 rounded-pill
-                                 d-flex align-items-center gap-1
-                                 fw-semibold"
-                          style="font-size: 0.85rem;">
-
-                        <span class="badge bg-danger rounded-circle p-1"
-                              style="
-                                width: 6px;
-                                height: 6px;
-                              ">
-                        </span>
-
-                        Belum Absen
-
+                    @php
+                        $statusText = $attendance ? ($attendance->status ?? 'Hadir') : 'Belum Absen';
+                        $badgeClass = $attendance ? 'bg-success bg-opacity-10 text-success' : 'bg-danger bg-opacity-10 text-danger';
+                        $dotClass = $attendance ? 'bg-success' : 'bg-danger';
+                    @endphp
+                    <span class="badge {{ $badgeClass }} px-3 py-2 rounded-pill d-flex align-items-center gap-1 fw-semibold" style="font-size: 0.85rem;">
+                        <span class="badge {{ $dotClass }} rounded-circle p-1" style="width: 6px; height: 6px;"></span>
+                        {{ $statusText }}
                     </span>
-
                 </div>
 
             </div>
 
 
-            <!-- =========================
-                 DETAIL JADWAL
-            ========================== -->
-            <div class="row g-3" style="font-size: 0.95rem;">
+            @if($nextJadwal)
+                <div class="row g-3" style="font-size: 0.95rem;">
 
-                <!-- Tanggal -->
-                <div class="col-12">
-
-                    <div class="row py-2">
-
-                        <div class="col-md-3 text-muted
-                                    d-flex align-items-center gap-2">
-
-                            <i class="bi bi-calendar-event
-                                      text-primary fs-5"></i>
-
-                            Tanggal Uji
-
-                        </div>
-
-                        <div class="col-md-9 fw-semibold text-dark
-                                    d-flex align-items-center">
-
-                            : 20 Agustus 2026 (Kamis)
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Waktu -->
-                <div class="col-12">
-
-                    <div class="row py-2">
-
-                        <div class="col-md-3 text-muted
-                                    d-flex align-items-center gap-2">
-
-                            <i class="bi bi-clock
-                                      text-primary fs-5"></i>
-
-                            Waktu
-
-                        </div>
-
-                        <div class="col-md-9 fw-semibold text-dark
-                                    d-flex align-items-center">
-
-                            : 08.00 – 16.00 WIB
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Lokasi -->
-                <div class="col-12">
-
-                    <div class="row py-2">
-
-                        <div class="col-md-3 text-muted
-                                    d-flex align-items-center gap-2">
-
-                            <i class="bi bi-geo-alt
-                                      text-primary fs-5"></i>
-
-                            Lokasi
-
-                        </div>
-
-                        <div class="col-md-9 fw-semibold text-dark">
-
-                            <div>
-                                : Lab Komputer 1
+                    <!-- Tanggal -->
+                    <div class="col-12">
+                        <div class="row py-2">
+                            <div class="col-md-3 text-muted d-flex align-items-center gap-2">
+                                <i class="bi bi-calendar-event text-primary fs-5"></i>
+                                Tanggal Uji
                             </div>
-
-                            <div class="text-muted fw-normal ms-3">
-                                SMK NEGERI 1 GARUT
+                            <div class="col-md-9 fw-semibold text-dark d-flex align-items-center">
+                                : {{ $nextJadwal->tanggal ? \Carbon\Carbon::parse($nextJadwal->tanggal)->translatedFormat('j F Y') : '-' }}
                             </div>
-
                         </div>
+                    </div>
 
+                    <!-- Waktu -->
+                    <div class="col-12">
+                        <div class="row py-2">
+                            <div class="col-md-3 text-muted d-flex align-items-center gap-2">
+                                <i class="bi bi-clock text-primary fs-5"></i>
+                                Waktu
+                            </div>
+                            <div class="col-md-9 fw-semibold text-dark d-flex align-items-center">
+                                : {{ $nextJadwal->jam_mulai }} – {{ $nextJadwal->jam_selesai }} WIB
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lokasi -->
+                    <div class="col-12">
+                        <div class="row py-2">
+                            <div class="col-md-3 text-muted d-flex align-items-center gap-2">
+                                <i class="bi bi-geo-alt text-primary fs-5"></i>
+                                Lokasi
+                            </div>
+                            <div class="col-md-9 fw-semibold text-dark">
+                                <div>: {{ $nextJadwal->lokasi ?? 'Belum ditentukan' }}</div>
+                                <div class="text-muted fw-normal ms-3">SMK NEGERI 1 GARUT</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Asesor -->
+                    <div class="col-12">
+                        <div class="row py-2">
+                            <div class="col-md-3 text-muted d-flex align-items-center gap-2">
+                                <i class="bi bi-person text-primary fs-5"></i>
+                                Asesor
+                            </div>
+                            <div class="col-md-9 fw-semibold text-dark d-flex align-items-center">
+                                : {{ optional($nextJadwal->asesor)->name ?? 'Belum ditentukan' }}
+                            </div>
+                        </div>
                     </div>
 
                 </div>
-
-
-                <!-- Asesor -->
-                <div class="col-12">
-
-                    <div class="row py-2">
-
-                        <div class="col-md-3 text-muted
-                                    d-flex align-items-center gap-2">
-
-                            <i class="bi bi-person
-                                      text-primary fs-5"></i>
-
-                            Asesor
-
-                        </div>
-
-                        <div class="col-md-9 fw-semibold text-dark
-                                    d-flex align-items-center">
-
-                            : Budi Santoso
-
-                        </div>
-
-                    </div>
-
+            @else
+                <div class="text-center py-4">
+                    <p class="mb-0 text-muted">Belum ada jadwal uji terdaftar untuk kelas Anda.</p>
                 </div>
-
-            </div>
+            @endif
 
         </div>
 
@@ -256,62 +219,154 @@
     <!-- =========================
          CARD SCAN QR
     ========================== -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4
-                text-center py-5 px-3">
+    @if(! $attendance)
+        <div class="card border-0 shadow-sm rounded-4 mb-4
+                    text-center py-5 px-3">
 
-        <div class="card-body">
+            <div class="card-body">
 
-            <!-- Icon -->
-            <div class="rounded-circle mx-auto
-                        d-flex align-items-center
-                        justify-content-center
-                        text-primary mb-3"
-                 style="
-                    width: 70px;
-                    height: 70px;
-                    background-color: #e6f0fa;
-                 ">
+                <!-- Icon -->
+                <div class="rounded-circle mx-auto
+                            d-flex align-items-center
+                            justify-content-center
+                            text-primary mb-3"
+                     style="
+                        width: 70px;
+                        height: 70px;
+                        background-color: #e6f0fa;
+                     ">
 
-                <i class="bi bi-qr-code-scan fs-2"></i>
+                    <i class="bi bi-qr-code-scan fs-2"></i>
+
+                </div>
+
+
+                <h5 class="fw-bold text-dark mb-1">
+                    Anda belum melakukan absensi
+                </h5>
+
+
+                <p class="text-muted small mb-4">
+                    Klik tombol di bawah untuk membuka kamera
+                    dan memindai QR Code.
+                </p>
+
+
+                <!-- =========================
+                     BUTTON SCAN
+                ========================== -->
+                <button type="button"
+                        id="btnScanQR"
+                        class="btn btn-primary px-4 py-2
+                               rounded-pill fw-semibold
+                               shadow-sm border-0
+                               d-inline-flex align-items-center gap-2"
+                        onclick="openScanner()"
+                        style="
+                            background-color: #0d6efd;
+                            font-size: 0.95rem;
+                        "
+                        {{ $nextJadwal ? '' : 'disabled' }}>
+
+                    <i class="bi bi-qr-code-scan"></i>
+
+                    {{ $nextJadwal ? 'Scan QR Code' : 'Jadwal belum tersedia' }}
+
+                </button>
 
             </div>
 
+        </div>
+    @elseif($attendance && ! $attendance->check_out)
+        <div class="card border-0 shadow-sm rounded-4 mb-4
+                    text-center py-5 px-3">
 
-            <h5 class="fw-bold text-dark mb-1">
-                Anda belum melakukan absensi
-            </h5>
+            <div class="card-body">
 
+                <div class="rounded-circle mx-auto
+                            d-flex align-items-center
+                            justify-content-center
+                            text-primary mb-3"
+                     style="
+                        width: 70px;
+                        height: 70px;
+                        background-color: #e6f0fa;
+                     ">
 
-            <p class="text-muted small mb-4">
-                Klik tombol di bawah untuk membuka kamera
-                dan memindai QR Code.
-            </p>
+                    <i class="bi bi-qr-code-scan fs-2"></i>
 
+                </div>
 
-            <!-- =========================
-                 BUTTON SCAN
-            ========================== -->
-            <button type="button"
-                    id="btnScanQR"
-                    class="btn btn-primary px-4 py-2
-                           rounded-pill fw-semibold
-                           shadow-sm border-0
-                           d-inline-flex align-items-center gap-2"
-                    onclick="openScanner()"
-                    style="
-                        background-color: #0d6efd;
-                        font-size: 0.95rem;
-                    ">
+                <h5 class="fw-bold text-dark mb-1">
+                    Anda sudah melakukan check-in
+                </h5>
 
-                <i class="bi bi-qr-code-scan"></i>
+                <p class="text-muted small mb-2">
+                    Check-in pada {{ \Carbon\Carbon::parse($attendance->check_in)->format('H:i') }}.
+                </p>
 
-                Scan QR Code
+                <p class="text-muted small mb-4">
+                    Jika Anda selesai ujian, silakan scan kembali untuk Check Out.
+                </p>
 
-            </button>
+                <button type="button"
+                        id="btnScanQR"
+                        class="btn btn-primary px-4 py-2
+                               rounded-pill fw-semibold
+                               shadow-sm border-0
+                               d-inline-flex align-items-center gap-2"
+                        onclick="openScanner()"
+                        style="
+                            background-color: #0d6efd;
+                            font-size: 0.95rem;
+                        "
+                        {{ $nextJadwal ? '' : 'disabled' }}>
+
+                    <i class="bi bi-qr-code-scan"></i>
+
+                    Scan Check Out
+
+                </button>
+
+            </div>
 
         </div>
+    @else
+        <div class="card border-0 shadow-sm rounded-4 mb-4
+                    text-center py-5 px-3">
 
-    </div>
+            <div class="card-body">
+
+                <div class="rounded-circle mx-auto
+                            d-flex align-items-center
+                            justify-content-center
+                            text-primary mb-3"
+                     style="
+                        width: 70px;
+                        height: 70px;
+                        background-color: #e6f0fa;
+                     ">
+
+                    <i class="bi bi-flag-fill fs-2"></i>
+
+                </div>
+
+                <h5 class="fw-bold text-dark mb-1">
+                    Ujian telah selesai
+                </h5>
+
+                <p class="text-muted small mb-2">
+                    Terima kasih telah mengikuti sertifikasi.
+                </p>
+
+                <p class="text-muted small mb-0">
+                    Check-in: {{ optional($attendance)->check_in ? \Carbon\Carbon::parse($attendance->check_in)->format('H:i') : '-' }} — Check-out: {{ optional($attendance)->check_out ? \Carbon\Carbon::parse($attendance->check_out)->format('H:i') : '-' }}
+                </p>
+
+            </div>
+
+        </div>
+    @endif
 
 </div>
 
@@ -723,11 +778,23 @@
                         |
                         */
 
-                        alert(
-                            "QR berhasil dibaca!\n\n" +
-                            "Data QR: " +
-                            decodedText
-                        );
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '{{ route('peserta.absensi.scan') }}';
+                        form.style.display = 'none';
+
+                        const token = document.createElement('input');
+                        token.name = '_token';
+                        token.value = '{{ csrf_token() }}';
+                        form.appendChild(token);
+
+                        const qrInput = document.createElement('input');
+                        qrInput.name = 'qr_data';
+                        qrInput.value = decodedText;
+                        form.appendChild(qrInput);
+
+                        document.body.appendChild(form);
+                        form.submit();
 
 
                     })

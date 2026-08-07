@@ -60,34 +60,34 @@
 
                 <div class="row g-3 mb-3">
                     <div class="col-sm-4 text-secondary fw-medium small">Nama Lengkap</div>
-                    <div class="col-sm-8 text-dark fw-semibold">Jenisa Nurfadillah</div>
+                    <div class="col-sm-8 text-dark fw-semibold">{{ $user->name ?? '-' }}</div>
                 </div>
 
                 <div class="row g-3 mb-3">
                     <div class="col-sm-4 text-secondary fw-medium small">NIS / No. Registrasi</div>
-                    <div class="col-sm-8 text-dark fw-semibold">1234567890</div>
+                    <div class="col-sm-8 text-dark fw-semibold">{{ $user->nis ?? $user->nik ?? $user->username ?? '-' }}</div>
                 </div>
 
                 <div class="row g-3 mb-3">
                     <div class="col-sm-4 text-secondary fw-medium small">Kelas / Kompetensi</div>
-                    <div class="col-sm-8 text-dark fw-semibold">XI PPL 1 / Junior Web Developer (JWD)</div>
+                    <div class="col-sm-8 text-dark fw-semibold">{{ $user->kelas ?? $user->skema_kompetensi ?? 'Belum ditentukan' }}</div>
                 </div>
 
                 <div class="row g-3 mb-3">
                     <div class="col-sm-4 text-secondary fw-medium small">Email</div>
-                    <div class="col-sm-8 text-dark fw-semibold">jenisa.peserta@lsp1.sch.id</div>
+                    <div class="col-sm-8 text-dark fw-semibold">{{ $user->email ?? '-' }}</div>
                 </div>
 
                 <div class="row g-3 mb-3">
                     <div class="col-sm-4 text-secondary fw-medium small">Role</div>
                     <div class="col-sm-8">
-                        <span class="badge text-white px-3 py-1 fw-semibold" style="background-color: #1b6ca8; border-radius: 6px; font-size: 0.8rem;">Peserta</span>
+                        <span class="badge text-white px-3 py-1 fw-semibold" style="background-color: #1b6ca8; border-radius: 6px; font-size: 0.8rem;">{{ ucfirst($user->role ?? 'Peserta') }}</span>
                     </div>
                 </div>
 
                 <div class="row g-3">
                     <div class="col-sm-4 text-secondary fw-medium small">Bergabung Sejak</div>
-                    <div class="col-sm-8 text-dark fw-semibold">10 Maret 2025</div>
+                    <div class="col-sm-8 text-dark fw-semibold">{{ optional($user->created_at)->translatedFormat('j F Y') ?? '-' }}</div>
                 </div>
             </div>
         </div>

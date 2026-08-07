@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid p-4" style="font-family: 'Poppins', sans-serif;">
     
-    <!-- Header & Breadcrumb -->
+    <!-- Top Header & Breadcrumb -->
     <div class="mb-4">
         <h1 class="fw-bold text-dark mb-0" style="font-size: 2.2rem;">Detail Peserta</h1>
         <small class="text-secondary d-block fw-medium mb-3" style="font-size: 0.85rem;">LSP P1 – SMK NEGERI 1 GARUT</small>
@@ -33,93 +33,58 @@
                             <tbody>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark" style="width: 35%;">Nama Lengkap</th>
-                                    <td>Aulia Novia Shuandhari</td>
+                                    <td>{{ $peserta->name ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">NIK</th>
-                                    <td>320xxxxxxxxxxx</td>
+                                    <td>{{ $peserta->nik ?? $peserta->username ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Jenis Kelamin</th>
-                                    <td>Perempuan</td>
+                                    <td>{{ $peserta->jenis_kelamin ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Tanggal Lahir</th>
-                                    <td>30 November 2008</td>
+                                    <td>{{ $peserta->tanggal_lahir ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">No Ponsel</th>
-                                    <td>08xxxxxxxxxx</td>
+                                    <td>{{ $peserta->no_hp ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Email</th>
-                                    <td>aulia@gmail.com</td>
+                                    <td>{{ $peserta->email ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Alamat</th>
-                                    <td>Tanjung</td>
+                                    <td>{{ $peserta->alamat ?? '-' }}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Jadwal Uji -->
+                <!-- Data Kompetensi Peserta -->
                 <div>
-                    <h5 class="fw-bold text-dark mb-3">Jadwal Uji</h5>
+                    <h5 class="fw-bold text-dark mb-3">Data Kompetensi</h5>
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle mb-0">
                             <tbody>
                                 <tr>
-                                    <th class="bg-light fw-bold text-dark" style="width: 35%;">Skema</th>
-                                    <td>Junior Web Developer</td>
+                                    <th class="bg-light fw-bold text-dark" style="width: 35%;">Skema Kompetensi</th>
+                                    <td>{{ $peserta->skema_kompetensi ?? '-' }}</td>
                                 </tr>
                                 <tr>
-                                    <th class="bg-light fw-bold text-dark">Tanggal</th>
-                                    <td>10 Agustus 2026</td>
+                                    <th class="bg-light fw-bold text-dark">Kelas</th>
+                                    <td>{{ $peserta->kelas ?? '-' }}</td>
                                 </tr>
                                 <tr>
-                                    <th class="bg-light fw-bold text-dark">Jam</th>
-                                    <td>08.00 – 16.00</td>
+                                    <th class="bg-light fw-bold text-dark">Jurusan</th>
+                                    <td>{{ $peserta->jurusan ?? '-' }}</td>
                                 </tr>
                                 <tr>
-                                    <th class="bg-light fw-bold text-dark">Lokasi</th>
-                                    <td>Lab Komputer 1</td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light fw-bold text-dark">Asesor</th>
-                                    <td>Budi Santoso</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Hasil Penilaian -->
-                <div>
-                    <h5 class="fw-bold text-dark mb-3">Hasil Penilaian</h5>
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle mb-0">
-                            <tbody>
-                                <tr>
-                                    <th class="bg-light fw-bold text-dark" style="width: 35%;">Asesor</th>
-                                    <td>Budi Santoso</td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light fw-bold text-dark">Nilai Akhir</th>
-                                    <td class="fw-bold">85</td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light fw-bold text-dark">Status</th>
-                                    <td>
-                                        <span class="badge px-3 py-2 text-white fw-medium" style="background-color: #20c997; border-radius: 20px;">
-                                            Kompeten
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light fw-bold text-dark">Catatan</th>
-                                    <td>Peserta memenuhi seluruh unit kompetensi</td>
+                                    <th class="bg-light fw-bold text-dark">No. MET</th>
+                                    <td>{{ $peserta->no_met ?? '-' }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -128,7 +93,7 @@
 
             </div>
 
-            <!-- Kolom Kanan: Data Instansi, Data Sertifikasi, Riwayat Absensi, Sertifikat -->
+            <!-- Kolom Kanan: Data Instansi, Data Sertifikasi, Riwayat Absensi -->
             <div class="col-lg-6 d-flex flex-column gap-4">
                 
                 <!-- Data Instansi -->
@@ -139,11 +104,11 @@
                             <tbody>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark" style="width: 35%;">Instansi</th>
-                                    <td>SMK Negeri 1 Garut</td>
+                                    <td>{{ $peserta->instansi ?? 'SMK Negeri 1 Garut' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Jurusan/Kelas</th>
-                                    <td>Rekayasa Perangkat Lunak</td>
+                                    <td>{{ $peserta->jurusan ?? 'Rekayasa Perangkat Lunak' }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -158,21 +123,21 @@
                             <tbody>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark" style="width: 35%;">Skema Sertifikasi</th>
-                                    <td class="fw-bold">Junior Web Developer</td>
+                                    <td class="fw-bold">{{ $peserta->skema ?? 'Junior Web Developer' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Kode Skema</th>
-                                    <td>SKM-JWD-001</td>
+                                    <td>{{ $peserta->kode_skema ?? 'SKM-JWD-001' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Tanggal Pendaftaran</th>
-                                    <td>01 Agustus 2026</td>
+                                    <td>{{ $peserta->created_at ? $peserta->created_at->format('d F Y') : '01 Agustus 2026' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Status Peserta</th>
                                     <td>
-                                        <span class="badge px-3 py-1-5 text-white fw-medium" style="background-color: #20c997; border-radius: 20px;">
-                                            Aktif
+                                        <span class="badge px-3 py-1 text-white fw-medium" style="background-color: #20c997; border-radius: 20px;">
+                                            {{ ucfirst($peserta->status ?? 'Aktif') }}
                                         </span>
                                     </td>
                                 </tr>
@@ -195,51 +160,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>01-06-2026</td>
-                                    <td>07.00</td>
-                                    <td>16.00</td>
-                                    <td><span class="badge px-3 py-1-5 text-white fw-medium" style="background-color: #20c997; border-radius: 20px;">Hadir</span></td>
-                                </tr>
-                                <tr>
-                                    <td>28-05-2026</td>
-                                    <td>07.00</td>
-                                    <td>16.00</td>
-                                    <td><span class="badge px-3 py-1-5 text-white fw-medium" style="background-color: #20c997; border-radius: 20px;">Hadir</span></td>
-                                </tr>
-                                <tr>
-                                    <td>18-05-2026</td>
-                                    <td>07.00</td>
-                                    <td>16.00</td>
-                                    <td><span class="badge px-3 py-1-5 text-white fw-medium" style="background-color: #ffb703; border-radius: 20px;">Telat</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Sertifikat -->
-                <div>
-                    <h5 class="fw-bold text-dark mb-3">Sertifikat</h5>
-                    <div class="table-responsive mb-3">
-                        <table class="table table-bordered align-middle mb-0">
-                            <tbody>
-                                <tr>
-                                    <th class="bg-light fw-bold text-dark" style="width: 35%;">Nomor Sertifikat</th>
-                                    <td class="fw-bold">CERT-001234</td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light fw-bold text-dark">Tanggal Terbit</th>
-                                    <td>20 Agustus 2026</td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light fw-bold text-dark">Status</th>
-                                    <td>
-                                        <span class="badge px-3 py-1-5 text-white fw-medium" style="background-color: #20c997; border-radius: 20px;">
-                                            Terbit
-                                        </span>
-                                    </td>
-                                </tr>
+                                @forelse($peserta->absensis as $absensi)
+                                    <tr>
+                                        <td>{{ optional($absensi->created_at)->format('d-m-Y') ?? '-' }}</td>
+                                        <td>{{ $absensi->check_in ? \Carbon\Carbon::parse($absensi->check_in)->format('H.i') : '-' }}</td>
+                                        <td>{{ $absensi->check_out ? \Carbon\Carbon::parse($absensi->check_out)->format('H.i') : '-' }}</td>
+                                        <td>
+                                            <span class="badge px-3 py-1 text-white fw-medium" style="background-color: {{ $absensi->status === 'Hadir' ? '#20c997' : ($absensi->status === 'Terlambat' ? '#ffb703' : '#6c757d') }}; border-radius: 20px;">
+                                                {{ $absensi->status ?? '-' }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">Belum ada riwayat absensi.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -250,11 +186,11 @@
 
         <!-- Action Buttons (Kembali & Download Sertifikat) -->
         <div class="d-flex justify-content-end align-items-center gap-3 mt-4 pt-3 border-top">
-            <a href="{{ route('admin.peserta.index') }}" class="btn text-white fw-bold px-4 py-2-5 shadow-sm d-inline-flex align-items-center justify-content-center gap-2" style="background-color: #ffb703; border-radius: 8px; border: none; min-width: 140px;">
+            <a href="{{ route('admin.peserta.index') }}" class="btn text-white fw-bold px-4 py-2 shadow-sm d-inline-flex align-items-center justify-content-center gap-2" style="background-color: #ffb703; border-radius: 8px; border: none; min-width: 140px;">
                 <i class="bi bi-arrow-left"></i>
                 <span>Kembali</span>
             </a>
-            <a href="#" class="btn btn-primary fw-bold px-4 py-2-5 shadow-sm d-inline-flex align-items-center justify-content-center gap-2" style="background-color: #3b82f6; border-radius: 8px; border: none;">
+            <a href="#" class="btn btn-primary fw-bold px-4 py-2 shadow-sm d-inline-flex align-items-center justify-content-center gap-2" style="background-color: #3b82f6; border-radius: 8px; border: none;">
                 <i class="bi bi-download"></i>
                 <span>Download Sertifikat</span>
             </a>

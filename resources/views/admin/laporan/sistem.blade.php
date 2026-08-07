@@ -18,35 +18,39 @@
     <!-- Filter Card -->
     <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
         <div class="row g-3 align-items-center">
-            <div class="col-md-3">
-                <label class="form-label small text-muted mb-1">Periode</label>
-                <select class="form-select form-select-sm">
-                    <option selected>Agustus 2026</option>
-                    <option>Juli 2026</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label small text-muted mb-1">Skema</label>
-                <select class="form-select form-select-sm">
-                    <option selected>Semua Skema</option>
-                    <option>Junior Web Developer</option>
-                    <option>Database Programmer</option>
-                    <option>Multimedia</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label small text-muted mb-1">Hasil</label>
-                <select class="form-select form-select-sm">
-                    <option selected>Semua</option>
-                    <option>Kompeten</option>
-                    <option>Belum Kompeten</option>
-                </select>
-            </div>
-            <div class="col-md-3 text-md-end mt-4">
-                <button class="btn btn-primary btn-sm px-3 shadow-sm" style="background-color: #2b70c9; border-color: #2b70c9;">
-                    <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
-                </button>
-            </div>
+            <form id="laporanFilterForm" action="{{ route('admin.laporan.sistem') }}" method="GET" class="row g-3 w-100">
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Periode</label>
+                    <select name="periode" class="form-select form-select-sm">
+                        <option value="">Semua Periode</option>
+                        @foreach($periodeOptions as $value => $label)
+                            <option value="{{ $value }}" {{ request('periode') == $value ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Skema</label>
+                    <select name="skema_id" class="form-select form-select-sm">
+                        <option value="">Semua Skema</option>
+                        @foreach($skemas as $skema)
+                            <option value="{{ $skema->id }}" {{ request('skema_id') == $skema->id ? 'selected' : '' }}>{{ $skema->nama_skema }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Hasil</label>
+                    <select name="hasil" class="form-select form-select-sm">
+                        <option value="">Semua</option>
+                        <option value="Kompeten" {{ request('hasil') === 'Kompeten' ? 'selected' : '' }}>Kompeten</option>
+                        <option value="Belum Kompeten" {{ request('hasil') === 'Belum Kompeten' ? 'selected' : '' }}>Belum Kompeten</option>
+                    </select>
+                </div>
+                <div class="col-md-3 text-md-end d-flex align-items-end justify-content-end gap-2">
+                    <a href="{{ route('admin.laporan.sistem.export', request()->except('page')) }}" class="btn btn-primary btn-sm px-3 shadow-sm" style="background-color: #2b70c9; border-color: #2b70c9;">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -57,15 +61,15 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="d-flex align-items-center gap-1 small text-muted">
                 Show 
-                <select class="form-select form-select-sm d-inline-block w-auto mx-1">
-                    <option selected>10</option>
-                    <option>25</option>
-                    <option>50</option>
+                <select name="per_page" form="laporanFilterForm" class="form-select form-select-sm d-inline-block w-auto mx-1">
+                    <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
                 </select> 
                 entries
             </div>
             <div class="d-flex align-items-center gap-1 small text-muted">
-                Search: <input type="text" class="form-control form-control-sm d-inline-block w-auto" placeholder="">
+                Search: <input type="search" name="search" form="laporanFilterForm" value="{{ request('search') }}" class="form-control form-control-sm d-inline-block w-auto" placeholder="Cari peserta, skema, atau asesor...">
             </div>
         </div>
 
@@ -84,78 +88,31 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="text-center">1</td>
-                        <td class="fw-semibold">Jenisa Nurfadillah</td>
-                        <td>Junior Web Developer</td>
-                        <td class="text-center">20/08/2026<br><span class="text-muted small">08.00 - 16.00</span></td>
-                        <td>Budi Santoso</td>
-                        <td class="text-center"><span class="badge bg-success-subtle text-success px-2 py-1">Hadir</span></td>
-                        <td class="text-center"><span class="badge bg-success-subtle text-success px-2 py-1">Kompeten</span></td>
-                        <td class="text-center fw-semibold text-dark">
-                            LSP-2026-001<br>
-                            <span class="text-muted fw-normal small">Terbit</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">2</td>
-                        <td class="fw-semibold">Aulia Rahma</td>
-                        <td>Junior Web Developer</td>
-                        <td class="text-center">20/08/2026<br><span class="text-muted small">08.00 - 16.00</span></td>
-                        <td>Budi Santoso</td>
-                        <td class="text-center"><span class="badge bg-success-subtle text-success px-2 py-1">Hadir</span></td>
-                        <td class="text-center"><span class="badge bg-success-subtle text-success px-2 py-1">Kompeten</span></td>
-                        <td class="text-center fw-semibold text-dark">
-                            LSP-2026-002<br>
-                            <span class="text-muted fw-normal small">Terbit</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">3</td>
-                        <td class="fw-semibold">Siti Nurhaliza</td>
-                        <td>Junior Web Developer</td>
-                        <td class="text-center">20/08/2026<br><span class="text-muted small">08.00 - 16.00</span></td>
-                        <td>Budi Santoso</td>
-                        <td class="text-center"><span class="badge bg-success-subtle text-success px-2 py-1">Hadir</span></td>
-                        <td class="text-center"><span class="badge bg-danger-subtle text-danger px-2 py-1">Belum Kompeten</span></td>
-                        <td class="text-center text-muted">-</td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">4</td>
-                        <td class="fw-semibold">Raka Pratama</td>
-                        <td>Database Programmer</td>
-                        <td class="text-center">21/08/2026<br><span class="text-muted small">08.00 - 16.00</span></td>
-                        <td>Siti Rahma</td>
-                        <td class="text-center"><span class="badge bg-danger-subtle text-danger px-2 py-1">Tidak Hadir</span></td>
-                        <td class="text-center text-muted">-</td>
-                        <td class="text-center text-muted">-</td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">5</td>
-                        <td class="fw-semibold">Dinda Aulia</td>
-                        <td>Database Programmer</td>
-                        <td class="text-center">21/08/2026<br><span class="text-muted small">08.00 - 16.00</span></td>
-                        <td>Siti Rahma</td>
-                        <td class="text-center"><span class="badge bg-success-subtle text-success px-2 py-1">Hadir</span></td>
-                        <td class="text-center"><span class="badge bg-success-subtle text-success px-2 py-1">Kompeten</span></td>
-                        <td class="text-center fw-semibold text-dark">
-                            LSP-2026-003<br>
-                            <span class="text-muted fw-normal small">Terbit</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">6</td>
-                        <td class="fw-semibold">Farhan Maulana</td>
-                        <td>Multimedia</td>
-                        <td class="text-center">22/08/2026<br><span class="text-muted small">08.00 - 16.00</span></td>
-                        <td>Rudi Hermawan</td>
-                        <td class="text-center"><span class="badge bg-success-subtle text-success px-2 py-1">Hadir</span></td>
-                        <td class="text-center"><span class="badge bg-success-subtle text-success px-2 py-1">Kompeten</span></td>
-                        <td class="text-center fw-semibold text-dark">
-                            LSP-2026-004<br>
-                            <span class="text-muted fw-normal small">Terbit</span>
-                        </td>
-                    </tr>
+                    @forelse($penilaians as $index => $item)
+                        @php
+                            $attendance = $attendanceMap[$item->user_id . '_' . $item->jadwal_id] ?? null;
+                            $attendanceStatus = $attendance->status ?? 'Tidak Hadir';
+                            $attendanceClass = strtolower($attendanceStatus) === 'hadir' ? 'bg-success-subtle text-success' : (strtolower($attendanceStatus) === 'tidak hadir' ? 'bg-danger-subtle text-danger' : 'bg-secondary text-dark');
+                            $resultClass = strtolower($item->hasil) === 'kompeten' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger';
+                        @endphp
+                        <tr>
+                            <td class="text-center">{{ $penilaians->firstItem() + $index }}</td>
+                            <td class="fw-semibold">{{ optional($item->user)->name ?? '-' }}</td>
+                            <td>{{ optional($item->jadwal->skema)->nama_skema ?? '-' }}</td>
+                            <td class="text-center">
+                                {{ optional($item->jadwal)->tanggal ? \Carbon\Carbon::parse($item->jadwal->tanggal)->format('d/m/Y') : '-' }}<br>
+                                <span class="text-muted small">{{ optional($item->jadwal)->jam_mulai ?? '-' }} - {{ optional($item->jadwal)->jam_selesai ?? '-' }}</span>
+                            </td>
+                            <td>{{ optional($item->asesor)->name ?? '-' }}</td>
+                            <td class="text-center"><span class="badge {{ $attendanceClass }} px-2 py-1">{{ $attendanceStatus }}</span></td>
+                            <td class="text-center"><span class="badge {{ $resultClass }} px-2 py-1">{{ $item->hasil }}</span></td>
+                            <td class="text-center fw-semibold text-dark">{{ optional($item->sertifikat)->no_sertifikat ?? '-' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">Tidak ada data sertifikasi untuk filter ini.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

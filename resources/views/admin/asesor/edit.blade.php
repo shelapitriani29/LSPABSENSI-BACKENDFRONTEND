@@ -8,20 +8,20 @@
         <p class="text-secondary small mb-2">LSP P1 – SMK NEGERI 1 GARUT</p>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0 small" style="background: transparent; padding: 0;">
-                <li class="breadcrumb-item"><span class="text-decoration-none text-muted">Dashboard</span></li>
+                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" class="text-decoration-none text-muted">Dashboard</a></li>
                 <li class="breadcrumb-item"><span class="text-decoration-none text-muted">Referensi</span></li>
-                <li class="breadcrumb-item"><span class="text-decoration-none text-muted">Data Asesor</span></li>
+                <li class="breadcrumb-item"><a href="{{ route('admin.asesor.index') }}" class="text-decoration-none text-muted">Data Asesor</a></li>
                 <li class="breadcrumb-item active text-dark" aria-current="page">Edit Asesor</li>
             </ol>
         </nav>
     </div>
 
-    <!-- Judul Edit Data Asesor yang Mencolok di Luar Card -->
+    <!-- Judul Edit Data Asesor -->
     <div class="mb-3">
         <h4 class="fw-bold text-dark">Edit Data Asesor</h4>
     </div>
 
-    <form action="#" method="POST">
+    <form action="{{ route('admin.asesor.update', $asesor->id) }}" method="POST">
         @csrf
         @method('PUT')
         
@@ -36,45 +36,73 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label small fw-bold">Nama Lengkap & Gelar</label>
-                            <input type="text" name="nama" class="form-control" value="Budi Santoso, M.Kom.">
+                            <label class="form-label small fw-bold">Nama Lengkap & Gelar <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $asesor->name) }}" required>
+                            @error('name')
+                                <div class="invalid-feedback small">{{ $message }}</div>
+                            @enderror
                         </div>
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold">NIP / NIPTK</label>
-                                <input type="text" name="nip" class="form-control" value="198501102010011002">
+                                <input type="text" name="nip" class="form-control @error('nip') is-invalid @enderror" value="{{ old('nip', $asesor->nip ?? '') }}">
+                                @error('nip')
+                                    <div class="invalid-feedback small">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold">NIK</label>
-                                <input type="text" name="nik" class="form-control" value="3205123456780001">
+                                <input type="text" name="nik" class="form-control @error('nik') is-invalid @enderror" value="{{ old('nik', $asesor->nik ?? '') }}">
+                                @error('nik')
+                                    <div class="invalid-feedback small">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold">Tempat Lahir</label>
-                                <input type="text" name="tempat_lahir" class="form-control" value="Garut">
+                                <input type="text" name="tempat_lahir" class="form-control @error('tempat_lahir') is-invalid @enderror" value="{{ old('tempat_lahir', $asesor->tempat_lahir ?? '') }}">
+                                @error('tempat_lahir')
+                                    <div class="invalid-feedback small">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold">Tanggal Lahir</label>
-                                <input type="date" name="tanggal_lahir" class="form-control" value="1985-01-10">
+                                <input type="date" name="tanggal_lahir" class="form-control @error('tanggal_lahir') is-invalid @enderror" value="{{ old('tanggal_lahir', $asesor->tanggal_lahir ?? '') }}">
+                                @error('tanggal_lahir')
+                                    <div class="invalid-feedback small">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold">Jenis Kelamin</label>
-                                <select name="jenis_kelamin" class="form-select">
-                                    <option value="L" selected>Laki-laki</option>
-                                    <option value="P">Perempuan</option>
+                                <select name="jenis_kelamin" class="form-select @error('jenis_kelamin') is-invalid @enderror">
+                                    <option value="L" {{ old('jenis_kelamin', $asesor->jenis_kelamin ?? 'L') == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="P" {{ old('jenis_kelamin', $asesor->jenis_kelamin ?? '') == 'P' ? 'selected' : '' }}>Perempuan</option>
                                 </select>
+                                @error('jenis_kelamin')
+                                    <div class="invalid-feedback small">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold">No. HP / WhatsApp</label>
-                                <input type="text" name="no_hp" class="form-control" value="081234567890">
+                                <input type="text" name="no_hp" class="form-control @error('no_hp') is-invalid @enderror" value="{{ old('no_hp', $asesor->no_hp ?? '') }}">
+                                @error('no_hp')
+                                    <div class="invalid-feedback small">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Alamat Lengkap</label>
-                            <textarea name="alamat" class="form-control" rows="2">Jl. Cimanuk No. 123, Tarogong Kidul, Garut</textarea>
+                            <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror" rows="2">{{ old('alamat', $asesor->alamat ?? '') }}</textarea>
+                            @error('alamat')
+                                <div class="invalid-feedback small">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -86,28 +114,44 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label small fw-bold">Nomor Registrasi / Sertifikat Asesor</label>
-                            <input type="text" name="no_sertifikat" class="form-control" value="ASR-001/LSP-SMKN1GRT/2023">
+                            <label class="form-label small fw-bold">Nomor Registrasi / Sertifikat Asesor (MET)</label>
+                            <input type="text" name="no_met" class="form-control @error('no_met') is-invalid @enderror" value="{{ old('no_met', $asesor->no_met ?? $asesor->no_sertifikat ?? '') }}">
+                            @error('no_met')
+                                <div class="invalid-feedback small">{{ $message }}</div>
+                            @enderror
                         </div>
                         
                         <!-- Skema Kompetensi Dropdown -->
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Skema Kompetensi</label>
-                            <select name="skema_kompetensi" class="form-select">
-                                <option value="" disabled>Pilih Skema Kompetensi</option>
-                                <option value="Junior Web Developer" selected>Junior Web Developer</option>
-                                <option value="Junior Programmer">Junior Programmer</option>
-                                <option value="Desainer Grafis Muda">Desainer Grafis Muda</option>
-                                <option value="Administrator Jaringan Komputer">Administrator Jaringan Komputer</option>
+                            @php
+                                $skemaSelected = old('skema_kompetensi', $asesor->skema_kompetensi ?? '');
+                            @endphp
+                            <select name="skema_kompetensi" class="form-select @error('skema_kompetensi') is-invalid @enderror">
+                                <option value="" disabled {{ empty($skemaSelected) ? 'selected' : '' }}>Pilih Skema Kompetensi</option>
+                                @foreach($skemas as $skema)
+                                    <option value="{{ $skema->nama_skema }}" {{ $skemaSelected == $skema->nama_skema ? 'selected' : '' }}>
+                                        {{ $skema->nama_skema }}
+                                    </option>
+                                @endforeach
                             </select>
+                            @error('skema_kompetensi')
+                                <div class="invalid-feedback small">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Status Asesor</label>
-                            <select name="status" class="form-select">
-                                <option value="aktif" selected>Aktif</option>
-                                <option value="nonaktif">Nonaktif</option>
+                            @php
+                                $statusSelected = strtolower(old('status', $asesor->status ?? 'aktif'));
+                            @endphp
+                            <select name="status" class="form-select @error('status') is-invalid @enderror">
+                                <option value="aktif" {{ $statusSelected == 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                <option value="nonaktif" {{ $statusSelected == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
                             </select>
+                            @error('status')
+                                <div class="invalid-feedback small">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -121,20 +165,28 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label small fw-bold">Username / ID Login</label>
-                            <input type="text" name="username" class="form-control" value="budi_asesor">
+                            <label class="form-label small fw-bold">Username / ID Login <span class="text-danger">*</span></label>
+                            <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $asesor->username) }}" required>
+                            @error('username')
+                                <div class="invalid-feedback small">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Email</label>
-                            <input type="email" name="email" class="form-control" value="budi.santoso@smkn1garut.sch.id">
+                            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $asesor->email) }}">
+                            @error('email')
+                                <div class="invalid-feedback small">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Password Baru <span class="text-muted fw-normal">(Opsional)</span></label>
-                            <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak diubah">
+                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Kosongkan jika tidak diubah">
+                            @error('password')
+                                <div class="invalid-feedback small">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="d-grid gap-2 mt-4">
-                            <!-- Tombol diubah menjadi Biru Navy -->
                             <button type="submit" class="btn text-white py-2 shadow-sm fw-semibold" style="background-color: #1e293b; border-color: #1e293b;">
                                 <i class="bi bi-arrow-repeat me-1"></i> Perbarui Data Asesor
                             </button>

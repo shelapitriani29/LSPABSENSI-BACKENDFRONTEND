@@ -22,28 +22,33 @@
         <h5 class="fw-bold text-dark mb-2" style="font-size: 1.1rem;">Informasi Akun</h5>
         <p class="text-secondary mb-4" style="font-size: 0.85rem;">Perbarui informasi akun Anda pada form di bawah ini.</p>
 
-        <form action="{{ route('asesor.profil.update') }}" method="POST">
+        <form action="{{ route('asesor.profil.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
             <div class="mb-3">
-                <label for="nama" class="form-label text-dark fw-medium" style="font-size: 0.9rem;">Nama Lengkap</label>
-                <input type="text" class="form-control" id="nama" name="nama" value="Budi Santoso" style="font-size: 0.9rem; padding: 10px 15px;">
+                <label for="name" class="form-label text-dark fw-medium" style="font-size: 0.9rem;">Nama Lengkap</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name) }}" style="font-size: 0.9rem; padding: 10px 15px;">
             </div>
 
             <div class="mb-3">
-                <label for="met" class="form-label text-dark fw-medium" style="font-size: 0.9rem;">No. Registrasi / MET</label>
-                <input type="text" class="form-control" id="met" name="met" value="MET.000.123456 2023" style="font-size: 0.9rem; padding: 10px 15px;">
-            </div>
-
-            <div class="mb-3">
-                <label for="kompetensi" class="form-label text-dark fw-medium" style="font-size: 0.9rem;">Bidang / Kompetensi</label>
-                <input type="text" class="form-control" id="kompetensi" name="kompetensi" value="Junior Web Developer & Software Engineering" style="font-size: 0.9rem; padding: 10px 15px;">
+                <label for="username" class="form-label text-dark fw-medium" style="font-size: 0.9rem;">Username</label>
+                <input type="text" class="form-control" id="username" name="username" value="{{ old('username', $user->username) }}" style="font-size: 0.9rem; padding: 10px 15px;">
             </div>
 
             <div class="mb-3">
                 <label for="email" class="form-label text-dark fw-medium" style="font-size: 0.9rem;">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="budi.santoso@lsp1.sch.id" style="font-size: 0.9rem; padding: 10px 15px;">
+                <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}" style="font-size: 0.9rem; padding: 10px 15px;">
+            </div>
+
+            <div class="mb-3">
+                <label for="no_hp" class="form-label text-dark fw-medium" style="font-size: 0.9rem;">No. HP</label>
+                <input type="text" class="form-control" id="no_hp" name="no_hp" value="{{ old('no_hp', $user->no_hp) }}" style="font-size: 0.9rem; padding: 10px 15px;">
+            </div>
+
+            <div class="mb-3">
+                <label for="instansi" class="form-label text-dark fw-medium" style="font-size: 0.9rem;">Instansi</label>
+                <input type="text" class="form-control" id="instansi" name="instansi" value="{{ old('instansi', $user->instansi) }}" style="font-size: 0.9rem; padding: 10px 15px;">
             </div>
 
             <div class="mb-3">
@@ -51,9 +56,14 @@
                 <input type="text" class="form-control bg-light text-secondary" id="role" value="Asesor" disabled style="font-size: 0.9rem; padding: 10px 15px;">
             </div>
 
+            <div class="mb-3">
+                <label for="foto" class="form-label text-dark fw-medium" style="font-size: 0.9rem;">Foto Profil</label>
+                <input type="file" class="form-control" id="foto" name="foto" accept="image/png,image/jpeg,image/jpg" style="font-size: 0.9rem; padding: 10px 15px;">
+            </div>
+
             <div class="mb-4">
                 <label for="tanggal_bergabung" class="form-label text-dark fw-medium" style="font-size: 0.9rem;">Tanggal Bergabung</label>
-                <input type="text" class="form-control bg-light text-secondary" id="tanggal_bergabung" value="15 Januari 2023" disabled style="font-size: 0.9rem; padding: 10px 15px;">
+                <input type="text" class="form-control bg-light text-secondary" id="tanggal_bergabung" value="{{ $user->created_at ? $user->created_at->format('d F Y') : '-' }}" disabled style="font-size: 0.9rem; padding: 10px 15px;">
             </div>
 
             <div class="d-flex justify-content-end gap-2">

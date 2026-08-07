@@ -97,7 +97,7 @@
 
     <!-- Logout Button -->
     <div class="px-3 mt-3">
-        <form action="{{ route('login') }}" method="GET">
+        <form action="{{ route('logout') }}" method="POST">
             @csrf
             <button type="submit" class="btn w-100 text-danger border-0 d-flex align-items-center fw-semibold text-start px-3 py-2" style="background-color: rgba(255,255,255,0.1); border-radius: 6px;">
                 <i class="bi bi-box-arrow-right me-2 fs-6 text-danger"></i> Logout
