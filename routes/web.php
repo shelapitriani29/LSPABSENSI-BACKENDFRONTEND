@@ -27,26 +27,29 @@ Route::middleware('guest')->group(function () {
     // Menampilkan Form Login
     Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
     Route::get('/login', [AuthController::class, 'showLoginForm']);
-    
+
     // Memproses Login
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('throttle:10,1');
 });
 
 // Logout (Hanya bisa diakses jika sudah login)
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
-    
+
 // Shortcut /dashboard (Redirect dinamis sesuai role user yang login)
 Route::get('/dashboard', function () {
     $user = Auth::user();
-    if ($user->role === 'admin') {
+    $normalizedRole = User::normalizeRole($user->role);
+
+    if ($normalizedRole === 'admin') {
         return redirect()->route('admin.dashboard');
-    } elseif ($user->role === 'asesor') {
+    } elseif ($normalizedRole === 'asesor') {
         return redirect()->route('asesor.dashboard');
-    } elseif ($user->role === 'peserta') {
+    } elseif ($normalizedRole === 'peserta') {
         return redirect()->route('peserta.dashboard');
     }
+
     return redirect('/');
 })->middleware('auth');
 
@@ -58,7 +61,7 @@ Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-    
+
         // Dashboard Admin
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -67,7 +70,7 @@ Route::middleware(['auth', 'role:admin'])
         // ------------------------------------------
         Route::resource('user', UserController::class);
         Route::put('user/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('user.toggle-status');
-        
+
         Route::resource('peserta', PesertaController::class);
         Route::resource('asesor', AsesorController::class)->except(['create', 'store']);
         Route::resource('skema', SkemaController::class);
@@ -76,7 +79,7 @@ Route::middleware(['auth', 'role:admin'])
         // FITUR SERTIFIKASI ADMIN
         // ------------------------------------------
         Route::prefix('sertifikasi')->name('sertifikasi.')->group(function () {
-            
+
             // Jadwal Uji Kompetensi
             Route::prefix('jadwal')->name('jadwal.')->group(function () {
                 Route::get('/', [JadwalController::class, 'index'])->name('index');
@@ -179,7 +182,7 @@ Route::middleware(['auth', 'role:asesor'])
                 'penilaianPending'
             ));
         })->name('dashboard');
-        
+
         Route::get('/jadwal-asesmen', function (Request $request) {
             $search = $request->input('search');
             $status = $request->input('status');
@@ -248,7 +251,7 @@ Route::middleware(['auth', 'role:asesor'])
             $lastAbsensi = $peserta->absensis->last();
             $penilaian = Penilaian::where('user_id', $peserta->id)->latest()->first();
 
-            return view('asesor.daftar-peserta-detail', compact('peserta', 'lastAbsensi', 'penilaian')); 
+            return view('asesor.daftar-peserta-detail', compact('peserta', 'lastAbsensi', 'penilaian'));
         })->name('daftar-peserta.detail');
 
         Route::prefix('input-penilaian')->name('input-penilaian.')->group(function () {
@@ -438,7 +441,7 @@ Route::middleware(['auth', 'role:peserta'])
     ->prefix('peserta')
     ->name('peserta.')
     ->group(function () {
-    
+
         // Dashboard & Profil
         Route::get('/dashboard', function () {
             $user = Auth::user();
@@ -467,7 +470,7 @@ Route::middleware(['auth', 'role:peserta'])
             $user = Auth::user();
             return view('peserta.profil', compact('user'));
         })->name('profil');
-        
+
         // Route Edit Profil
         Route::get('/profil/edit', function () {
             $user = Auth::user();
@@ -507,8 +510,8 @@ Route::middleware(['auth', 'role:peserta'])
         })->name('profil.update-foto');
 
         // Route Ubah Password
-        Route::get('/profil/ubah-password', function () { 
-            return view('peserta.ubah-password'); 
+        Route::get('/profil/ubah-password', function () {
+            return view('peserta.ubah-password');
         })->name('profil.ubah-password');
 
         Route::put('/profil/update-password', function (Request $request) {

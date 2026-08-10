@@ -65,7 +65,7 @@ class AsesorController extends Controller
             'name'             => 'required|string|max:255',
             'username'         => ['required', 'string', Rule::unique('users', 'username')->ignore($asesor->id)],
             'email'            => ['nullable', 'email', Rule::unique('users', 'email')->ignore($asesor->id)],
-            'password'         => 'nullable|string|min:6',
+            'password'         => ['nullable','string','min:6','max:255'],
             'nip'              => 'nullable|string|max:50',
             'nik'              => 'nullable|string|max:20',
             'tempat_lahir'     => 'nullable|string|max:100',

@@ -72,7 +72,7 @@ class JadwalController extends Controller
         $request->validate([
             'kode_jadwal' => 'required|string|unique:jadwals,kode_jadwal',
             'skema_id' => 'required|exists:skemas,id',
-            'kelas' => 'required|string|max:100',
+            'kelas' => 'nullable|string|max:100',
             'asesor_id' => 'required|exists:users,id',
             'tanggal' => 'required|date',
             'jam_mulai' => 'required|date_format:H:i',
