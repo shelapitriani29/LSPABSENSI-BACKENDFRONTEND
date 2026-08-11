@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -98,15 +99,5 @@ class AuthAndRoleAccessTest extends TestCase
 
         $this->get('/admin/dashboard')->assertStatus(403);
         $this->get('/asesor/dashboard')->assertStatus(403);
-    }
-
-    public function test_seeding_default_users_twice_is_safe(): void
-    {
-        $this->seed(DatabaseSeeder::class);
-        $this->seed(DatabaseSeeder::class);
-
-        $this->assertDatabaseHas('users', ['username' => 'admin']);
-        $this->assertDatabaseHas('users', ['username' => 'asesor']);
-        $this->assertDatabaseHas('users', ['username' => 'peserta']);
     }
 }

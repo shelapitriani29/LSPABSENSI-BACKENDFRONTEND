@@ -142,7 +142,17 @@ Route::middleware(['auth', 'role:admin'])
             return view('admin.profil.edit', compact('user'));
         })->name('profil.edit');
 
-        Route::put('/profil/update', function () {
+        Route::put('/profil/update', function (Request $request) {
+            /** @var User $user */
+            $user = Auth::user();
+
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            ]);
+
+            $user->update($request->only(['name', 'email']));
+
             return redirect()->route('admin.profil')->with('success', 'Profil berhasil diperbarui!');
         })->name('profil.update');
 
@@ -150,7 +160,21 @@ Route::middleware(['auth', 'role:admin'])
             return view('admin.profil.ubah-password');
         })->name('profil.ubah-password');
 
-        Route::put('/profil/update-password', function () {
+        Route::put('/profil/update-password', function (Request $request) {
+            /** @var User $user */
+            $user = Auth::user();
+
+            $request->validate([
+                'current_password' => ['required', 'string', 'min:6'],
+                'new_password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
+            ]);
+
+            if (!Hash::check($request->current_password, $user->password)) {
+                return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
+            }
+
+            $user->update(['password' => Hash::make($request->new_password)]);
+
             return redirect()->route('admin.profil')->with('success', 'Password berhasil diperbarui!');
         })->name('profil.update-password');
 });
@@ -377,11 +401,11 @@ Route::middleware(['auth', 'role:asesor'])
 
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'email', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
                 'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $user->id],
                 'no_hp' => ['nullable', 'string', 'max:20'],
                 'instansi' => ['nullable', 'string', 'max:255'],
-                'foto' => ['nullable', 'image', 'max:2048'],
+                'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             ]);
 
             $data = $request->only(['name', 'email', 'username', 'no_hp', 'instansi']);
@@ -419,15 +443,15 @@ Route::middleware(['auth', 'role:asesor'])
             $user = Auth::user();
 
             $request->validate([
-                'current_password' => ['required'],
-                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'current_password' => ['required', 'string', 'min:6'],
+                'new_password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
             ]);
 
             if (!Hash::check($request->current_password, $user->password)) {
                 return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
             }
 
-            $user->update(['password' => Hash::make($request->password)]);
+            $user->update(['password' => Hash::make($request->new_password)]);
 
             return redirect()->route('asesor.profil')->with('success', 'Password berhasil diperbarui!');
         })->name('profil.update-password');
@@ -500,7 +524,7 @@ Route::middleware(['auth', 'role:peserta'])
             $user = Auth::user();
 
             $request->validate([
-                'foto' => ['required', 'image', 'max:2048'],
+                'foto' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             ]);
 
             $path = $request->file('foto')->store('profiles', 'public');
@@ -519,8 +543,8 @@ Route::middleware(['auth', 'role:peserta'])
             $user = Auth::user();
 
             $request->validate([
-                'current_password' => ['required', 'string'],
-                'new_password' => ['required', 'string', 'min:6', 'confirmed'],
+                'current_password' => ['required', 'string', 'min:6'],
+                'new_password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
             ]);
 
             if (!Hash::check($request->current_password, $user->password)) {

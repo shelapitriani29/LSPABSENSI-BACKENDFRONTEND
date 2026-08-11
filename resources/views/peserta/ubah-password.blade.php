@@ -6,7 +6,7 @@
     <div class="mb-3">
         <h1 class="fw-bold text-dark mb-0" style="font-size: 2.2rem; letter-spacing: -0.5px;">Ubah Password</h1>
         <small class="text-secondary d-block fw-medium mb-3" style="font-size: 0.85rem;">Pastikan password Anda kuat dan tidak mudah ditebak.</small>
-        
+
         <!-- Breadcrumb Navigation -->
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-transparent p-0 mb-0" style="font-size: 0.9rem;">
@@ -74,7 +74,7 @@
                             <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2" style="line-height: 1.5;">
                                 <li class="d-flex align-items-start gap-2">
                                     <span style="font-size: 6px; margin-top: 6px;" class="text-primary">■</span>
-                                    <span>Gunakan minimal 8 karakter</span>
+                                    <span>Gunakan minimal 6 karakter</span>
                                 </li>
                                 <li class="d-flex align-items-start gap-2">
                                     <span style="font-size: 6px; margin-top: 6px;" class="text-primary">■</span>

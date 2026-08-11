@@ -60,7 +60,7 @@
                     <h6 class="fw-bold mb-0">Tips Keamanan</h6>
                 </div>
                 <ul class="text-muted small ps-3 mb-0 lh-lg">
-                    <li>Gunakan minimal 8 karakter.</li>
+                    <li>Gunakan minimal 6 karakter.</li>
                     <li>Kombinasikan huruf besar, kecil, angka, dan simbol.</li>
                     <li>Jangan gunakan informasi pribadi.</li>
                     <li>Ganti password secara berkala.</li>

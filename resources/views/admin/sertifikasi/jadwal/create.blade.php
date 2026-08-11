@@ -56,6 +56,16 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label fw-semibold small">Kelas *</label>
+                    <select name="kelas" class="form-select" required>
+                        <option value="" disabled {{ old('kelas') ? '' : 'selected' }}>Pilih kelas</option>
+                        @foreach($kelasOptions as $kelas)
+                            <option value="{{ $kelas }}" {{ old('kelas') == $kelas ? 'selected' : '' }}>{{ $kelas }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="mb-3">
                     <label class="form-label fw-semibold small">Asesor *</label>
                     <select name="asesor_id" class="form-select" required>
                         <option value="" disabled {{ old('asesor_id') ? '' : 'selected' }}>Pilih asesor</option>

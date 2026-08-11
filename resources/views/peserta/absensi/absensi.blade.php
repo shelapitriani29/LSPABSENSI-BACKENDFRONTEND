@@ -679,29 +679,26 @@
         |--------------------------------------------------------------------------
         */
 
-        scanner.start(
+        const scanOptions = {
+            fps: 10,
+            qrbox: {
+                width: 220,
+                height: 220
+            }
+        };
 
-            {
-                facingMode: "environment"
-            },
+        const startCamera = (constraints) => {
+            return scanner.start(
+                constraints,
+                scanOptions,
 
-            {
-                fps: 10,
+                /*
+                |--------------------------------------------------------------------------
+                | QR BERHASIL DIBACA
+                |--------------------------------------------------------------------------
+                */
 
-                qrbox: {
-                    width: 220,
-                    height: 220
-                }
-            },
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | QR BERHASIL DIBACA
-            |--------------------------------------------------------------------------
-            */
-
-            function(decodedText) {
+                function(decodedText) {
 
 
                 /*
@@ -817,78 +814,59 @@
             |--------------------------------------------------------------------------
             */
 
-            function(errorMessage) {
+                function(errorMessage) {
 
-                /*
-                | Tidak perlu melakukan apa-apa.
-                |
-                | Function ini terus dipanggil
-                | selama kamera mencari QR.
-                */
+                    /*
+                    | Tidak perlu melakukan apa-apa.
+                    |
+                    | Function ini terus dipanggil
+                    | selama kamera mencari QR.
+                    */
 
-            }
+                }
 
-        )
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | CAMERA BERHASIL DIMULAI
-        |--------------------------------------------------------------------------
-        */
-
-        .then(() => {
-
-            isScanning = true;
-
-            console.log(
-                "Kamera berhasil dimulai."
             );
+        };
 
-        })
+        startCamera({ facingMode: "environment" })
+            .then(() => {
+                isScanning = true;
+                console.log("Kamera berhasil dimulai.");
+            })
+            .catch(error => {
+                console.warn("Kamera environment ditolak, mencoba kamera depan.", error);
 
+                startCamera({ facingMode: "user" })
+                    .then(() => {
+                        isScanning = true;
+                        console.log("Kamera fallback berhasil dimulai.");
+                    })
+                    .catch(fallbackError => {
+                        console.error("Gagal mengakses kamera:", fallbackError);
 
-        /*
-        |--------------------------------------------------------------------------
-        | ERROR CAMERA
-        |--------------------------------------------------------------------------
-        */
+                        isScanning = false;
 
-        .catch(error => {
+                        result.innerHTML = `
 
+                            <span class="text-danger fw-semibold">
 
-            console.error(
-                "Gagal mengakses kamera:",
-                error
-            );
+                                <i class="bi bi-camera-video-off me-1"></i>
 
+                                Kamera tidak dapat digunakan.
 
-            isScanning = false;
+                            </span>
 
+                        `;
 
-            result.innerHTML = `
+                        alert(
+                            "Gagal mengakses kamera.\n\n" +
+                            "Pastikan izin kamera di browser " +
+                            "sudah diberikan."
+                        );
 
-                <span class="text-danger fw-semibold">
-
-                    <i class="bi bi-camera-video-off me-1"></i>
-
-                    Kamera tidak dapat digunakan.
-
-                </span>
-
-            `;
-
-
-            alert(
-                "Gagal mengakses kamera.\n\n" +
-                "Pastikan izin kamera di browser " +
-                "sudah diberikan."
-            );
-
-
-            modal.style.display = 'none';
-
-        });
+                        modal.style.display = 'none';
+                    });
+            });
 
     }
 
