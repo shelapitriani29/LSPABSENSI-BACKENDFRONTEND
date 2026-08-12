@@ -47,6 +47,16 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label fw-semibold small">Kelas *</label>
+                    <select name="kelas" class="form-select" required>
+                        <option value="" disabled {{ old('kelas', $jadwal->kelas) ? '' : 'selected' }}>Pilih kelas</option>
+                        @foreach($kelasOptions as $kelas)
+                            <option value="{{ $kelas }}" {{ old('kelas', $jadwal->kelas) == $kelas ? 'selected' : '' }}>{{ $kelas }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="mb-3">
                     <label class="form-label fw-semibold small">Asesor *</label>
                     <select name="asesor_id" class="form-select" required>
                         <option value="" disabled {{ old('asesor_id', $jadwal->asesor_id) ? '' : 'selected' }}>Pilih asesor</option>
@@ -63,11 +73,11 @@
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold small">Jam Mulai *</label>
-                        <input type="time" name="jam_mulai" class="form-control" value="{{ old('jam_mulai', $jadwal->jam_mulai) }}" required>
+                        <input type="time" name="jam_mulai" class="form-control" value="{{ old('jam_mulai', $jadwal->jam_mulai ? substr($jadwal->jam_mulai, 0, 5) : '') }}" required>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold small">Jam Selesai *</label>
-                        <input type="time" name="jam_selesai" class="form-control" value="{{ old('jam_selesai', $jadwal->jam_selesai) }}" required>
+                        <input type="time" name="jam_selesai" class="form-control" value="{{ old('jam_selesai', $jadwal->jam_selesai ? substr($jadwal->jam_selesai, 0, 5) : '') }}" required>
                     </div>
                 </div>
 

@@ -79,6 +79,22 @@ class JadwalController extends Controller
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
             'lokasi' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
+        ], [
+            'kode_jadwal.required' => 'Kode jadwal wajib diisi.',
+            'skema_id.required' => 'Skema sertifikasi wajib dipilih.',
+            'skema_id.exists' => 'Skema yang dipilih tidak valid.',
+            'kelas.required' => 'Kelas wajib dipilih.',
+            'asesor_id.required' => 'Asesor wajib dipilih.',
+            'asesor_id.exists' => 'Asesor yang dipilih tidak valid.',
+            'tanggal.required' => 'Tanggal uji wajib diisi.',
+            'tanggal.date' => 'Tanggal uji harus berupa tanggal yang valid.',
+            'jam_mulai.required' => 'Jam mulai wajib diisi.',
+            'jam_mulai.date_format' => 'Jam mulai harus menggunakan format HH:MM.',
+            'jam_selesai.required' => 'Jam selesai wajib diisi.',
+            'jam_selesai.date_format' => 'Jam selesai harus menggunakan format HH:MM.',
+            'jam_selesai.after' => 'Jam selesai harus lebih besar dari jam mulai.',
+            'lokasi.required' => 'Lokasi wajib diisi.',
+            'lokasi.max' => 'Lokasi terlalu panjang.',
         ]);
 
         Jadwal::create($request->only([
@@ -133,6 +149,11 @@ class JadwalController extends Controller
     {
         $jadwal = Jadwal::findOrFail($id);
 
+        $request->merge([
+            'jam_mulai' => $request->filled('jam_mulai') ? substr($request->jam_mulai, 0, 5) : null,
+            'jam_selesai' => $request->filled('jam_selesai') ? substr($request->jam_selesai, 0, 5) : null,
+        ]);
+
         $request->validate([
             'kode_jadwal' => ['required', 'string', Rule::unique('jadwals', 'kode_jadwal')->ignore($jadwal->id)],
             'skema_id' => 'required|exists:skemas,id',
@@ -143,6 +164,23 @@ class JadwalController extends Controller
             'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
             'lokasi' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
+        ], [
+            'kode_jadwal.required' => 'Kode jadwal wajib diisi.',
+            'kode_jadwal.unique' => 'Kode jadwal sudah digunakan.',
+            'skema_id.required' => 'Skema sertifikasi wajib dipilih.',
+            'skema_id.exists' => 'Skema yang dipilih tidak valid.',
+            'kelas.required' => 'Kelas wajib dipilih.',
+            'asesor_id.required' => 'Asesor wajib dipilih.',
+            'asesor_id.exists' => 'Asesor yang dipilih tidak valid.',
+            'tanggal.required' => 'Tanggal uji wajib diisi.',
+            'tanggal.date' => 'Tanggal uji harus berupa tanggal yang valid.',
+            'jam_mulai.required' => 'Jam mulai wajib diisi.',
+            'jam_mulai.date_format' => 'Jam mulai harus menggunakan format HH:MM.',
+            'jam_selesai.required' => 'Jam selesai wajib diisi.',
+            'jam_selesai.date_format' => 'Jam selesai harus menggunakan format HH:MM.',
+            'jam_selesai.after' => 'Jam selesai harus lebih besar dari jam mulai.',
+            'lokasi.required' => 'Lokasi wajib diisi.',
+            'lokasi.max' => 'Lokasi terlalu panjang.',
         ]);
 
         $jadwal->update($request->only([

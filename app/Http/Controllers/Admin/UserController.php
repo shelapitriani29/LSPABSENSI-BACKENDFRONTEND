@@ -36,7 +36,7 @@ class UserController extends Controller
             'name'                 => 'required|string|max:255',
             'username'             => 'required|string|max:255|unique:users,username',
             'email'                => 'required|email|unique:users,email',
-            'password'             => 'required|string|min:6',
+            'password'             => ['required','string','min:6','max:255'],
             'role'                 => 'required|string',
             'status'               => 'nullable|string',
             'nomor_induk'          => 'nullable|string',
@@ -110,7 +110,7 @@ class UserController extends Controller
             'kelas'       => 'nullable|string',
             'jurusan'     => 'nullable|string',
             'status'      => 'nullable|string',
-            'password'    => 'nullable|string|min:6',
+            'password'    => ['nullable','string','min:6','max:255'],
         ]);
 
         // 2. Ambil data input

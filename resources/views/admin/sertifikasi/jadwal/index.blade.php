@@ -14,6 +14,13 @@
             </ol>
         </nav>
     </div>
+        
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
     <!-- Card Tabel Jadwal Uji -->
     <div class="card border-0 shadow-sm rounded-4">
@@ -37,7 +44,7 @@
                         <option value="Selesai" {{ request('status') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
                     </select>
                 </div>
-                
+
                 <div class="d-flex align-items-center gap-2">
                     <span class="small text-secondary">Search:</span>
                     <div class="input-group input-group-sm" style="width: 260px;">

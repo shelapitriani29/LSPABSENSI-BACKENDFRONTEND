@@ -6,7 +6,7 @@
     <div class="mb-4">
         <h2 class="fw-bold text-dark mb-1" style="font-size: 1.5rem;">Ubah Password</h2>
         <p class="text-secondary mb-2" style="font-size: 0.9rem;">Pastikan password Anda kuat dan tidak mudah ditebak.</p>
-        
+
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0" style="font-size: 0.85rem;">
@@ -87,7 +87,7 @@
                     <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.95rem;">Tips Keamanan</h6>
                 </div>
                 <ul class="text-secondary ps-3 mb-0" style="font-size: 0.85rem; line-height: 1.6;">
-                    <li>Gunakan minimal 8 karakter.</li>
+                    <li>Gunakan minimal 6 karakter.</li>
                     <li>Kombinasikan huruf besar, kecil, angka, dan simbol.</li>
                     <li>Jangan gunakan informasi pribadi.</li>
                     <li>Ganti password secara berkala.</li>

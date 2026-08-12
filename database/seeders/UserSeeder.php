@@ -14,30 +14,36 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Admin
-        User::create([
-            'name' => 'Administrator',
-            'username' => 'admin',
-            'email' => 'admin@lsp.com',
-            'password' => Hash::make('1'),
-            'role' => 'admin',
-        ]);
+        User::updateOrCreate(
+            ['username' => 'admin'],
+            [
+                'name' => 'Administrator',
+                'email' => 'admin@lsp.com',
+                'password' => Hash::make('1'),
+                'role' => 'admin',
+            ]
+        );
 
         // Asesor
-        User::create([
-            'name' => 'Asesor',
-            'username' => 'asesor',
-            'email' => 'asesor@lsp.com',
-            'password' => Hash::make('1'),
-            'role' => 'asesor',
-        ]);
+        User::updateOrCreate(
+            ['username' => 'asesor'],
+            [
+                'name' => 'Asesor',
+                'email' => 'asesor@lsp.com',
+                'password' => Hash::make('1'),
+                'role' => 'asesor',
+            ]
+        );
 
         // Peserta
-        User::create([
-            'name' => 'Peserta',
-            'username' => 'peserta',
-            'email' => 'peserta@lsp.com',
-            'password' => Hash::make('1'),
-            'role' => 'peserta',
-        ]);
+        User::updateOrCreate(
+            ['username' => 'peserta'],
+            [
+                'name' => 'Peserta',
+                'email' => 'peserta@lsp.com',
+                'password' => Hash::make('1'),
+                'role' => 'peserta',
+            ]
+        );
     }
 }

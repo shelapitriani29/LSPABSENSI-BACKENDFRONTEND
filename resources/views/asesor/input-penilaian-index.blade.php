@@ -54,7 +54,7 @@
                                 $attendance = $peserta->absensis->first();
                                 $penilaian = $peserta->penilaians->first();
                                 $attendanceStatus = $attendance->status ?? 'Belum Hadir';
-                                $hasAttendance = strtolower($attendanceStatus) === 'hadir';
+                                $hasAttendance = in_array(strtolower($attendanceStatus), ['hadir', 'selesai'], true);
                                 $penilaianStatus = $penilaian->hasil ?? 'Belum Dinilai';
                                 $attendanceClass = $hasAttendance ? 'bg-success text-white' : ($attendanceStatus === 'Belum Hadir' ? 'bg-secondary text-white' : 'bg-warning text-dark');
                                 $penilaianClass = $penilaian ? ($penilaian->hasil === 'Kompeten' ? 'bg-success text-white' : 'bg-danger text-white') : 'bg-secondary text-white';

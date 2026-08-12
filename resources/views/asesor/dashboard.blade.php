@@ -17,7 +17,7 @@
     <!-- Ucapan Selamat Datang -->
     <div class="card border-0 shadow-sm mt-3 mb-4 rounded-4">
         <div class="card-body py-3 px-4">
-            <h5 class="fw-bold text-dark mb-1">Halo, Budi Santoso</h5>
+            <h5 class="fw-bold text-dark mb-1">Halo, {{ Auth::user()->name ?? 'User' }}</h5>
             <p class="text-muted small mb-0">Selamat Datang di Sistem Sertifikasi LSP</p>
         </div>
     </div>

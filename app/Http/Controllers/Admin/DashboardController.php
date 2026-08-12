@@ -27,9 +27,9 @@ class DashboardController extends Controller
         $persentaseTidakLulus = $totalPenilaian ? (100 - $persentaseLulus) : 0;
 
         $grafikSertifikasi = [
-            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
-            'lulus' => array_fill(0, 6, 0),
-            'tidak_lulus' => array_fill(0, 6, 0),
+            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+            'lulus' => array_fill(0, 12, 0),
+            'tidak_lulus' => array_fill(0, 12, 0),
         ];
 
         $byMonth = Penilaian::selectRaw('MONTH(tanggal) as month, hasil, COUNT(*) as total')

@@ -27,26 +27,29 @@ Route::middleware('guest')->group(function () {
     // Menampilkan Form Login
     Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
     Route::get('/login', [AuthController::class, 'showLoginForm']);
-    
+
     // Memproses Login
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('throttle:10,1');
 });
 
 // Logout (Hanya bisa diakses jika sudah login)
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
-    
+
 // Shortcut /dashboard (Redirect dinamis sesuai role user yang login)
 Route::get('/dashboard', function () {
     $user = Auth::user();
-    if ($user->role === 'admin') {
+    $normalizedRole = User::normalizeRole($user->role);
+
+    if ($normalizedRole === 'admin') {
         return redirect()->route('admin.dashboard');
-    } elseif ($user->role === 'asesor') {
+    } elseif ($normalizedRole === 'asesor') {
         return redirect()->route('asesor.dashboard');
-    } elseif ($user->role === 'peserta') {
+    } elseif ($normalizedRole === 'peserta') {
         return redirect()->route('peserta.dashboard');
     }
+
     return redirect('/');
 })->middleware('auth');
 
@@ -58,7 +61,7 @@ Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-    
+
         // Dashboard Admin
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -67,7 +70,7 @@ Route::middleware(['auth', 'role:admin'])
         // ------------------------------------------
         Route::resource('user', UserController::class);
         Route::put('user/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('user.toggle-status');
-        
+
         Route::resource('peserta', PesertaController::class);
         Route::resource('asesor', AsesorController::class)->except(['create', 'store']);
         Route::resource('skema', SkemaController::class);
@@ -76,7 +79,7 @@ Route::middleware(['auth', 'role:admin'])
         // FITUR SERTIFIKASI ADMIN
         // ------------------------------------------
         Route::prefix('sertifikasi')->name('sertifikasi.')->group(function () {
-            
+
             // Jadwal Uji Kompetensi
             Route::prefix('jadwal')->name('jadwal.')->group(function () {
                 Route::get('/', [JadwalController::class, 'index'])->name('index');
@@ -139,7 +142,17 @@ Route::middleware(['auth', 'role:admin'])
             return view('admin.profil.edit', compact('user'));
         })->name('profil.edit');
 
-        Route::put('/profil/update', function () {
+        Route::put('/profil/update', function (Request $request) {
+            /** @var User $user */
+            $user = Auth::user();
+
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            ]);
+
+            $user->update($request->only(['name', 'email']));
+
             return redirect()->route('admin.profil')->with('success', 'Profil berhasil diperbarui!');
         })->name('profil.update');
 
@@ -147,7 +160,21 @@ Route::middleware(['auth', 'role:admin'])
             return view('admin.profil.ubah-password');
         })->name('profil.ubah-password');
 
-        Route::put('/profil/update-password', function () {
+        Route::put('/profil/update-password', function (Request $request) {
+            /** @var User $user */
+            $user = Auth::user();
+
+            $request->validate([
+                'current_password' => ['required', 'string', 'min:6'],
+                'new_password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
+            ]);
+
+            if (!Hash::check($request->current_password, $user->password)) {
+                return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
+            }
+
+            $user->update(['password' => Hash::make($request->new_password)]);
+
             return redirect()->route('admin.profil')->with('success', 'Password berhasil diperbarui!');
         })->name('profil.update-password');
 });
@@ -179,7 +206,7 @@ Route::middleware(['auth', 'role:asesor'])
                 'penilaianPending'
             ));
         })->name('dashboard');
-        
+
         Route::get('/jadwal-asesmen', function (Request $request) {
             $search = $request->input('search');
             $status = $request->input('status');
@@ -212,7 +239,7 @@ Route::middleware(['auth', 'role:asesor'])
         Route::get('/jadwal-asesmen/{id}', function ($id) {
             $jadwal = Jadwal::with(['skema', 'asesor'])->findOrFail($id);
             $pesertaCount = User::where('role', 'peserta')->where('kelas', $jadwal->kelas)->count();
-            $hadirCount = Absensi::where('jadwal_id', $jadwal->id)->where('status', 'Hadir')->count();
+            $hadirCount = Absensi::where('jadwal_id', $jadwal->id)->whereIn('status', ['Hadir', 'Selesai'])->count();
             $penilaianCount = Penilaian::where('jadwal_id', $jadwal->id)->count();
             $belumPenilaianCount = max(0, $pesertaCount - $penilaianCount);
 
@@ -248,7 +275,7 @@ Route::middleware(['auth', 'role:asesor'])
             $lastAbsensi = $peserta->absensis->last();
             $penilaian = Penilaian::where('user_id', $peserta->id)->latest()->first();
 
-            return view('asesor.daftar-peserta-detail', compact('peserta', 'lastAbsensi', 'penilaian')); 
+            return view('asesor.daftar-peserta-detail', compact('peserta', 'lastAbsensi', 'penilaian'));
         })->name('daftar-peserta.detail');
 
         Route::prefix('input-penilaian')->name('input-penilaian.')->group(function () {
@@ -374,11 +401,11 @@ Route::middleware(['auth', 'role:asesor'])
 
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'email', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
                 'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $user->id],
                 'no_hp' => ['nullable', 'string', 'max:20'],
                 'instansi' => ['nullable', 'string', 'max:255'],
-                'foto' => ['nullable', 'image', 'max:2048'],
+                'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             ]);
 
             $data = $request->only(['name', 'email', 'username', 'no_hp', 'instansi']);
@@ -416,15 +443,15 @@ Route::middleware(['auth', 'role:asesor'])
             $user = Auth::user();
 
             $request->validate([
-                'current_password' => ['required'],
-                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'current_password' => ['required', 'string', 'min:6'],
+                'new_password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
             ]);
 
             if (!Hash::check($request->current_password, $user->password)) {
                 return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
             }
 
-            $user->update(['password' => Hash::make($request->password)]);
+            $user->update(['password' => Hash::make($request->new_password)]);
 
             return redirect()->route('asesor.profil')->with('success', 'Password berhasil diperbarui!');
         })->name('profil.update-password');
@@ -438,7 +465,7 @@ Route::middleware(['auth', 'role:peserta'])
     ->prefix('peserta')
     ->name('peserta.')
     ->group(function () {
-    
+
         // Dashboard & Profil
         Route::get('/dashboard', function () {
             $user = Auth::user();
@@ -467,7 +494,7 @@ Route::middleware(['auth', 'role:peserta'])
             $user = Auth::user();
             return view('peserta.profil', compact('user'));
         })->name('profil');
-        
+
         // Route Edit Profil
         Route::get('/profil/edit', function () {
             $user = Auth::user();
@@ -497,7 +524,7 @@ Route::middleware(['auth', 'role:peserta'])
             $user = Auth::user();
 
             $request->validate([
-                'foto' => ['required', 'image', 'max:2048'],
+                'foto' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             ]);
 
             $path = $request->file('foto')->store('profiles', 'public');
@@ -507,8 +534,8 @@ Route::middleware(['auth', 'role:peserta'])
         })->name('profil.update-foto');
 
         // Route Ubah Password
-        Route::get('/profil/ubah-password', function () { 
-            return view('peserta.ubah-password'); 
+        Route::get('/profil/ubah-password', function () {
+            return view('peserta.ubah-password');
         })->name('profil.ubah-password');
 
         Route::put('/profil/update-password', function (Request $request) {
@@ -516,8 +543,8 @@ Route::middleware(['auth', 'role:peserta'])
             $user = Auth::user();
 
             $request->validate([
-                'current_password' => ['required', 'string'],
-                'new_password' => ['required', 'string', 'min:6', 'confirmed'],
+                'current_password' => ['required', 'string', 'min:6'],
+                'new_password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
             ]);
 
             if (!Hash::check($request->current_password, $user->password)) {
