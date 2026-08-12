@@ -19,7 +19,7 @@ class SecurityHeaders
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('Referrer-Policy', 'same-origin');
         $response->headers->set('X-XSS-Protection', '1; mode=block');
-        $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+        $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(self)');
 
         if ($request->isSecure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');

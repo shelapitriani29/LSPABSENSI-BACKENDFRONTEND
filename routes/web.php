@@ -239,7 +239,7 @@ Route::middleware(['auth', 'role:asesor'])
         Route::get('/jadwal-asesmen/{id}', function ($id) {
             $jadwal = Jadwal::with(['skema', 'asesor'])->findOrFail($id);
             $pesertaCount = User::where('role', 'peserta')->where('kelas', $jadwal->kelas)->count();
-            $hadirCount = Absensi::where('jadwal_id', $jadwal->id)->where('status', 'Hadir')->count();
+            $hadirCount = Absensi::where('jadwal_id', $jadwal->id)->whereIn('status', ['Hadir', 'Selesai'])->count();
             $penilaianCount = Penilaian::where('jadwal_id', $jadwal->id)->count();
             $belumPenilaianCount = max(0, $pesertaCount - $penilaianCount);
 
