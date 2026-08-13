@@ -1,9 +1,10 @@
 <IfModule mod_rewrite.c>
-    <IfModule mod_negotiation.c>
-        Options -MultiViews -Indexes
-    </IfModule>
-
     RewriteEngine On
+
+    # Force HTTPS (handle direct and proxied / load-balanced requests)
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
