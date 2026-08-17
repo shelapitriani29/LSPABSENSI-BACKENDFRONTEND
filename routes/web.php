@@ -86,6 +86,38 @@ Route::middleware(['auth', 'role:admin'])
                 Route::get('/create', [JadwalController::class, 'create'])->name('create');
                 Route::post('/', [JadwalController::class, 'store'])->name('store');
                 Route::get('/{id}', [JadwalController::class, 'show'])->name('show');
+                
+                // Rute khusus kelola soal diarahkan ke method kelolaSoal di JadwalController
+                Route::get('/{id}/kelola-soal', [JadwalController::class, 'kelolaSoal'])->name('soal');
+                
+                // Rute Tambahan untuk Kelola Soal Per Kategori (Mengatasi RouteNotFoundException)
+                Route::get('/{id}/kategori/{kategoriId}/soal', function($id, $kategoriId) {
+                    $jadwal = Jadwal::with('skema')->findOrFail($id);
+                    return view('admin.sertifikasi.jadwal.detail-soal', compact('jadwal', 'kategoriId'));
+                })->name('kategori.soal');
+
+                // Rute Halaman Terpisah Tambah Kategori Soal
+                Route::get('/{id}/kategori/create', function($id) {
+                    $jadwal = Jadwal::with('skema')->findOrFail($id);
+                    return view('admin.sertifikasi.jadwal.create-kategori', compact('jadwal'));
+                })->name('kategori.create');
+
+                // Rute Frontend / Penghubung Tambah Soal (Sesuai Link pada Tombol Tambah Soal)
+                Route::get('/{id}/kategori/{kategoriId}/soal/tambah', function($id, $kategoriId) {
+                    $jadwal = Jadwal::with('skema')->findOrFail($id);
+                    return view('admin.sertifikasi.jadwal.tambah-soal', compact('jadwal', 'kategoriId'));
+                })->name('kategori.soal.tambah');
+
+                // Rute Tambahan untuk Edit Soal Kategori (Menangani 404 pada URL edit-soal)
+                Route::get('/{id}/kategori/{kategoriId}/soal/{soalId}/edit-soal', function($id, $kategoriId, $soalId) {
+                    $jadwal = Jadwal::with('skema')->findOrFail($id);
+                    return view('admin.sertifikasi.jadwal.edit-soal', compact('jadwal', 'kategoriId', 'soalId'));
+                })->name('kategori.soal.edit');
+
+                // Rute Baru untuk Simpan Pengaturan Ujian & Simpan Kategori Soal
+                Route::put('/{id}/update-pengaturan', [JadwalController::class, 'updatePengaturan'])->name('update-pengaturan');
+                Route::post('/{id}/kategori', [JadwalController::class, 'storeKategori'])->name('kategori.store');
+
                 Route::get('/{id}/edit', [JadwalController::class, 'edit'])->name('edit');
                 Route::put('/{id}', [JadwalController::class, 'update'])->name('update');
                 Route::delete('/{id}', [JadwalController::class, 'destroy'])->name('destroy');
@@ -187,6 +219,7 @@ Route::middleware(['auth', 'role:asesor'])
     ->prefix('asesor')
     ->name('asesor.')
     ->group(function () {
+        
         Route::get('/dashboard', function () {
             $today = now()->toDateString();
 
@@ -236,6 +269,25 @@ Route::middleware(['auth', 'role:asesor'])
             return view('asesor.jadwal-asesmen', compact('jadwals'));
         })->name('jadwal-asesmen');
 
+        // Rute untuk mengarahkan ke halaman daftar peserta berdasarkan kelas jadwal
+        Route::get('/jadwal-asesmen/{id}/peserta', function ($id) {
+            $jadwal = Jadwal::findOrFail($id);
+            return redirect()->route('asesor.daftar-peserta', ['search' => $jadwal->kelas]);
+        })->name('jadwal-asesmen.peserta');
+
+        // Rute baru untuk menampilkan daftar peserta per jadwal secara spesifik
+        Route::get('/jadwal-asesmen/{id}/lihat-peserta', function ($id) {
+            $jadwal = Jadwal::findOrFail($id);
+            $pesertas = User::where('role', 'peserta')
+                ->where('kelas', $jadwal->kelas)
+                ->with([
+                    'absensis' => fn($q) => $q->where('jadwal_id', $jadwal->id), 
+                    'penilaians' => fn($q) => $q->where('jadwal_id', $jadwal->id)
+                ])
+                ->get();
+            return view('asesor.jadwal-peserta', compact('jadwal', 'pesertas'));
+        })->name('jadwal-asesmen.lihat-peserta');
+
         Route::get('/jadwal-asesmen/{id}', function ($id) {
             $jadwal = Jadwal::with(['skema', 'asesor'])->findOrFail($id);
             $pesertaCount = User::where('role', 'peserta')->where('kelas', $jadwal->kelas)->count();
@@ -257,10 +309,10 @@ Route::middleware(['auth', 'role:asesor'])
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('username', 'like', "%{$search}%")
-                      ->orWhere('no_hp', 'like', "%{$search}%")
-                      ->orWhere('instansi', 'like', "%{$search}%")
-                      ->orWhere('kelas', 'like', "%{$search}%");
+                        ->orWhere('username', 'like', "%{$search}%")
+                        ->orWhere('no_hp', 'like', "%{$search}%")
+                        ->orWhere('instansi', 'like', "%{$search}%")
+                        ->orWhere('kelas', 'like', "%{$search}%");
                 });
             }
 
@@ -302,16 +354,8 @@ Route::middleware(['auth', 'role:asesor'])
                         });
                     })
                     ->with([
-                        'penilaians' => function ($query) use ($jadwalId) {
-                            if ($jadwalId) {
-                                $query->where('jadwal_id', $jadwalId);
-                            }
-                        },
-                        'absensis' => function ($query) use ($jadwalId) {
-                            if ($jadwalId) {
-                                $query->where('jadwal_id', $jadwalId);
-                            }
-                        },
+                        'penilaians' => function ($query) use ($jadwalId) { if ($jadwalId) $query->where('jadwal_id', $jadwalId); },
+                        'absensis' => function ($query) use ($jadwalId) { if ($jadwalId) $query->where('jadwal_id', $jadwalId); },
                     ])
                     ->orderBy('name')
                     ->paginate($perPage)
@@ -326,9 +370,7 @@ Route::middleware(['auth', 'role:asesor'])
                     ->when($user->kelas, fn($query) => $query->where('kelas', $user->kelas))
                     ->orderBy('kode_jadwal')
                     ->get();
-
                 $selectedJadwalId = request('jadwal_id') ?: ($jadwals->count() === 1 ? $jadwals->first()->id : null);
-
                 return view('asesor.input-penilaian-create', compact('user', 'jadwals', 'selectedJadwalId'));
             })->name('create');
 
@@ -341,12 +383,9 @@ Route::middleware(['auth', 'role:asesor'])
                     'tanggal' => ['nullable', 'date'],
                     'keterangan' => ['nullable', 'string'],
                 ]);
-
                 $data = $request->only(['user_id', 'jadwal_id', 'hasil', 'catatan', 'tanggal', 'keterangan']);
                 $data['asesor_id'] = Auth::id();
-
                 Penilaian::create($data);
-
                 return redirect()->route('asesor.input-penilaian.index')->with('success', 'Penilaian berhasil disimpan.');
             })->name('store');
 
@@ -356,26 +395,32 @@ Route::middleware(['auth', 'role:asesor'])
             })->name('detail');
         });
 
+        // ==========================================
+        // RUTE SEMENTARA (FRONTEND DEMO) - PENILAIAN PESERTA & ESSAY
+        // ==========================================
+        Route::get('/penilaian-peserta-demo', function () {
+            return view('asesor.penilaian-peserta');
+        })->name('penilaian-peserta-demo');
+
+        Route::get('/penilaian-essay-demo', function () {
+            return view('asesor.penilaian-essay');
+        })->name('penilaian-essay-demo');
+
         Route::get('/riwayat-penilaian', function (Request $request) {
             $search = $request->input('search');
             $perPage = $request->input('per_page', 10);
-
             $query = Penilaian::with(['user', 'jadwal.skema', 'asesor'])
                 ->when($search, function ($query, $search) {
                     return $query->whereHas('user', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%")
-                            ->orWhere('username', 'like', "%{$search}%");
+                        $q->where('name', 'like', "%{$search}%")->orWhere('username', 'like', "%{$search}%");
                     })->orWhereHas('jadwal', function ($q) use ($search) {
                         $q->where('kode_jadwal', 'like', "%{$search}%");
                     });
                 });
-
             $total = $query->count();
             $kompetenCount = (clone $query)->where('hasil', 'Kompeten')->count();
             $belumCount = (clone $query)->where('hasil', 'Belum Kompeten')->count();
-
             $penilaians = $query->latest()->paginate($perPage)->appends($request->query());
-
             return view('asesor.riwayat-penilaian', compact('penilaians', 'total', 'kompetenCount', 'belumCount'));
         })->name('riwayat-penilaian');
 
@@ -384,7 +429,6 @@ Route::middleware(['auth', 'role:asesor'])
             return view('asesor.riwayat-penilaian-detail', compact('penilaian'));
         })->name('riwayat-penilaian.detail');
 
-        // Profil & Pengaturan Asesor
         Route::get('/profil', function () {
             $user = Auth::user();
             return view('asesor.profil', compact('user'));
@@ -398,7 +442,6 @@ Route::middleware(['auth', 'role:asesor'])
         Route::put('/profil/update', function (Request $request) {
             /** @var User $user */
             $user = Auth::user();
-
             $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
@@ -407,30 +450,21 @@ Route::middleware(['auth', 'role:asesor'])
                 'instansi' => ['nullable', 'string', 'max:255'],
                 'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             ]);
-
             $data = $request->only(['name', 'email', 'username', 'no_hp', 'instansi']);
-
             if ($request->hasFile('foto')) {
                 $path = $request->file('foto')->store('profiles', 'public');
                 $data['foto'] = $path;
             }
-
             $user->update($data);
-
             return redirect()->route('asesor.profil')->with('success', 'Profil berhasil diperbarui!');
         })->name('profil.update');
 
         Route::post('/profil/update-foto', function (Request $request) {
             /** @var User $user */
             $user = Auth::user();
-
-            $request->validate([
-                'foto' => ['required', 'image', 'max:2048'],
-            ]);
-
+            $request->validate(['foto' => ['required', 'image', 'max:2048']]);
             $path = $request->file('foto')->store('profiles', 'public');
             $user->update(['foto' => $path]);
-
             return redirect()->route('asesor.profil')->with('success', 'Foto profil berhasil diperbarui!');
         })->name('profil.update-foto');
 
@@ -441,22 +475,17 @@ Route::middleware(['auth', 'role:asesor'])
         Route::put('/profil/update-password', function (Request $request) {
             /** @var User $user */
             $user = Auth::user();
-
             $request->validate([
                 'current_password' => ['required', 'string', 'min:6'],
                 'new_password' => ['required', 'string', 'min:6', 'max:255', 'confirmed'],
             ]);
-
             if (!Hash::check($request->current_password, $user->password)) {
                 return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
             }
-
             $user->update(['password' => Hash::make($request->new_password)]);
-
             return redirect()->route('asesor.profil')->with('success', 'Password berhasil diperbarui!');
         })->name('profil.update-password');
 });
-
 
 // ==========================================
 // PESERTA ROUTES
@@ -571,6 +600,28 @@ Route::middleware(['auth', 'role:peserta'])
             return view('peserta.jadwal.index', compact('user', 'jadwals'));
         })->name('jadwal.index');
 
+        // ==========================================
+        // ROUTE UJIKOM / UJI KOMPETENSI (FRONTEND FOCUS)
+        // ==========================================
+        Route::prefix('ujikom')->name('ujikom.')->group(function () {
+            Route::get('/', function () {
+                return view('peserta.ujikom.index');
+            })->name('index');
+
+            Route::get('/soal', function () {
+                return view('peserta.ujikom.soal');
+            })->name('soal');
+
+            // Tambahan route untuk halaman selesai
+            Route::get('/selesai', function () {
+                return view('peserta.ujikom.selesai');
+            })->name('selesai');
+
+            Route::post('/submit', function (Request $request) {
+                return redirect()->route('peserta.ujikom.selesai')->with('success', 'Jawaban ujian berhasil dikirim!');
+            })->name('submit');
+        });
+
         // Absensi QR Code
         Route::get('/absensi', function () {
             $user = Auth::user();
@@ -655,8 +706,8 @@ Route::middleware(['auth', 'role:peserta'])
             $penilaian = Penilaian::with(['jadwal.skema', 'asesor'])
                 ->where('user_id', $user->id)
                 ->latest('tanggal')
-                ->first();
+                ->get();
 
-            return view('peserta.penilaian.index', compact('user', 'penilaian'));
+            return view('peserta.hasil-penilaian.index', compact('user', 'penilaian'));
         })->name('penilaian.index');
 });

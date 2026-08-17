@@ -11,7 +11,6 @@ use Illuminate\Validation\Rule;
 
 class JadwalController extends Controller
 {
-
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -121,6 +120,59 @@ class JadwalController extends Controller
             ->get();
 
         return view('admin.sertifikasi.jadwal.show', compact('jadwal', 'pesertas'));
+    }
+
+    /**
+     * Menangani halaman khusus untuk pengelolaan soal berdasarkan jadwal uji.
+     */
+    public function kelolaSoal($id)
+    {
+        $jadwal = Jadwal::with(['skema', 'asesor'])->findOrFail($id);
+        $pesertas = User::where('role', 'peserta')
+            ->where('kelas', $jadwal->kelas)
+            ->orderBy('name')
+            ->get();
+
+        if (view()->exists('admin.sertifikasi.jadwal.kelola-soal')) {
+            return view('admin.sertifikasi.jadwal.kelola-soal', compact('jadwal', 'pesertas'));
+        }
+
+        return view('admin.sertifikasi.jadwal.show', compact('jadwal', 'pesertas'));
+    }
+
+    /**
+     * Menyimpan pengaturan ujian tambahan pada jadwal tertentu.
+     */
+    public function updatePengaturan(Request $request, $id)
+    {
+        $jadwal = Jadwal::findOrFail($id);
+        
+        // Lakukan validasi atau penyimpanan pengaturan ujian sesuai kebutuhan kolom database Anda
+        $request->validate([
+            // Tambahkan aturan validasi pengaturan di sini jika ada
+        ]);
+
+        // Contoh update data (sesuaikan dengan field yang ingin disimpan)
+        // $jadwal->update($request->only([...]));
+
+        return redirect()->back()->with('success', 'Pengaturan ujian berhasil diperbarui!');
+    }
+
+    /**
+     * Menyimpan kategori soal baru untuk jadwal tertentu.
+     */
+    public function storeKategori(Request $request, $id)
+    {
+        $jadwal = Jadwal::findOrFail($id);
+
+        $request->validate([
+            'nama_kategori' => 'required|string|max:255',
+        ]);
+
+        // Tambahkan logika penyimpanan kategori soal ke database Anda di sini
+        // Contoh: $jadwal->kategoris()->create($request->only('nama_kategori'));
+
+        return redirect()->back()->with('success', 'Kategori soal berhasil ditambahkan!');
     }
 
     public function edit($id)

@@ -26,34 +26,67 @@
     <!-- Informasi Detail Jadwal -->
     <div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-body p-4">
-            <h5 class="fw-bold text-dark mb-4">Detail Jadwal Uji</h5>
+            <h5 class="fw-bold text-dark mb-4">Informasi Utama</h5>
+            
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Kode Jadwal</div>
                 <div class="col-sm-9 fw-semibold text-dark">: {{ $jadwal->kode_jadwal }}</div>
             </div>
+            
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Status</div>
-                <div class="col-sm-9">: <span class="badge {{ $jadwal->status == 'Akan Mendatang' ? 'bg-warning text-dark' : ($jadwal->status == 'Mulai' ? 'bg-success' : 'bg-secondary') }} text-white px-3 py-1 rounded-pill">{{ $jadwal->status }}</span></div>
+                <div class="col-sm-9">: 
+                    <span class="badge {{ $jadwal->status == 'Akan Mendatang' ? 'bg-warning text-dark' : ($jadwal->status == 'Mulai' ? 'bg-success' : 'bg-secondary') }} text-white px-3 py-1 rounded-pill">
+                        {{ $jadwal->status }}
+                    </span>
+                </div>
             </div>
+
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Skema Sertifikasi</div>
                 <div class="col-sm-9 fw-semibold text-dark">: {{ $jadwal->skema->nama_skema ?? '-' }}</div>
             </div>
+
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Kelas & Peserta</div>
                 <div class="col-sm-9">: {{ $jadwal->kelas }} ({{ $pesertas->count() }} Peserta)</div>
             </div>
+
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Asesor Penguji</div>
                 <div class="col-sm-9">: {{ $jadwal->asesor->name ?? '-' }}</div>
             </div>
+
             <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Tanggal & Waktu</div>
                 <div class="col-sm-9">: {{ \Carbon\Carbon::parse($jadwal->tanggal)->translatedFormat('j F Y') }} ({{ \Carbon\Carbon::parse($jadwal->jam_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($jadwal->jam_selesai)->format('H:i') }} WIB)</div>
             </div>
-            <div class="row mb-0">
+
+            <div class="row mb-3">
                 <div class="col-sm-3 text-muted small">Lokasi</div>
                 <div class="col-sm-9">: {{ $jadwal->lokasi }}</div>
+            </div>
+
+            <!-- Tambahan Informasi Baru -->
+            <div class="row mb-3">
+                <div class="col-sm-3 text-muted small">Durasi</div>
+                <div class="col-sm-9 fw-semibold text-dark">: {{ $jadwal->durasi ?? '60' }} Menit</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-3 text-muted small">Status Soal</div>
+                <div class="col-sm-9">: 
+                    @if(($jadwal->soals_count ?? 0) > 0)
+                        <span class="badge rounded-pill text-white px-3 py-1" style="background-color: #28a745;">Soal Siap</span>
+                    @else
+                        <span class="badge rounded-pill text-white px-3 py-1" style="background-color: #e69500;">Soal Belum Dibuat</span>
+                    @endif
+                </div>
+            </div>
+
+            <div class="row mb-0">
+                <div class="col-sm-3 text-muted small">Jumlah Soal</div>
+                <div class="col-sm-9 fw-semibold text-dark">: {{ $jadwal->soals_count ?? 0 }} Soal</div>
             </div>
         </div>
     </div>

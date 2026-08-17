@@ -34,7 +34,7 @@
         .sidebar { 
             width: 280px; 
             height: calc(100vh - 48px); 
-            background-color: #1b6ca8; /* Warna Biru Awal */
+            background-color: #1b6ca8; 
             color: white; 
             position: fixed; 
             top: 48px; 
@@ -139,7 +139,7 @@
         <ul class="nav flex-column mb-auto">
             
             <!-- Dropdown Sertifikasi -->
-            @php $isSertifikasi = request()->routeIs('peserta.sertifikasi.*') || request()->routeIs('peserta.jadwal.*') || request()->routeIs('peserta.penilaian.*'); @endphp
+            @php $isSertifikasi = request()->routeIs('peserta.sertifikasi.*') || request()->routeIs('peserta.jadwal.*') || request()->routeIs('peserta.ujikom.*') || request()->routeIs('peserta.penilaian.*'); @endphp
             <li class="nav-item mb-1">
                 <a class="nav-link d-flex justify-content-between align-items-center {{ $isSertifikasi ? 'active' : '' }}" data-bs-toggle="collapse" href="#menuSertifikasiPeserta" role="button" aria-expanded="{{ $isSertifikasi ? 'true' : 'false' }}">
                     <span><i class="bi bi-award me-2"></i>Sertifikasi</span>
@@ -148,6 +148,7 @@
                 <div class="collapse {{ $isSertifikasi ? 'show' : '' }}" id="menuSertifikasiPeserta">
                     <ul class="submenu my-1">
                         <li><a href="{{ route('peserta.jadwal.index') }}" class="{{ request()->routeIs('peserta.jadwal.*') ? 'active' : '' }}">Jadwal Uji</a></li>
+                        <li><a href="{{ route('peserta.ujikom.index') }}" class="{{ request()->routeIs('peserta.ujikom.*') ? 'active' : '' }}">Ujikom</a></li>
                         <li><a href="{{ route('peserta.penilaian.index') }}" class="{{ request()->routeIs('peserta.penilaian.*') ? 'active' : '' }}">Hasil Penilaian</a></li>
                     </ul>
                 </div>
