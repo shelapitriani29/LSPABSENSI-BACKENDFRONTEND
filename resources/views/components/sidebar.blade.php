@@ -6,12 +6,12 @@
             <span class="fs-5 fw-bold text-dark">LSP</span> 
             <span class="text-secondary fw-semibold" style="font-size: 0.85rem;">SMK NEGERI 1 GARUT</span>
         </div>
-        <i class="bi bi-window-sidebar text-dark fs-5 flex-shrink-0 ms-2"></i>
+        <i class="bi bi-window-sidebar text-dark fs-5 shrink-0 ms-2"></i>
     </div>
 
     <!-- Profile User (Sesuai UI/UX Figma) -->
     <div class="d-flex align-items-center gap-3 my-3 px-3">
-        <div class="bg-light rounded-circle flex-shrink-0 shadow-sm d-flex align-items-center justify-content-center text-secondary" style="width: 50px; height: 50px;">
+        <div class="bg-light rounded-circle shrink-0 shadow-sm d-flex align-items-center justify-content-center text-secondary" style="width: 50px; height: 50px;">
             <i class="bi bi-person-fill fs-4"></i>
         </div>
         <div class="text-start overflow-hidden">

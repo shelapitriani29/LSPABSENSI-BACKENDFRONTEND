@@ -150,6 +150,17 @@ class PesertaController extends Controller
             }
         }
 
+        // Normalisasi status agar match dengan enum values di database
+        $status = $request->status;
+        if ($status) {
+            $lowerStatus = strtolower($status);
+            if (in_array($lowerStatus, ['a', 'aktif'], true)) {
+                $status = 'Aktif';
+            } elseif (in_array($lowerStatus, ['n', 'nonaktif', 'non-aktif', 'tidak aktif'], true)) {
+                $status = 'Nonaktif';
+            }
+        }
+
         // Masukkan atribut ke dalam array update
         $data = [
             'name'             => $request->name,
@@ -165,7 +176,7 @@ class PesertaController extends Controller
             'jurusan'          => $request->jurusan,
             'skema_kompetensi' => $request->skema_kompetensi,
             'instansi'         => $request->instansi,
-            'status'           => $request->status,
+            'status'           => $status,
         ];
 
         // Hanya hash password jika diisi

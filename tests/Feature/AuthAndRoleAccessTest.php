@@ -31,6 +31,20 @@ class AuthAndRoleAccessTest extends TestCase
         $response->assertViewIs('auth.login');
     }
 
+    public function test_seeded_admin_can_login_with_default_credentials(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $response = $this->post('/login', [
+            'username' => 'admin',
+            'password' => '1',
+        ]);
+
+        $response->assertRedirect(route('admin.dashboard'));
+        $this->assertTrue(Auth::check());
+        $this->assertSame('admin', User::normalizeRole(Auth::user()->role));
+    }
+
     public function test_authenticated_user_can_logout_and_clear_session(): void
     {
         $user = $this->makeUser('admin');

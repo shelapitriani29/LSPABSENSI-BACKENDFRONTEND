@@ -27,10 +27,10 @@
                 <!-- 1. Skema Sertifikasi -->
                 <div class="col-md-3 border-end">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary flex-shrink-0" style="width: 42px; height: 42px;">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary shrink-0" style="width: 42px; height: 42px;">
                             <i class="bi bi-shield-check fs-5"></i>
                         </div>
-                        <div class="flex-grow-1 overflow-hidden">
+                        <div class="grow overflow-hidden">
                             <div class="text-secondary" style="font-size: 11px;">Skema Sertifikasi</div>
                             <div class="fw-bold text-dark lh-sm" style="font-size: 13px; word-break: break-word;">{{ $jadwal->skema->nama_skema ?? '-' }}</div>
                             <div class="badge bg-primary bg-opacity-10 text-primary px-1.5 py-0 mt-1" style="font-size: 9px;">{{ $jadwal->skema->kode_skema ?? '-' }}</div>
@@ -41,7 +41,7 @@
                 <!-- 2. Kode Skema -->
                 <div class="col-md-3 border-end">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary flex-shrink-0" style="width: 42px; height: 42px;">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary shrink-0" style="width: 42px; height: 42px;">
                             <i class="bi bi-journal-code fs-5"></i>
                         </div>
                         <div>
@@ -54,10 +54,10 @@
                 <!-- 3. Lokasi -->
                 <div class="col-md-3 border-end">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary flex-shrink-0" style="width: 42px; height: 42px;">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary shrink-0" style="width: 42px; height: 42px;">
                             <i class="bi bi-geo-alt fs-5"></i>
                         </div>
-                        <div class="flex-grow-1 overflow-hidden">
+                        <div class="grow overflow-hidden">
                             <div class="text-secondary" style="font-size: 11px;">Lokasi</div>
                             <div class="fw-bold text-dark text-truncate" style="font-size: 13px;">{{ $jadwal->lokasi ?? '-' }}</div>
                         </div>
@@ -67,7 +67,7 @@
                 <!-- 4. Status Soal -->
                 <div class="col-md-3">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center text-success flex-shrink-0" style="width: 42px; height: 42px;">
+                        <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center text-success shrink-0" style="width: 42px; height: 42px;">
                             <i class="bi bi-patch-check fs-5"></i>
                         </div>
                         <div>
@@ -93,7 +93,7 @@
                 <!-- 5. Tanggal Uji -->
                 <div class="col-md-3 border-end">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary flex-shrink-0" style="width: 42px; height: 42px;">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary shrink-0" style="width: 42px; height: 42px;">
                             <i class="bi bi-calendar3 fs-5"></i>
                         </div>
                         <div>
@@ -106,7 +106,7 @@
                 <!-- 6. Jam Uji / Waktu -->
                 <div class="col-md-3 border-end">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary flex-shrink-0" style="width: 42px; height: 42px;">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary shrink-0" style="width: 42px; height: 42px;">
                             <i class="bi bi-clock fs-5"></i>
                         </div>
                         <div>
@@ -122,7 +122,7 @@
                 <!-- 7. Jumlah Peserta -->
                 <div class="col-md-3 border-end">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary flex-shrink-0" style="width: 42px; height: 42px;">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary shrink-0" style="width: 42px; height: 42px;">
                             <i class="bi bi-people fs-5"></i>
                         </div>
                         <div>
@@ -135,10 +135,10 @@
                 <!-- 8. Jumlah Soal & Progress Bar -->
                 <div class="col-md-3">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary flex-shrink-0" style="width: 42px; height: 42px;">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center text-primary shrink-0" style="width: 42px; height: 42px;">
                             <i class="bi bi-journal-text fs-5"></i>
                         </div>
-                        <div class="flex-grow-1">
+                        <div class="grow">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="text-secondary" style="font-size: 11px;">Jumlah Soal</span>
                                 @php
@@ -191,7 +191,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="alert alert-primary bg-primary bg-opacity-10 border-0 small p-2 mb-0 rounded-3 d-flex align-items-center gap-2">
-                            <i class="bi bi-info-circle text-primary fs-5 flex-shrink-0"></i>
+                            <i class="bi bi-info-circle text-primary fs-5 shrink-0"></i>
                             <span style="font-size: 11px;">Durasi akan digunakan sebagai batas waktu ujian untuk peserta.</span>
                         </div>
                     </div>
@@ -233,66 +233,28 @@
                                 <td class="text-secondary">{{ $kategori->deskripsi ?? '-' }}</td>
                                 <td class="text-center fw-semibold">{{ $kategori->soals_count ?? 0 }} Soal</td>
                                 <td class="text-center">
-                                    <a href="{{ route('admin.sertifikasi.jadwal.kategori.soal', [$jadwal->id, $kategori->id]) }}" class="btn btn-sm px-3 rounded-pill py-1 fw-medium text-white" style="font-size: 12px; background-color: #1b6ca8;">
-                                        Kelola Soal
-                                    </a>
+                                    <div class="d-flex justify-content-center align-items-center gap-1">
+                                        <a href="{{ route('admin.sertifikasi.jadwal.kategori.soal', [$jadwal->id, $kategori->id]) }}" class="btn btn-sm px-3 rounded-pill py-1 fw-medium text-white" style="font-size: 12px; background-color: #1b6ca8;">
+                                            Kelola Soal
+                                        </a>
+                                        <form action="{{ route('admin.sertifikasi.jadwal.kategori.destroy', [$jadwal->id, $kategori->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus kategori soal ini? Kategori yang masih memiliki soal tidak dapat dihapus.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill py-1 px-2" title="Hapus kategori" aria-label="Hapus kategori {{ $kategori->nama_kategori }}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
                         @else
                             <tr>
-                                <td class="text-center">1.</td>
-                                <td class="fw-bold text-dark">Prinsip Animasi</td>
-                                <td class="text-secondary">Konsep dasar animasi seperti squash & stretch, anticipation, staging, dll.</td>
-                                <td class="text-center fw-semibold">8 Soal</td>
-                                <td class="text-center">
-                                    <a href="{{ route('admin.sertifikasi.jadwal.kategori.soal', [$jadwal->id, 1]) }}" class="btn btn-sm px-3 rounded-pill py-1 fw-medium text-white" style="font-size: 12px; background-color: #1b6ca8;">
-                                        Kelola Soal
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">2.</td>
-                                <td class="fw-bold text-dark">Teknik Animasi</td>
-                                <td class="text-secondary">Teknik pembuatan animasi 2D dan frame by frame.</td>
-                                <td class="text-center fw-semibold">6 Soal</td>
-                                <td class="text-center">
-                                    <a href="{{ route('admin.sertifikasi.jadwal.kategori.soal', [$jadwal->id, 2]) }}" class="btn btn-sm px-3 rounded-pill py-1 fw-medium text-white" style="font-size: 12px; background-color: #1b6ca8;">
-                                        Kelola Soal
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">3.</td>
-                                <td class="fw-bold text-dark">Software Animasi</td>
-                                <td class="text-secondary">Penggunaan software seperti Adobe Animate, Toon Boom, dll.</td>
-                                <td class="text-center fw-semibold">4 Soal</td>
-                                <td class="text-center">
-                                    <a href="{{ route('admin.sertifikasi.jadwal.kategori.soal', [$jadwal->id, 3]) }}" class="btn btn-sm px-3 rounded-pill py-1 fw-medium text-white" style="font-size: 12px; background-color: #1b6ca8;">
-                                        Kelola Soal
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">4.</td>
-                                <td class="fw-bold text-dark">Desain Karakter</td>
-                                <td class="text-secondary">Pembuatan karakter, ekspresi, dan pergerakan karakter.</td>
-                                <td class="text-center fw-semibold">3 Soal</td>
-                                <td class="text-center">
-                                    <a href="{{ route('admin.sertifikasi.jadwal.kategori.soal', [$jadwal->id, 4]) }}" class="btn btn-sm px-3 rounded-pill py-1 fw-medium text-white" style="font-size: 12px; background-color: #1b6ca8;">
-                                        Kelola Soal
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">5.</td>
-                                <td class="fw-bold text-dark">Produksi Animasi</td>
-                                <td class="text-secondary">Tahapan produksi animasi dari pra-produksi hingga pasca-produksi.</td>
-                                <td class="text-center fw-semibold">2 Soal</td>
-                                <td class="text-center">
-                                    <a href="{{ route('admin.sertifikasi.jadwal.kategori.soal', [$jadwal->id, 5]) }}" class="btn btn-sm px-3 rounded-pill py-1 fw-medium text-white" style="font-size: 12px; background-color: #1b6ca8;">
-                                        Kelola Soal
-                                    </a>
+                                <td colspan="5" class="text-center py-4 text-secondary">
+                                    <div class="mb-3">
+                                        <i class="bi bi-inbox fs-1 text-muted"></i>
+                                    </div>
+                                    <p class="mb-0">Belum ada kategori soal. Silakan tambah kategori terlebih dahulu untuk memulai mengelola soal.</p>
                                 </td>
                             </tr>
                         @endif

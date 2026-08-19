@@ -160,8 +160,8 @@
                     <div class="mb-4">
                         <label for="status" class="form-label fw-bold text-secondary small">Status Akun Sistem *</label>
                         <select name="status" id="status" class="form-select bg-light py-2 px-3" style="border-radius: 8px;">
-                            <option value="aktif" {{ strtolower(old('status', $peserta->status)) == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                            <option value="nonaktif" {{ strtolower(old('status', $peserta->status)) == 'nonaktif' || strtolower(old('status', $peserta->status)) == 'tidak aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                            <option value="Aktif" {{ (old('status', $peserta->status) == 'Aktif' || strtolower(old('status', $peserta->status)) == 'aktif') ? 'selected' : '' }}>Aktif</option>
+                            <option value="Nonaktif" {{ (old('status', $peserta->status) == 'Nonaktif' || strtolower(old('status', $peserta->status)) == 'nonaktif' || strtolower(old('status', $peserta->status)) == 'tidak aktif') ? 'selected' : '' }}>Tidak Aktif</option>
                         </select>
                     </div>
 

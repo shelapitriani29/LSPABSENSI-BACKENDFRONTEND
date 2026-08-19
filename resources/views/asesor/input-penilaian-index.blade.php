@@ -16,7 +16,7 @@
 
     <!-- Alert Informasi Instruksi -->
     <div class="alert alert-primary bg-primary bg-opacity-10 border-0 text-primary small p-3 mb-4 rounded-3 d-flex align-items-center gap-2">
-        <i class="bi bi-info-circle-fill fs-5 flex-shrink-0"></i>
+        <i class="bi bi-info-circle-fill fs-5 shrink-0"></i>
         <span>Pilih jadwal uji untuk melihat daftar peserta dan melakukan penilaian.</span>
     </div>
 
@@ -55,103 +55,40 @@
                     </thead>
                     <tbody>
                         @forelse($jadwals ?? [] as $jadwal)
+                            @php
+                                // Hitung total peserta di kelas ini
+                                $totalPeserta = \App\Models\User::where('role', 'peserta')
+                                    ->where('kelas', $jadwal->kelas)
+                                    ->count();
+                                
+                                // Hitung peserta yang sudah dinilai untuk jadwal ini
+                                $pesertaDinilai = \App\Models\Penilaian::where('jadwal_id', $jadwal->id)->count();
+                            @endphp
                             <tr>
                                 <td class="text-center">
                                     {{ method_exists($jadwals, 'firstItem') && $jadwals->firstItem() ? $loop->iteration + $jadwals->firstItem() - 1 : $loop->iteration }}
                                 </td>
-                                <td class="fw-semibold text-dark">{{ $jadwal->skema->nama ?? $jadwal->nama_skema ?? 'JWD' }}</td>
-                                <td>{{ $jadwal->kelas ?? 'XI PPL 1' }}</td>
-                                <td>{{ $jadwal->tanggal_uji ?? '07-08-2026' }}</td>
-                                <td>{{ $jadwal->waktu ?? '08.00-12.00' }}</td>
-                                <td>{{ $jadwal->lokasi ?? 'Lab Komputer 1' }}</td>
-                                <td class="text-center fw-semibold">{{ $jadwal->peserta_count ?? 15 }}</td>
+                                <td class="fw-semibold text-dark">{{ $jadwal->skema->nama ?? $jadwal->kode_jadwal ?? 'JWD' }}</td>
+                                <td>{{ $jadwal->kelas ?? '-' }}</td>
+                                <td>{{ $jadwal->tanggal ? \Carbon\Carbon::parse($jadwal->tanggal)->format('d-m-Y') : '-' }}</td>
+                                <td>{{ $jadwal->jam_mulai ? substr($jadwal->jam_mulai, 0, 5) . '-' . substr($jadwal->jam_selesai, 0, 5) : '-' }}</td>
+                                <td>{{ $jadwal->lokasi ?? '-' }}</td>
+                                <td class="text-center fw-semibold">{{ $totalPeserta }}</td>
                                 <td>
                                     <span class="badge text-dark fw-semibold px-2 py-2 rounded-2 border border-warning" style="background-color: #fff3cd !important;">
-                                        {{ $jadwal->status_penilaian ?? '10 / 15 Dinilai' }}
+                                        {{ $pesertaDinilai }} / {{ $totalPeserta }} Dinilai
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('asesor.jadwal-asesmen.lihat-peserta', $jadwal->id ?? 1) }}" class="btn btn-sm text-white px-3 fw-semibold shadow-sm rounded-2" style="background-color: #1b6ca8; border-color: #1b6ca8;">
+                                    <a href="{{ route('asesor.jadwal-asesmen.lihat-peserta', $jadwal->id) }}" class="btn btn-sm text-white px-3 fw-semibold shadow-sm rounded-2" style="background-color: #1b6ca8; border-color: #1b6ca8;">
                                         Lihat Peserta
                                     </a>
                                 </td>
                             </tr>
                         @empty
-                            {{-- Data dummy persis seperti tampilan referensi Figma --}}
                             <tr>
-                                <td class="text-center">1.</td>
-                                <td class="fw-semibold text-dark">JWD</td>
-                                <td>XI PPL 1</td>
-                                <td>07-08-2026</td>
-                                <td>08.00-12.00</td>
-                                <td>Lab Komputer 1</td>
-                                <td class="text-center fw-semibold">15</td>
-                                <td>
-                                    <span class="badge text-dark fw-semibold px-2 py-2 rounded-2 border border-warning" style="background-color: #fff3cd !important;">
-                                        10 / 15 Dinilai
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <a href="#" class="btn btn-sm text-white px-3 fw-semibold shadow-sm rounded-2" style="background-color: #1b6ca8; border-color: #1b6ca8;">
-                                        Lihat Peserta
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">2.</td>
-                                <td class="fw-semibold text-dark">JWD</td>
-                                <td>XI PPL 2</td>
-                                <td>07-08-2026</td>
-                                <td>08.00-12.00</td>
-                                <td>Lab Komputer 1</td>
-                                <td class="text-center fw-semibold">14</td>
-                                <td>
-                                    <span class="badge text-dark fw-semibold px-2 py-2 rounded-2 border border-warning" style="background-color: #fff3cd !important;">
-                                        8 / 14 Dinilai
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <a href="#" class="btn btn-sm text-white px-3 fw-semibold shadow-sm rounded-2" style="background-color: #1b6ca8; border-color: #1b6ca8;">
-                                        Lihat Peserta
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">3.</td>
-                                <td class="fw-semibold text-dark">JA</td>
-                                <td>XI DKV 1</td>
-                                <td>08-08-2026</td>
-                                <td>08.00-12.00</td>
-                                <td>Lab Komputer 2</td>
-                                <td class="text-center fw-semibold">12</td>
-                                <td>
-                                    <span class="badge text-dark fw-semibold px-2 py-2 rounded-2 border border-warning" style="background-color: #fff3cd !important;">
-                                        0 / 12 Dinilai
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <a href="#" class="btn btn-sm text-white px-3 fw-semibold shadow-sm rounded-2" style="background-color: #1b6ca8; border-color: #1b6ca8;">
-                                        Lihat Peserta
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">4.</td>
-                                <td class="fw-semibold text-dark">DG</td>
-                                <td>XI DKV 2</td>
-                                <td>09-08-2026</td>
-                                <td>09.00-13.00</td>
-                                <td>Lab Komputer 3</td>
-                                <td class="text-center fw-semibold">16</td>
-                                <td>
-                                    <span class="badge text-dark fw-semibold px-2 py-2 rounded-2 border border-warning" style="background-color: #fff3cd !important;">
-                                        5 / 16 Dinilai
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <a href="#" class="btn btn-sm text-white px-3 fw-semibold shadow-sm rounded-2" style="background-color: #1b6ca8; border-color: #1b6ca8;">
-                                        Lihat Peserta
-                                    </a>
+                                <td colspan="9" class="text-center py-4 text-muted">
+                                    <p class="mb-0"><i class="bi bi-inbox"></i> Belum ada jadwal ujian yang tersedia untuk Anda.</p>
                                 </td>
                             </tr>
                         @endforelse

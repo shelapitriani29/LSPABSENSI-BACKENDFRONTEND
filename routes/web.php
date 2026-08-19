@@ -13,7 +13,10 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Models\Absensi;
 use App\Models\Jadwal;
+use App\Models\KategoriSoal;
 use App\Models\Penilaian;
+use App\Models\Soal;
+use App\Models\Ujian;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -90,33 +93,26 @@ Route::middleware(['auth', 'role:admin'])
                 // Rute khusus kelola soal diarahkan ke method kelolaSoal di JadwalController
                 Route::get('/{id}/kelola-soal', [JadwalController::class, 'kelolaSoal'])->name('soal');
                 
-                // Rute Tambahan untuk Kelola Soal Per Kategori (Mengatasi RouteNotFoundException)
-                Route::get('/{id}/kategori/{kategoriId}/soal', function($id, $kategoriId) {
-                    $jadwal = Jadwal::with('skema')->findOrFail($id);
-                    return view('admin.sertifikasi.jadwal.detail-soal', compact('jadwal', 'kategoriId'));
-                })->name('kategori.soal');
+                // Rute Tambahan untuk Kelola Soal Per Kategori
+                Route::get('/{id}/kategori', [JadwalController::class, 'kategoriIndex'])->name('kategori.index');
+                Route::get('/{id}/kategori/{kategoriId}/soal', [JadwalController::class, 'showKategoriSoal'])->name('kategori.soal');
+                Route::get('/{id}/kategori/create', [JadwalController::class, 'createKategoriSoal'])->name('kategori.create');
+                Route::get('/{id}/kategori/{kategoriId}/soal/tambah', [JadwalController::class, 'createSoal'])->name('kategori.soal.tambah');
+                Route::get('/{id}/kategori/{kategoriId}/soal/create', [JadwalController::class, 'createSoal'])->name('kategori.soal.create');
+                
+                // Soal routes (Put before single soal routes untuk avoid conflicts)
+                Route::post('/{id}/kategori/{kategoriId}/soal', [JadwalController::class, 'storeSoal'])->name('kategori.soal.store');
+                Route::put('/{id}/kategori/{kategoriId}/soal/{soalId}', [JadwalController::class, 'updateSoal'])->name('kategori.soal.update');
+                Route::delete('/{id}/kategori/{kategoriId}/soal/{soalId}', [JadwalController::class, 'destroySoal'])->name('kategori.soal.destroy');
+                
+                // Edit soal route (after PUT/POST/DELETE untuk avoid conflicts)
+                Route::get('/{id}/kategori/{kategoriId}/soal/{soalId}/edit', [JadwalController::class, 'editSoal'])->name('kategori.soal.edit');
 
-                // Rute Halaman Terpisah Tambah Kategori Soal
-                Route::get('/{id}/kategori/create', function($id) {
-                    $jadwal = Jadwal::with('skema')->findOrFail($id);
-                    return view('admin.sertifikasi.jadwal.create-kategori', compact('jadwal'));
-                })->name('kategori.create');
-
-                // Rute Frontend / Penghubung Tambah Soal (Sesuai Link pada Tombol Tambah Soal)
-                Route::get('/{id}/kategori/{kategoriId}/soal/tambah', function($id, $kategoriId) {
-                    $jadwal = Jadwal::with('skema')->findOrFail($id);
-                    return view('admin.sertifikasi.jadwal.tambah-soal', compact('jadwal', 'kategoriId'));
-                })->name('kategori.soal.tambah');
-
-                // Rute Tambahan untuk Edit Soal Kategori (Menangani 404 pada URL edit-soal)
-                Route::get('/{id}/kategori/{kategoriId}/soal/{soalId}/edit-soal', function($id, $kategoriId, $soalId) {
-                    $jadwal = Jadwal::with('skema')->findOrFail($id);
-                    return view('admin.sertifikasi.jadwal.edit-soal', compact('jadwal', 'kategoriId', 'soalId'));
-                })->name('kategori.soal.edit');
-
-                // Rute Baru untuk Simpan Pengaturan Ujian & Simpan Kategori Soal
                 Route::put('/{id}/update-pengaturan', [JadwalController::class, 'updatePengaturan'])->name('update-pengaturan');
                 Route::post('/{id}/kategori', [JadwalController::class, 'storeKategori'])->name('kategori.store');
+                Route::get('/{id}/kategori/{kategoriId}/edit', [JadwalController::class, 'editKategori'])->name('kategori.edit');
+                Route::put('/{id}/kategori/{kategoriId}', [JadwalController::class, 'updateKategori'])->name('kategori.update');
+                Route::delete('/{id}/kategori/{kategoriId}', [JadwalController::class, 'destroyKategori'])->name('kategori.destroy');
 
                 Route::get('/{id}/edit', [JadwalController::class, 'edit'])->name('edit');
                 Route::put('/{id}', [JadwalController::class, 'update'])->name('update');
@@ -336,8 +332,24 @@ Route::middleware(['auth', 'role:asesor'])
                 $jadwalId = $request->input('jadwal_id');
                 $perPage = $request->input('per_page', 10);
 
-                $asesorId = Auth::id();
-                $jadwals = Jadwal::where('asesor_id', $asesorId)->with('skema')->orderBy('kode_jadwal')->get();
+                $user = Auth::user();
+                $isAdmin = $user && User::normalizeRole($user->role) === 'admin';
+
+                $jadwals = Jadwal::with('skema')
+                    ->when(!$isAdmin, fn ($query) => $query->where('asesor_id', $user->id))
+                    ->orderBy('kode_jadwal')
+                    ->get()
+                    ->unique(function ($jadwal) {
+                        return implode('|', [
+                            $jadwal->skema_id ?? '',
+                            $jadwal->kelas ?? '',
+                            $jadwal->tanggal ?? '',
+                            $jadwal->jam_mulai ?? '',
+                            $jadwal->jam_selesai ?? '',
+                            $jadwal->lokasi ?? '',
+                        ]);
+                    })
+                    ->values();
                 $jadwal = $jadwalId ? $jadwals->firstWhere('id', $jadwalId) : null;
                 $kelasList = $jadwals->pluck('kelas')->filter()->unique();
 
@@ -399,12 +411,107 @@ Route::middleware(['auth', 'role:asesor'])
         // RUTE SEMENTARA (FRONTEND DEMO) - PENILAIAN PESERTA & ESSAY
         // ==========================================
         Route::get('/penilaian-peserta-demo', function () {
-            return view('asesor.penilaian-peserta');
+            $penilaian = Penilaian::first();
+            return view('asesor.penilaian-peserta', ['penilaian' => $penilaian]);
         })->name('penilaian-peserta-demo');
 
+        Route::post('/penilaian-peserta-demo/store', function (Request $request) {
+            $request->validate([
+                'penilaian_id' => 'required|integer',
+                'nilai_pilihan_ganda' => 'nullable|numeric|min:0|max:100',
+                'catatan_pilihan_ganda' => 'nullable|string',
+            ]);
+
+            try {
+                $penilaian = Penilaian::find($request->penilaian_id);
+                
+                if (!$penilaian) {
+                    return back()->withErrors(['penilaian_id' => 'Penilaian tidak ditemukan']);
+                }
+
+                // Update penilaian
+                $penilaian->update([
+                    'nilai_pilihan_ganda' => $request->nilai_pilihan_ganda,
+                    'catatan_pilihan_ganda' => $request->catatan_pilihan_ganda,
+                ]);
+
+                return redirect()->route('asesor.penilaian-peserta-demo')
+                    ->with('success', 'Penilaian berhasil disimpan!');
+            } catch (\Exception $e) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Gagal menyimpan penilaian: ' . $e->getMessage());
+            }
+        })->name('penilaian-peserta-demo.store');
+
         Route::get('/penilaian-essay-demo', function () {
-            return view('asesor.penilaian-essay');
+            // Cari atau buat penilaian dummy untuk demo
+            $penilaian = Penilaian::first();
+            
+            if (!$penilaian) {
+                // Jika belum ada penilaian, buat yang dummy
+                $jadwal = Jadwal::first();
+                $user = User::where('role', 'peserta')->first();
+                $asesor = User::where('role', 'asesor')->first() ?? Auth::user();
+                
+                if (!$jadwal || !$user || !$asesor) {
+                    // Fallback jika data tidak lengkap
+                    return view('asesor.penilaian-essay', ['penilaian_id' => 1]);
+                }
+                
+                $penilaian = Penilaian::firstOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'jadwal_id' => $jadwal->id,
+                        'asesor_id' => $asesor->id,
+                    ],
+                    [
+                        'hasil' => 'Kompeten',
+                        'tanggal' => now()->toDateString(),
+                    ]
+                );
+            }
+            
+            return view('asesor.penilaian-essay', ['penilaian_id' => $penilaian->id]);
         })->name('penilaian-essay-demo');
+
+        Route::post('/penilaian-essay/store', function (Request $request) {
+            // Validasi input
+            $validated = $request->validate([
+                'penilaian_id' => 'required|integer',
+                'nilai_essay' => 'required|numeric|min:0|max:100',
+                'catatan_essay' => 'nullable|string',
+            ], [
+                'penilaian_id.required' => 'ID Penilaian tidak boleh kosong',
+                'penilaian_id.integer' => 'ID Penilaian harus berupa angka',
+                'nilai_essay.required' => 'Nilai essay harus diisi',
+                'nilai_essay.numeric' => 'Nilai essay harus berupa angka',
+                'nilai_essay.min' => 'Nilai essay minimal 0',
+                'nilai_essay.max' => 'Nilai essay maksimal 100',
+            ]);
+
+            try {
+                // Cek apakah penilaian ada
+                $penilaian = Penilaian::find($request->penilaian_id);
+                
+                if (!$penilaian) {
+                    return back()->withErrors(['penilaian_id' => 'Penilaian dengan ID ' . $request->penilaian_id . ' tidak ditemukan.']);
+                }
+
+                // Update penilaian
+                $penilaian->update([
+                    'nilai_essay' => $request->nilai_essay,
+                    'catatan_essay' => $request->catatan_essay ?? null,
+                ]);
+
+                return redirect()->route('asesor.penilaian-peserta-demo')
+                    ->with('success', 'Nilai Essay berhasil disimpan!');
+            } catch (\Exception $e) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Gagal menyimpan nilai essay: ' . $e->getMessage());
+            }
+        })->name('penilaian-essay.store');
 
         Route::get('/riwayat-penilaian', function (Request $request) {
             $search = $request->input('search');
@@ -601,25 +708,137 @@ Route::middleware(['auth', 'role:peserta'])
         })->name('jadwal.index');
 
         // ==========================================
-        // ROUTE UJIKOM / UJI KOMPETENSI (FRONTEND FOCUS)
+        // ROUTE UJIKOM / UJI KOMPETENSI
         // ==========================================
         Route::prefix('ujikom')->name('ujikom.')->group(function () {
             Route::get('/', function () {
-                return view('peserta.ujikom.index');
+                $user = Auth::user();
+                $jadwal = Jadwal::with(['skema', 'asesor'])
+                    ->where('kelas', $user->kelas)
+                    ->orderBy('tanggal', 'desc')
+                    ->first();
+
+                if (! $jadwal) {
+                    return redirect()->route('peserta.jadwal.index')->with('error', 'Tidak ada jadwal ujian yang tersedia untuk Anda.');
+                }
+
+                $ujian = Ujian::firstOrCreate(
+                    ['jadwal_id' => $jadwal->id, 'peserta_id' => $user->id],
+                    ['status' => 'belum_dimulai']
+                );
+
+                return view('peserta.ujikom.index', compact('jadwal', 'ujian'));
             })->name('index');
 
+            Route::get('/mulai', function () {
+                $user = Auth::user();
+                $jadwal = Jadwal::with(['kategoris.soals.pilihanJawaban'])->where('kelas', $user->kelas)->orderByDesc('tanggal')->first();
+
+                if (! $jadwal) {
+                    return redirect()->route('peserta.jadwal.index')->with('error', 'Jadwal tidak ditemukan.');
+                }
+
+                $ujian = Ujian::firstOrCreate([
+                    'jadwal_id' => $jadwal->id,
+                    'peserta_id' => $user->id,
+                ], [
+                    'status' => 'berlangsung',
+                    'waktu_mulai' => now(),
+                    'waktu_selesai' => now()->addMinutes((int) ($jadwal->durasi_ujian ?? 120)),
+                ]);
+
+                if ($ujian->status === 'belum_dimulai') {
+                    $ujian->update([
+                        'status' => 'berlangsung',
+                        'waktu_mulai' => now(),
+                        'waktu_selesai' => now()->addMinutes((int) ($jadwal->durasi_ujian ?? 120)),
+                    ]);
+                }
+
+                $soals = $jadwal->soals()->with('pilihanJawaban')->get();
+
+                return view('peserta.ujikom.soal', compact('jadwal', 'ujian', 'soals'));
+            })->name('mulai');
+
+            // Route untuk halaman soal ujian kompetensi
             Route::get('/soal', function () {
-                return view('peserta.ujikom.soal');
+                $user = Auth::user();
+                $jadwal = Jadwal::with(['kategoris.soals.pilihanJawaban'])->where('kelas', $user->kelas)->orderByDesc('tanggal')->first();
+
+                if (! $jadwal) {
+                    return redirect()->route('peserta.jadwal.index')->with('error', 'Jadwal tidak ditemukan.');
+                }
+
+                $ujian = Ujian::firstOrCreate([
+                    'jadwal_id' => $jadwal->id,
+                    'peserta_id' => $user->id,
+                ], [
+                    'status' => 'berlangsung',
+                    'waktu_mulai' => now(),
+                    'waktu_selesai' => now()->addMinutes((int) ($jadwal->durasi_ujian ?? 120)),
+                ]);
+
+                if ($ujian->status === 'belum_dimulai') {
+                    $ujian->update([
+                        'status' => 'berlangsung',
+                        'waktu_mulai' => now(),
+                        'waktu_selesai' => now()->addMinutes((int) ($jadwal->durasi_ujian ?? 120)),
+                    ]);
+                }
+
+                $soals = $jadwal->soals()->with('pilihanJawaban')->get();
+
+                return view('peserta.ujikom.soal', compact('jadwal', 'ujian', 'soals'));
             })->name('soal');
 
-            // Tambahan route untuk halaman selesai
+            Route::post('/submit', function (Request $request) {
+                $user = Auth::user();
+                $jadwal = Jadwal::where('kelas', $user->kelas)->latest('tanggal')->first();
+                $ujian = Ujian::where('jadwal_id', $jadwal->id ?? 0)->where('peserta_id', $user->id)->first();
+
+                if (! $jadwal || ! $ujian) {
+                    return redirect()->route('peserta.jadwal.index')->with('error', 'Ujian tidak ditemukan.');
+                }
+
+                $soals = $jadwal->soals()->get();
+                $nilaiOtomatis = 0;
+
+                foreach ($soals as $soal) {
+                    $jawabanPeserta = $request->input('jawaban.' . $soal->id);
+                    $nilai = null;
+
+                    if ($soal->tipe_soal === 'Pilihan Ganda') {
+                        $nilai = ($jawabanPeserta === $soal->jawaban_benar) ? (float) $soal->poin : 0;
+                        $nilaiOtomatis += $nilai;
+                    }
+
+                    $jawabanUjian = $ujian->jawabanUjian()->updateOrCreate(
+                        ['soal_id' => $soal->id],
+                        [
+                            'jawaban' => $jawabanPeserta,
+                            'nilai' => $nilai,
+                            'waktu_dinilai' => now(),
+                        ]
+                    );
+
+                    if ($soal->tipe_soal === 'Essay') {
+                        $jawabanUjian->update(['nilai' => null]);
+                    }
+                }
+
+                $ujian->update([
+                    'status' => 'selesai',
+                    'waktu_selesai' => now(),
+                    'nilai_otomatis' => $nilaiOtomatis,
+                    'nilai_akhir' => $nilaiOtomatis,
+                ]);
+
+                return redirect()->route('peserta.ujikom.selesai')->with('success', 'Jawaban ujian berhasil dikirim!');
+            })->name('submit');
+
             Route::get('/selesai', function () {
                 return view('peserta.ujikom.selesai');
             })->name('selesai');
-
-            Route::post('/submit', function (Request $request) {
-                return redirect()->route('peserta.ujikom.selesai')->with('success', 'Jawaban ujian berhasil dikirim!');
-            })->name('submit');
         });
 
         // Absensi QR Code

@@ -2,6 +2,33 @@
 
 @section('content')
 <div class="container-fluid px-0">
+    <!-- Error/Success Messages -->
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <strong>Validasi Gagal!</strong>
+            <ul class="mb-0 mt-2">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <!-- Header Title & Breadcrumb -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
@@ -77,19 +104,19 @@
                         <tr>
                             <td class="text-center">1.</td>
                             <td class="fw-semibold text-dark">Pilihan Ganda (Otomatis)</td>
-                            <td class="text-center fw-bold text-dark">85.00 <span class="text-muted fw-normal small">/ 100</span></td>
-                            <td class="text-muted">Nilai Otomatis Dari Sistem</td>
-                            <td class="text-center text-muted">-</td>
+                            <td class="text-center fw-bold text-dark">{{ $penilaian?->nilai_pilihan_ganda ?? '85.00' }} <span class="text-muted fw-normal small">/ 100</span></td>
+                            <td class="text-muted">{{ $penilaian?->catatan_pilihan_ganda ?? 'Nilai Otomatis Dari Sistem' }}</td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm text-white px-3 fw-semibold rounded-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editNilaiPilihanGandaModal" style="background-color: #1b6ca8; font-size: 0.8rem;">
+                                    Edit
+                                </button>
+                            </td>
                         </tr>
                         <tr>
                             <td class="text-center">2.</td>
                             <td class="fw-semibold text-dark">Essay (Perlu Penilaian)</td>
-                            <td class="text-center">
-                                <input type="text" class="form-control form-control-sm text-center fw-bold text-dark shadow-sm py-1 mx-auto" value="85,00" style="max-width: 90px;">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control form-control-sm text-muted shadow-sm" placeholder="Isi Catatan (Opsional)">
-                            </td>
+                            <td class="text-center fw-bold text-dark">{{ $penilaian?->nilai_essay ?? '85.00' }} <span class="text-muted fw-normal small">/ 100</span></td>
+                            <td class="text-muted">{{ $penilaian?->catatan_essay ?? 'Jawaban sudah cukup baik dan sesuai konsep yang diharapkan.' }}</td>
                             <td class="text-center">
                                 <a href="{{ route('asesor.penilaian-essay-demo') }}" class="btn btn-sm text-white px-3 fw-semibold rounded-2 shadow-sm" style="background-color: #1b6ca8; font-size: 0.8rem;">
                                     Nilai Essay
@@ -109,7 +136,7 @@
             <div class="row align-items-center g-3">
                 <div class="col-md-4">
                     <span class="text-muted small d-block mb-1">Nilai Akhir</span>
-                    <h3 class="fw-bold text-dark mb-0">85.00 <span class="text-muted fs-6 fw-normal">/ 100</span></h3>
+                    <h3 class="fw-bold text-dark mb-0">{{ $penilaian?->nilai_essay ?? '85.00' }} <span class="text-muted fs-6 fw-normal">/ 100</span></h3>
                 </div>
                 <div class="col-md-4">
                     <span class="text-muted small d-block mb-1">Passing Grade</span>
@@ -123,15 +150,56 @@
         </div>
     </div>
 
-    <!-- Tombol Aksi Bawah -->
-    <div class="d-flex justify-content-end gap-2 mb-5">
-        <a href="{{ route('asesor.jadwal-asesmen.lihat-peserta', 1) }}" class="btn btn-outline-secondary px-4 fw-semibold shadow-sm rounded-2 bg-white text-secondary py-2" style="font-size: 0.9rem;">
-            &times; Batal
-        </a>
-        <!-- Tombol pemicu modal pop-up -->
-        <button type="button" class="btn text-white px-4 fw-semibold shadow-sm rounded-2 py-2" data-bs-toggle="modal" data-bs-target="#successModal" style="background-color: #1b6ca8; border-color: #1b6ca8; font-size: 0.9rem;">
-            Simpan Penilaian
-        </button>
+    <!-- Form untuk Simpan Penilaian -->
+    <form action="{{ route('asesor.penilaian-peserta-demo.store') }}" method="POST" id="formSimpanPenilaian">
+        @csrf
+        <input type="hidden" name="penilaian_id" value="{{ $penilaian?->id ?? 1 }}">
+        
+        <!-- Tombol Aksi Bawah -->
+        <div class="d-flex justify-content-end gap-2 mb-5">
+            <a href="{{ route('asesor.jadwal-asesmen.lihat-peserta', 1) }}" class="btn btn-outline-secondary px-4 fw-semibold shadow-sm rounded-2 bg-white text-secondary py-2" style="font-size: 0.9rem;">
+                &times; Batal
+            </a>
+            <button type="submit" class="btn text-white px-4 fw-semibold shadow-sm rounded-2 py-2" style="background-color: #1b6ca8; border-color: #1b6ca8; font-size: 0.9rem;">
+                Simpan Penilaian
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Modal Edit Nilai Pilihan Ganda -->
+<div class="modal fade" id="editNilaiPilihanGandaModal" tabindex="-1" aria-labelledby="editNilaiPilihanGandaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 bg-white">
+            <div class="modal-header border-bottom px-4 py-3 bg-light">
+                <h5 class="modal-title fw-bold text-dark" id="editNilaiPilihanGandaLabel">Edit Nilai Pilihan Ganda</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('asesor.penilaian-peserta-demo.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="penilaian_id" value="{{ $penilaian?->id ?? 1 }}">
+                
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">Nilai Pilihan Ganda <span class="text-danger">*</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="number" step="0.01" name="nilai_pilihan_ganda" class="form-control form-control-sm text-center fw-bold text-dark shadow-sm py-2" value="{{ $penilaian?->nilai_pilihan_ganda ?? '85.00' }}" min="0" max="100" required>
+                            <span class="text-muted small text-nowrap">/ 100</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">Catatan (Opsional)</label>
+                        <textarea name="catatan_pilihan_ganda" class="form-control text-dark shadow-sm" rows="3" placeholder="Masukkan catatan jika ada...">{{ $penilaian?->catatan_pilihan_ganda ?? '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top px-4 py-3 bg-light">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn text-white px-4" style="background-color: #1b6ca8;">Simpan</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

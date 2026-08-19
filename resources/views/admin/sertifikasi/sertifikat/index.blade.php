@@ -68,9 +68,9 @@
                 </div>
                 <div class="col-lg-4 col-12">
                     <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2 justify-content-lg-end">
-                        <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0">
+                        <div class="d-flex align-items-center gap-2 grow min-w-0">
                             <span class="text-dark fw-medium">Search:</span>
-                            <input type="search" name="search" value="{{ request('search') }}" class="form-control form-control-sm border-secondary-subtle shadow-none flex-grow-1 min-w-0" style="border-radius: 6px;" placeholder="Cari peserta / no sertifikat">
+                            <input type="search" name="search" value="{{ request('search') }}" class="form-control form-control-sm border-secondary-subtle shadow-none grow min-w-0" style="border-radius: 6px;" placeholder="Cari peserta / no sertifikat">
                         </div>
                     </div>
                 </div>

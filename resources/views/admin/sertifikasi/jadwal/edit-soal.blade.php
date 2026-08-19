@@ -35,12 +35,16 @@
                 </div>
                 <div>
                     <div class="text-secondary" style="font-size: 12px;">Skema Aktif</div>
-                    <div class="fw-bold text-dark">Junior Animator <span class="text-muted fw-normal mx-1">&bull;</span> <span class="text-secondary fw-semibold">Kode Skema: JA001</span></div>
+                    <div class="fw-bold text-dark">
+                        {{ optional($jadwal->skema)->nama_skema ?? 'Skema belum ditentukan' }}
+                        <span class="text-muted fw-normal mx-1">&bull;</span>
+                        <span class="text-secondary fw-semibold">Kode Skema: {{ optional($jadwal->skema)->kode_skema ?? '-' }}</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Form Inputs -->
-            <form action="#" method="POST">
+            <form action="{{ url('admin/sertifikasi/jadwal/' . $jadwal->id . '/kategori/' . $kategori->id . '/soal/' . $soal->id) }}" method="POST">
                 @csrf
                 @method('PUT')
                 
@@ -49,9 +53,9 @@
                     <label class="form-label fw-bold text-dark d-flex align-items-center gap-2 mb-2">
                         <i class="bi bi-question-circle text-primary" style="color: #1b6ca8 !important;"></i> Pertanyaan
                     </label>
-                    <textarea class="form-control rounded-3" id="inputPertanyaan" rows="4" placeholder="Tulis pertanyaan di sini...">Apa yang dimaksud dengan squash and stretch dalam animasi?</textarea>
+                    <textarea class="form-control rounded-3" id="inputPertanyaan" name="pertanyaan" rows="4" placeholder="Tulis pertanyaan di sini...">{{ $soal->pertanyaan }}</textarea>
                     <div class="d-flex justify-content-end mt-1">
-                        <span class="text-muted" id="charCount" style="font-size: 11px;">54 / 500</span>
+                        <span class="text-muted" id="charCount" style="font-size: 11px;">{{ strlen($soal->pertanyaan) }} / 500</span>
                     </div>
                 </div>
 
@@ -61,8 +65,9 @@
                         <i class="bi bi-ui-checks text-primary" style="color: #1b6ca8 !important;"></i> Tipe Soal
                     </label>
                     <select class="form-select rounded-3" id="tipeSoalSelect" name="tipe_soal">
-                        <option value="pilihan-ganda" selected>Pilihan Ganda</option>
-                        <option value="essay">Essay</option>
+                        <option value="Pilihan Ganda" {{ $soal->tipe_soal === 'Pilihan Ganda' ? 'selected' : '' }}>Pilihan Ganda</option>
+                        <option value="Essay" {{ $soal->tipe_soal === 'Essay' ? 'selected' : '' }}>Essay</option>
+                        <option value="Isian Singkat" {{ $soal->tipe_soal === 'Isian Singkat' ? 'selected' : '' }}>Isian Singkat</option>
                     </select>
                 </div>
 
@@ -71,11 +76,11 @@
                     <label class="form-label fw-bold text-dark d-flex align-items-center gap-2 mb-2">
                         <i class="bi bi-speedometer2 text-primary" style="color: #1b6ca8 !important;"></i> Tingkat Kesulitan
                     </label>
-                    <select class="form-select rounded-3" name="tingkat_kesulitan">
+                    <select class="form-select rounded-3" name="tingkat_kesulitan" required>
                         <option value="" disabled>Pilih tingkat kesulitan soal</option>
-                        <option value="mudah" selected>Mudah</option>
-                        <option value="sedang">Sedang</option>
-                        <option value="sulit">Sulit</option>
+                        <option value="Mudah" {{ $soal->tingkat_kesulitan === 'Mudah' ? 'selected' : '' }}>Mudah</option>
+                        <option value="Sedang" {{ $soal->tingkat_kesulitan === 'Sedang' ? 'selected' : '' }}>Sedang</option>
+                        <option value="Sulit" {{ $soal->tingkat_kesulitan === 'Sulit' ? 'selected' : '' }}>Sulit</option>
                     </select>
                 </div>
 
@@ -87,33 +92,25 @@
                             <i class="bi bi-list-ul text-primary" style="color: #1b6ca8 !important;"></i> Pilihan Jawaban
                         </label>
                         
+                        @php
+                            $pilihanMap = $soal->pilihanJawaban->keyBy('pilihan');
+                        @endphp
+                        
                         <div class="input-group mb-3">
                             <span class="input-group-text fw-bold bg-light text-primary" style="color: #1b6ca8 !important; width: 45px; justify-content: center;">A</span>
-                            <input type="text" class="form-control" value="Penambahan efek suara pada objek bergerak" placeholder="Masukkan pilihan jawaban A">
-                            <span class="input-group-text bg-white">
-                                <input class="form-check-input mt-0" type="radio" name="jawaban_benar_radio" aria-label="Radio for A">
-                            </span>
+                            <input type="text" name="pilihan_a" class="form-control" value="{{ $pilihanMap['A']->teks_jawaban ?? '' }}" placeholder="Masukkan pilihan jawaban A">
                         </div>
                         <div class="input-group mb-3">
                             <span class="input-group-text fw-bold bg-light text-primary" style="color: #1b6ca8 !important; width: 45px; justify-content: center;">B</span>
-                            <input type="text" class="form-control" value="Upaya membuat ilusi kelenturan dan berat pada objek" placeholder="Masukkan pilihan jawaban B">
-                            <span class="input-group-text bg-white">
-                                <input class="form-check-input mt-0" type="radio" name="jawaban_benar_radio" checked aria-label="Radio for B">
-                            </span>
+                            <input type="text" name="pilihan_b" class="form-control" value="{{ $pilihanMap['B']->teks_jawaban ?? '' }}" placeholder="Masukkan pilihan jawaban B">
                         </div>
                         <div class="input-group mb-3">
                             <span class="input-group-text fw-bold bg-light text-primary" style="color: #1b6ca8 !important; width: 45px; justify-content: center;">C</span>
-                            <input type="text" class="form-control" value="Teknik mempercepat frame rate video" placeholder="Masukkan pilihan jawaban C">
-                            <span class="input-group-text bg-white">
-                                <input class="form-check-input mt-0" type="radio" name="jawaban_benar_radio" aria-label="Radio for C">
-                            </span>
+                            <input type="text" name="pilihan_c" class="form-control" value="{{ $pilihanMap['C']->teks_jawaban ?? '' }}" placeholder="Masukkan pilihan jawaban C">
                         </div>
                         <div class="input-group mb-3">
                             <span class="input-group-text fw-bold bg-light text-primary" style="color: #1b6ca8 !important; width: 45px; justify-content: center;">D</span>
-                            <input type="text" class="form-control" value="Proses pewarnaan karakter 2D" placeholder="Masukkan pilihan jawaban D">
-                            <span class="input-group-text bg-white">
-                                <input class="form-check-input mt-0" type="radio" name="jawaban_benar_radio" aria-label="Radio for D">
-                            </span>
+                            <input type="text" name="pilihan_d" class="form-control" value="{{ $pilihanMap['D']->teks_jawaban ?? '' }}" placeholder="Masukkan pilihan jawaban D">
                         </div>
                     </div>
 
@@ -122,12 +119,12 @@
                         <label class="form-label fw-bold text-dark d-flex align-items-center gap-2 mb-2">
                             <i class="bi bi-shield-check text-primary" style="color: #1b6ca8 !important;"></i> Jawaban Benar
                         </label>
-                        <select class="form-select rounded-3" name="jawaban_benar">
+                        <select class="form-select rounded-3" id="jawabanBenarSelect" name="jawaban_benar">
                             <option value="" disabled>Pilih salah satu jawaban yang benar.</option>
-                            <option value="A">A</option>
-                            <option value="B" selected>B</option>
-                            <option value="C">C</option>
-                            <option value="D">D</option>
+                            <option value="A" {{ $soal->jawaban_benar === 'A' ? 'selected' : '' }}>A</option>
+                            <option value="B" {{ $soal->jawaban_benar === 'B' ? 'selected' : '' }}>B</option>
+                            <option value="C" {{ $soal->jawaban_benar === 'C' ? 'selected' : '' }}>C</option>
+                            <option value="D" {{ $soal->jawaban_benar === 'D' ? 'selected' : '' }}>D</option>
                         </select>
                     </div>
                 </div>
@@ -142,7 +139,7 @@
                     <label class="form-label fw-bold text-dark d-flex align-items-center gap-2 mb-2">
                         <i class="bi bi-star text-primary" style="color: #1b6ca8 !important;"></i> Point
                     </label>
-                    <input type="number" class="form-control rounded-3" name="poin" value="5" placeholder="Masukkan point untuk soal ini.">
+                    <input type="number" name="poin" class="form-control rounded-3" value="{{ $soal->poin }}" placeholder="Masukkan point untuk soal ini." min="1" required>
                 </div>
 
                 <hr class="my-4 text-muted opacity-25">
@@ -187,6 +184,7 @@
         const tipeSoalSelect = document.getElementById('tipeSoalSelect');
         const wrapperPG = document.getElementById('wrapperPilihanGanda');
         const wrapperEssay = document.getElementById('wrapperEssay');
+        const jawabanBenarSelect = document.getElementById('jawabanBenarSelect');
 
         function toggleTipeSoal() {
             const val = tipeSoalSelect.value;
@@ -194,15 +192,20 @@
             wrapperPG.classList.add('d-none');
             wrapperEssay.classList.add('d-none');
 
-            if (val === 'pilihan-ganda') {
+            if (val === 'Pilihan Ganda') {
                 wrapperPG.classList.remove('d-none');
-            } else if (val === 'essay') {
+                jawabanBenarSelect.setAttribute('required', 'required');
+            } else if (val === 'Essay') {
                 wrapperEssay.classList.remove('d-none');
+                jawabanBenarSelect.removeAttribute('required');
+            } else if (val === 'Isian Singkat') {
+                wrapperEssay.classList.remove('d-none');
+                jawabanBenarSelect.removeAttribute('required');
             }
         }
 
         tipeSoalSelect.addEventListener('change', toggleTipeSoal);
-        toggleTipeSoal();
+        toggleTipeSoal();  // Trigger on page load to show/hide sections based on current value
     });
 </script>
 @endsection

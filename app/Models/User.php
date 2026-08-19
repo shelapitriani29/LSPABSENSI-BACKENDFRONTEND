@@ -70,6 +70,11 @@ class User extends Authenticatable
         return $this->hasOne(Jadwal::class, 'kelas', 'kelas')->orderBy('tanggal', 'desc');
     }
 
+    public function ujians()
+    {
+        return $this->hasMany(Ujian::class, 'peserta_id');
+    }
+
     protected function casts(): array
     {
         return [

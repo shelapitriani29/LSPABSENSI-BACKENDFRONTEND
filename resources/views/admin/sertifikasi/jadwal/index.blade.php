@@ -61,16 +61,16 @@
                 <table class="table table-hover table-bordered align-middle mb-0" style="table-layout: fixed;">
                     <thead class="table-light text-secondary small" style="font-weight: 600;">
                         <tr>
-                            <th scope="col" class="py-3 px-2 text-center" style="width: 6%;">NO.</th>
-                            <th scope="col" class="py-3" style="width: 11%;">Kode Jadwal</th>
+                            <th scope="col" class="py-3 px-2 text-center" style="width: 5%;">NO.</th>
+                            <th scope="col" class="py-3" style="width: 10%;">Kode Jadwal</th>
                             <th scope="col" class="py-3" style="width: 16%;">Skema</th>
-                            <th scope="col" class="py-3" style="width: 10%;">Kelas</th>
-                            <th scope="col" class="py-3" style="width: 15%;">Asesor</th>
-                            <th scope="col" class="py-3 text-center" style="width: 10%;">Durasi</th>
-                            <th scope="col" class="py-3 text-center" style="width: 12%;">Status Soal</th>
+                            <th scope="col" class="py-3" style="width: 9%;">Kelas</th>
+                            <th scope="col" class="py-3" style="width: 13%;">Asesor</th>
+                            <th scope="col" class="py-3 text-center" style="width: 9%;">Durasi</th>
+                            <th scope="col" class="py-3 text-center" style="width: 13%;">Status Soal</th>
                             <th scope="col" class="py-3 text-center" style="width: 8%;">Jumlah Soal</th>
                             <th scope="col" class="py-3 text-center" style="width: 10%;">Status</th>
-                            <th scope="col" class="py-3 text-center" style="width: 8%;">Aksi</th>
+                            <th scope="col" class="py-3 text-center" style="width: 7%;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="small">
@@ -94,11 +94,11 @@
                             @endphp
                             <td class="text-center">
                                 @if($jumlahSoal >= $targetSoal)
-                                    <span class="badge text-white px-2 py-1 rounded-3 fw-normal" style="background-color: #28a745; font-size: 0.70rem;">Soal Siap</span>
+                                    <span class="badge text-white px-2 py-1 rounded-pill fw-normal shadow-sm d-inline-block" style="background-color: #28a745; font-size: 0.75rem; white-space: nowrap;">Soal Siap</span>
                                 @elseif($jumlahSoal > 0)
-                                    <span class="badge text-white px-2 py-1 rounded-3 fw-normal" style="background-color: #ffc107; color: #000 !important; font-size: 0.70rem;">Belum Lengkap</span>
+                                    <span class="badge text-white px-2 py-1 rounded-pill fw-normal shadow-sm d-inline-block" style="background-color: #ffc107; color: #000 !important; font-size: 0.75rem; white-space: nowrap;">Belum Lengkap</span>
                                 @else
-                                    <span class="badge text-white px-2 py-1 rounded-3 fw-normal" style="background-color: #f39c12; font-size: 0.70rem;">Soal Belum Dibuat</span>
+                                    <span class="badge text-white px-2 py-1 rounded-pill fw-normal shadow-sm d-inline-block" style="background-color: #f39c12; font-size: 0.75rem; white-space: nowrap;">Soal Belum Dibuat</span>
                                 @endif
                             </td>
 

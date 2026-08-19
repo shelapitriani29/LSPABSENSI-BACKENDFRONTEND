@@ -78,6 +78,17 @@ class AsesorController extends Controller
             'status'           => 'nullable|string|in:aktif,nonaktif',
         ]);
 
+        // Normalisasi status agar match dengan enum values di database
+        $status = $request->status ?? $asesor->status;
+        if ($status) {
+            $lowerStatus = strtolower($status);
+            if (in_array($lowerStatus, ['a', 'aktif'], true)) {
+                $status = 'Aktif';
+            } elseif (in_array($lowerStatus, ['n', 'nonaktif', 'non-aktif', 'tidak aktif'], true)) {
+                $status = 'Nonaktif';
+            }
+        }
+
         $data = [
             'name'             => $request->name,
             'username'         => $request->username,
@@ -91,7 +102,7 @@ class AsesorController extends Controller
             'alamat'           => $request->alamat,
             'no_met'           => $request->no_met,
             'skema_kompetensi' => $request->skema_kompetensi,
-            'status'           => $request->status ?? $asesor->status,
+            'status'           => $status,
         ];
 
         if ($request->filled('password')) {

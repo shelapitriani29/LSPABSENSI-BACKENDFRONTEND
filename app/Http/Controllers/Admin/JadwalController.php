@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Jadwal;
+use App\Models\KategoriSoal;
+use App\Models\PilihanJawaban;
 use App\Models\Skema;
+use App\Models\Soal;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -128,13 +131,14 @@ class JadwalController extends Controller
     public function kelolaSoal($id)
     {
         $jadwal = Jadwal::with(['skema', 'asesor'])->findOrFail($id);
+        $kategoris = $jadwal->kategoris()->withCount('soals')->get();
         $pesertas = User::where('role', 'peserta')
             ->where('kelas', $jadwal->kelas)
             ->orderBy('name')
             ->get();
 
         if (view()->exists('admin.sertifikasi.jadwal.kelola-soal')) {
-            return view('admin.sertifikasi.jadwal.kelola-soal', compact('jadwal', 'pesertas'));
+            return view('admin.sertifikasi.jadwal.kelola-soal', compact('jadwal', 'kategoris', 'pesertas'));
         }
 
         return view('admin.sertifikasi.jadwal.show', compact('jadwal', 'pesertas'));
@@ -146,14 +150,20 @@ class JadwalController extends Controller
     public function updatePengaturan(Request $request, $id)
     {
         $jadwal = Jadwal::findOrFail($id);
-        
-        // Lakukan validasi atau penyimpanan pengaturan ujian sesuai kebutuhan kolom database Anda
+
         $request->validate([
-            // Tambahkan aturan validasi pengaturan di sini jika ada
+            'passing_grade' => 'nullable|integer|min:0|max:100',
+            'durasi_ujian' => 'nullable|integer|min:1',
+            'durasi' => 'nullable|integer|min:1',
         ]);
 
-        // Contoh update data (sesuaikan dengan field yang ingin disimpan)
-        // $jadwal->update($request->only([...]));
+        $durasi = $request->input('durasi_ujian', $request->input('durasi', $jadwal->durasi_ujian ?? 120));
+        $passingGrade = $request->input('passing_grade', $jadwal->passing_grade ?? 75);
+
+        $jadwal->update([
+            'passing_grade' => (int) $passingGrade,
+            'durasi_ujian' => (int) $durasi,
+        ]);
 
         return redirect()->back()->with('success', 'Pengaturan ujian berhasil diperbarui!');
     }
@@ -167,12 +177,223 @@ class JadwalController extends Controller
 
         $request->validate([
             'nama_kategori' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
         ]);
 
-        // Tambahkan logika penyimpanan kategori soal ke database Anda di sini
-        // Contoh: $jadwal->kategoris()->create($request->only('nama_kategori'));
+        $jadwal->kategoris()->create($request->only(['nama_kategori', 'deskripsi']));
 
-        return redirect()->back()->with('success', 'Kategori soal berhasil ditambahkan!');
+        return redirect()->route('admin.sertifikasi.jadwal.soal', $jadwal->id)->with('success', 'Kategori soal berhasil ditambahkan!');
+    }
+
+    public function kategoriIndex($id)
+    {
+        $jadwal = Jadwal::with(['skema', 'kategoris.soals'])->findOrFail($id);
+        $kategoris = $jadwal->kategoris()->withCount('soals')->get();
+
+        return view('admin.sertifikasi.jadwal.kelola-soal', compact('jadwal', 'kategoris'));
+    }
+
+    public function showKategoriSoal($id, $kategoriId)
+    {
+        $jadwal = Jadwal::with(['skema', 'asesor'])->findOrFail($id);
+        $kategori = $jadwal->kategoris()->with('soals')->findOrFail($kategoriId);
+        $soals = $kategori->soals()->with('pilihanJawaban')->get();
+
+        return view('admin.sertifikasi.jadwal.detail-soal', compact('jadwal', 'kategori', 'soals'));
+    }
+
+    public function createKategoriSoal($id)
+    {
+        $jadwal = Jadwal::with('skema')->findOrFail($id);
+
+        return view('admin.sertifikasi.jadwal.create-kategori', compact('jadwal'));
+    }
+
+    public function createSoal($id, $kategoriId)
+    {
+        $jadwal = Jadwal::with('skema')->findOrFail($id);
+        $kategori = $jadwal->kategoris()->findOrFail($kategoriId);
+
+        return view('admin.sertifikasi.jadwal.tambah-soal', compact('jadwal', 'kategori'));
+    }
+
+    public function editSoal($id, $kategoriId, $soalId)
+    {
+        $jadwal = Jadwal::with('skema')->findOrFail($id);
+        $kategori = $jadwal->kategoris()->findOrFail($kategoriId);
+        $soal = $kategori->soals()->with('pilihanJawaban')->findOrFail($soalId);
+
+        return view('admin.sertifikasi.jadwal.edit-soal', compact('jadwal', 'kategori', 'soal'));
+    }
+
+    public function editKategori($id, $kategoriId)
+    {
+        $jadwal = Jadwal::with('skema')->findOrFail($id);
+        $kategori = $jadwal->kategoris()->findOrFail($kategoriId);
+
+        return view('admin.sertifikasi.jadwal.create-kategori', compact('jadwal', 'kategori'));
+    }
+
+    public function updateKategori(Request $request, $id, $kategoriId)
+    {
+        $jadwal = Jadwal::findOrFail($id);
+        $kategori = $jadwal->kategoris()->findOrFail($kategoriId);
+
+        $request->validate([
+            'nama_kategori' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+        ]);
+
+        $kategori->update($request->only(['nama_kategori', 'deskripsi']));
+
+        return redirect()->route('admin.sertifikasi.jadwal.soal', $jadwal->id)->with('success', 'Kategori soal berhasil diperbarui!');
+    }
+
+    public function destroyKategori($id, $kategoriId)
+    {
+        $jadwal = Jadwal::findOrFail($id);
+        $kategori = $jadwal->kategoris()->findOrFail($kategoriId);
+
+        if ($kategori->soals()->exists()) {
+            return redirect()->route('admin.sertifikasi.jadwal.soal', $jadwal->id)->with('error', 'Kategori tidak dapat dihapus karena masih memiliki soal.');
+        }
+
+        $kategori->delete();
+
+        return redirect()->route('admin.sertifikasi.jadwal.soal', $jadwal->id)->with('success', 'Kategori soal berhasil dihapus!');
+    }
+
+    public function storeSoal(Request $request, $id, $kategoriId)
+    {
+        $jadwal = Jadwal::findOrFail($id);
+        $kategori = $jadwal->kategoris()->findOrFail($kategoriId);
+
+        $validationRules = [
+            'pertanyaan' => 'required|string',
+            'tipe_soal' => 'required|in:Pilihan Ganda,Essay,Isian Singkat',
+            'tingkat_kesulitan' => 'required|string',
+            'poin' => 'required|integer|min:1',
+            'jawaban_benar' => 'nullable|string|max:1',
+        ];
+
+        // Add validation for pilihan jawaban when tipe_soal is Pilihan Ganda
+        if ($request->input('tipe_soal') === 'Pilihan Ganda') {
+            $validationRules['pilihan_a'] = 'required|string';
+            $validationRules['pilihan_b'] = 'required|string';
+            $validationRules['pilihan_c'] = 'required|string';
+            $validationRules['pilihan_d'] = 'required|string';
+        }
+
+        $request->validate($validationRules, [
+            'pertanyaan.required' => 'Pertanyaan wajib diisi.',
+            'tipe_soal.required' => 'Tipe soal wajib dipilih.',
+            'tipe_soal.in' => 'Tipe soal tidak valid.',
+            'tingkat_kesulitan.required' => 'Tingkat kesulitan wajib dipilih.',
+            'poin.required' => 'Poin wajib diisi.',
+            'poin.integer' => 'Poin harus berupa angka.',
+            'poin.min' => 'Poin minimal 1.',
+            'jawaban_benar.required_if' => 'Jawaban benar wajib dipilih untuk soal pilihan ganda.',
+            'pilihan_a.required' => 'Pilihan A wajib diisi.',
+            'pilihan_b.required' => 'Pilihan B wajib diisi.',
+            'pilihan_c.required' => 'Pilihan C wajib diisi.',
+            'pilihan_d.required' => 'Pilihan D wajib diisi.',
+        ]);
+
+        $soal = $kategori->soals()->create([
+            'pertanyaan' => $request->pertanyaan,
+            'tipe_soal' => $request->tipe_soal,
+            'tingkat_kesulitan' => $request->tingkat_kesulitan,
+            'poin' => $request->poin,
+            'jawaban_benar' => $request->tipe_soal === 'Pilihan Ganda' ? $request->jawaban_benar : null,
+        ]);
+
+        if ($request->tipe_soal === 'Pilihan Ganda') {
+            foreach (['A', 'B', 'C', 'D'] as $pilihan) {
+                $field = 'pilihan_' . strtolower($pilihan);
+                if ($request->filled($field)) {
+                    PilihanJawaban::create([
+                        'soal_id' => $soal->id,
+                        'pilihan' => $pilihan,
+                        'teks_jawaban' => $request->$field,
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('admin.sertifikasi.jadwal.kategori.soal', [$jadwal->id, $kategori->id])->with('success', 'Soal berhasil ditambahkan!');
+    }
+
+    public function updateSoal(Request $request, $id, $kategoriId, $soalId)
+    {
+        $jadwal = Jadwal::findOrFail($id);
+        $kategori = $jadwal->kategoris()->findOrFail($kategoriId);
+        $soal = $kategori->soals()->findOrFail($soalId);
+
+        $validationRules = [
+            'pertanyaan' => 'required|string',
+            'tipe_soal' => 'required|in:Pilihan Ganda,Essay,Isian Singkat',
+            'tingkat_kesulitan' => 'required|string',
+            'poin' => 'required|integer|min:1',
+            'jawaban_benar' => 'nullable|string|max:1',
+        ];
+
+        // Add validation for pilihan jawaban when tipe_soal is Pilihan Ganda
+        if ($request->input('tipe_soal') === 'Pilihan Ganda') {
+            $validationRules['pilihan_a'] = 'required|string';
+            $validationRules['pilihan_b'] = 'required|string';
+            $validationRules['pilihan_c'] = 'required|string';
+            $validationRules['pilihan_d'] = 'required|string';
+        }
+
+        $request->validate($validationRules, [
+            'pertanyaan.required' => 'Pertanyaan wajib diisi.',
+            'tipe_soal.required' => 'Tipe soal wajib dipilih.',
+            'tipe_soal.in' => 'Tipe soal tidak valid.',
+            'tingkat_kesulitan.required' => 'Tingkat kesulitan wajib dipilih.',
+            'poin.required' => 'Poin wajib diisi.',
+            'poin.integer' => 'Poin harus berupa angka.',
+            'poin.min' => 'Poin minimal 1.',
+            'jawaban_benar.required_if' => 'Jawaban benar wajib dipilih untuk soal pilihan ganda.',
+            'pilihan_a.required' => 'Pilihan A wajib diisi.',
+            'pilihan_b.required' => 'Pilihan B wajib diisi.',
+            'pilihan_c.required' => 'Pilihan C wajib diisi.',
+            'pilihan_d.required' => 'Pilihan D wajib diisi.',
+        ]);
+
+        $soal->update([
+            'pertanyaan' => $request->pertanyaan,
+            'tipe_soal' => $request->tipe_soal,
+            'tingkat_kesulitan' => $request->tingkat_kesulitan,
+            'poin' => $request->poin,
+            'jawaban_benar' => $request->tipe_soal === 'Pilihan Ganda' ? $request->jawaban_benar : null,
+        ]);
+
+        if ($request->tipe_soal === 'Pilihan Ganda') {
+            $soal->pilihanJawaban()->delete();
+            foreach (['A', 'B', 'C', 'D'] as $pilihan) {
+                $field = 'pilihan_' . strtolower($pilihan);
+                if ($request->filled($field)) {
+                    PilihanJawaban::create([
+                        'soal_id' => $soal->id,
+                        'pilihan' => $pilihan,
+                        'teks_jawaban' => $request->$field,
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('admin.sertifikasi.jadwal.kategori.soal', [$jadwal->id, $kategori->id])->with('success', 'Soal berhasil diperbarui!');
+    }
+
+    public function destroySoal($id, $kategoriId, $soalId)
+    {
+        $jadwal = Jadwal::findOrFail($id);
+        $kategori = $jadwal->kategoris()->findOrFail($kategoriId);
+        $soal = $kategori->soals()->findOrFail($soalId);
+
+        $soal->delete();
+
+        return redirect()->route('admin.sertifikasi.jadwal.kategori.soal', [$jadwal->id, $kategori->id])->with('success', 'Soal berhasil dihapus!');
     }
 
     public function edit($id)

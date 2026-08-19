@@ -111,7 +111,7 @@
                 ->implode('');
         @endphp
         <div class="px-3 py-2 mb-2 d-flex align-items-center">
-            <div class="bg-white text-secondary rounded-circle me-3 shadow-sm flex-shrink-0 d-flex align-items-center justify-content-center fw-bold" style="width: 42px; height: 42px; font-size: 0.95rem; overflow: hidden;">
+            <div class="bg-white text-secondary rounded-circle me-3 shadow-sm shrink-0 d-flex align-items-center justify-content-center fw-bold" style="width: 42px; height: 42px; font-size: 0.95rem; overflow: hidden;">
                 @if($sidebarUser && $sidebarUser->foto)
                     <img src="{{ asset('storage/' . $sidebarUser->foto) }}" alt="Foto Profil" class="rounded-circle" style="width: 42px; height: 42px; object-fit: cover;">
                 @else

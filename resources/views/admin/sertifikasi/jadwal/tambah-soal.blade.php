@@ -34,19 +34,24 @@
                 </div>
                 <div>
                     <div class="text-secondary" style="font-size: 12px;">Skema Aktif</div>
-                    <div class="fw-bold text-dark">Junior Animator <span class="text-muted fw-normal mx-1">&bull;</span> <span class="text-secondary fw-semibold">Kode Skema: JA001</span></div>
+                    <div class="fw-bold text-dark">
+                        {{ optional($jadwal->skema)->nama_skema ?? 'Skema belum ditentukan' }}
+                        <span class="text-muted fw-normal mx-1">&bull;</span>
+                        <span class="text-secondary fw-semibold">Kode Skema: {{ optional($jadwal->skema)->kode_skema ?? '-' }}</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Form Inputs -->
-            <form>
+            <form action="{{ route('admin.sertifikasi.jadwal.kategori.soal.store', [$jadwal->id, $kategori->id]) }}" method="POST">
+                @csrf
                 
                 <!-- 1. Pertanyaan -->
                 <div class="mb-4">
                     <label class="form-label fw-bold text-dark d-flex align-items-center gap-2 mb-2">
                         <i class="bi bi-question-circle text-primary" style="color: #1b6ca8 !important;"></i> Pertanyaan
                     </label>
-                    <textarea class="form-control rounded-3" id="inputPertanyaan" rows="4" placeholder="Tulis pertanyaan di sini..."></textarea>
+                    <textarea class="form-control rounded-3" id="inputPertanyaan" name="pertanyaan" rows="4" placeholder="Tulis pertanyaan di sini..." required>{{ old('pertanyaan') }}</textarea>
                     <div class="d-flex justify-content-end mt-1">
                         <span class="text-muted" id="charCount" style="font-size: 11px;">0 / 500</span>
                     </div>
@@ -57,9 +62,9 @@
                     <label class="form-label fw-bold text-dark d-flex align-items-center gap-2 mb-2">
                         <i class="bi bi-ui-checks text-primary" style="color: #1b6ca8 !important;"></i> Tipe Soal
                     </label>
-                    <select class="form-select rounded-3" id="tipeSoalSelect">
-                        <option value="pilihan-ganda" selected>Pilihan Ganda</option>
-                        <option value="essay">Essay</option>
+                    <select class="form-select rounded-3" id="tipeSoalSelect" name="tipe_soal">
+                        <option value="Pilihan Ganda" selected>Pilihan Ganda</option>
+                        <option value="Essay">Essay</option>
                     </select>
                 </div>
 
@@ -68,17 +73,16 @@
                     <label class="form-label fw-bold text-dark d-flex align-items-center gap-2 mb-2">
                         <i class="bi bi-speedometer2 text-primary" style="color: #1b6ca8 !important;"></i> Tingkat Kesulitan
                     </label>
-                    <select class="form-select rounded-3" name="tingkat_kesulitan">
+                    <select class="form-select rounded-3" name="tingkat_kesulitan" required>
                         <option value="" disabled selected>Pilih tingkat kesulitan soal</option>
-                        <option value="mudah">Mudah</option>
-                        <option value="sedang">Sedang</option>
-                        <option value="sulit">Sulit</option>
+                        <option value="Mudah">Mudah</option>
+                        <option value="Sedang">Sedang</option>
+                        <option value="Sulit">Sulit</option>
                     </select>
                 </div>
 
                 <!-- ================= BAGIAN KHUSUS PILIHAN GANDA ================= -->
                 <div id="wrapperPilihanGanda">
-                    <!-- Pilihan Jawaban -->
                     <div class="mb-4">
                         <label class="form-label fw-bold text-dark d-flex align-items-center gap-2 mb-3">
                             <i class="bi bi-list-ul text-primary" style="color: #1b6ca8 !important;"></i> Pilihan Jawaban
@@ -87,20 +91,16 @@
                         @foreach(['A', 'B', 'C', 'D'] as $opt)
                         <div class="input-group mb-3">
                             <span class="input-group-text fw-bold bg-light text-primary" style="color: #1b6ca8 !important; width: 45px; justify-content: center;">{{ $opt }}</span>
-                            <input type="text" class="form-control" placeholder="Masukkan pilihan jawaban {{ $opt }}">
-                            <span class="input-group-text bg-white">
-                                <input class="form-check-input mt-0" type="radio" name="correct_answer_radio" aria-label="Radio for {{ $opt }}">
-                            </span>
+                            <input type="text" name="pilihan_{{ strtolower($opt) }}" class="form-control" placeholder="Masukkan pilihan jawaban {{ $opt }}">
                         </div>
                         @endforeach
                     </div>
 
-                    <!-- Jawaban Benar Pilihan Ganda -->
                     <div class="mb-4">
                         <label class="form-label fw-bold text-dark d-flex align-items-center gap-2 mb-2">
                             <i class="bi bi-shield-check text-primary" style="color: #1b6ca8 !important;"></i> Jawaban Benar
                         </label>
-                        <select class="form-select rounded-3">
+                        <select class="form-select rounded-3" id="jawabanBenarSelect" name="jawaban_benar">
                             <option value="" disabled selected>Pilih salah satu jawaban yang benar.</option>
                             <option value="A">A</option>
                             <option value="B">B</option>
@@ -110,27 +110,26 @@
                     </div>
                 </div>
 
-                <!-- ================= BAGIAN KHUSUS ESSAY ================= -->
                 <div id="wrapperEssay" class="d-none">
-                    <!-- Kunci jawaban essay telah dihapus sesuai permintaan -->
+                    <div class="alert alert-light border small text-secondary rounded-3 p-3 mb-0">
+                        Soal essay tidak memerlukan jawaban benar karena akan dinilai manual oleh asesor.
+                    </div>
                 </div>
 
-                <!-- 5. Point (Berlaku untuk semua jenis soal) -->
                 <div class="mb-4">
                     <label class="form-label fw-bold text-dark d-flex align-items-center gap-2 mb-2">
-                        <i class="bi bi-star text-primary" style="color: #1b6ca8 !important;"></i> Point
+                        <i class="bi bi-star text-primary" style="color: #1b6ca8 !important;"></i> Poin
                     </label>
-                    <input type="number" class="form-control rounded-3" value="5" placeholder="Masukkan point untuk soal ini.">
+                    <input type="number" name="poin" class="form-control rounded-3" value="5" placeholder="Masukkan point untuk soal ini." min="1" required>
                 </div>
 
                 <hr class="my-4 text-muted opacity-25">
 
-                <!-- Tombol Aksi Batal & Simpan Soal -->
                 <div class="d-flex justify-content-end gap-2">
                     <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-3 px-4 py-2 small fw-semibold text-decoration-none">
                         Batal
                     </a>
-                    <button type="button" class="btn text-white rounded-3 px-4 py-2 small fw-semibold border-0 shadow-sm" style="background-color: #1b6ca8;" onclick="alert('Simpan soal diklik (Frontend Mode)')">
+                    <button type="submit" class="btn text-white rounded-3 px-4 py-2 small fw-semibold border-0 shadow-sm" style="background-color: #1b6ca8;">
                         <i class="bi bi-save me-1"></i> Simpan Soal
                     </button>
                 </div>
@@ -162,6 +161,7 @@
         const tipeSoalSelect = document.getElementById('tipeSoalSelect');
         const wrapperPG = document.getElementById('wrapperPilihanGanda');
         const wrapperEssay = document.getElementById('wrapperEssay');
+        const jawabanBenarSelect = document.getElementById('jawabanBenarSelect');
 
         tipeSoalSelect.addEventListener('change', function() {
             const val = this.value;
@@ -170,13 +170,18 @@
             wrapperPG.classList.add('d-none');
             wrapperEssay.classList.add('d-none');
 
-            // Tampilkan sesuai pilihan
-            if (val === 'pilihan-ganda') {
+            // Tampilkan sesuai pilihan dan set required attribute
+            if (val === 'Pilihan Ganda') {
                 wrapperPG.classList.remove('d-none');
-            } else if (val === 'essay') {
+                jawabanBenarSelect.setAttribute('required', 'required');
+            } else if (val === 'Essay') {
                 wrapperEssay.classList.remove('d-none');
+                jawabanBenarSelect.removeAttribute('required');
             }
         });
+
+        // Trigger on page load to show the correct section
+        tipeSoalSelect.dispatchEvent(new Event('change'));
     });
 </script>
 @endsection

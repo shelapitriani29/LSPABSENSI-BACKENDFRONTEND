@@ -103,7 +103,7 @@
         
         <!-- User Profile Section -->
         <div class="px-3 py-2 mb-2 d-flex align-items-center">
-            <div class="bg-white rounded-circle me-3 shadow-sm flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+            <div class="bg-white rounded-circle me-3 shadow-sm shrink-0 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
                 <i class="bi bi-person-fill text-secondary fs-4"></i>
             </div>
             <div>

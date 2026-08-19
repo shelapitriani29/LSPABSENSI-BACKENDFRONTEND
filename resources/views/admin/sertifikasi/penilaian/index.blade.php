@@ -131,44 +131,71 @@
             </div>
 
             <!-- Table -->
-            <div class="table-responsive shadow-sm rounded-4">
-                <table class="table table-hover table-bordered align-middle mb-0">
-                    <thead class="table-light text-uppercase fs-7 text-secondary">
+            <div class="table-responsive shadow-sm rounded-4 border border-light">
+                <table class="table table-hover table-bordered align-middle mb-0" style="table-layout: auto;">
+                    <thead class="table-light text-uppercase fs-7 text-secondary fw-semibold">
                         <tr>
-                            <th class="py-3" style="width: 5%;">No</th>
-                            <th class="py-3">Peserta</th>
-                            <th class="py-3">Skema</th>
-                            <th class="py-3">Asesor</th>
-                            <th class="py-3" style="width: 15%;">Hasil</th>
-                            <th class="py-3 text-center" style="width: 10%;">Aksi</th>
+                            <th class="py-3 text-center" style="width: 5%;">No</th>
+                            <th class="py-3" style="width: 18%;">Peserta</th>
+                            <th class="py-3" style="width: 18%;">Skema</th>
+                            <th class="py-3" style="width: 14%;">Jadwal</th>
+                            <th class="py-3" style="width: 14%;">Asesor</th>
+                            <th class="py-3 text-center" style="width: 12%;">Tanggal</th>
+                            <th class="py-3 text-center" style="width: 12%;">Hasil</th>
+                            <th class="py-3 text-center" style="width: 7%;">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="small">
                         @forelse($penilaians as $penilaian)
                             <tr>
-                                <td>{{ $loop->iteration + ($penilaians->firstItem() ? $penilaians->firstItem() - 1 : 0) }}</td>
-                                <td class="fw-semibold text-dark">{{ $penilaian->user->name ?? '-' }}</td>
-                                <td>{{ $penilaian->jadwal->skema->nama_skema ?? '-' }}</td>
-                                <td>{{ $penilaian->asesor->name ?? '-' }}</td>
-                                <td>
-                                    <span class="badge px-3 py-2 fw-semibold text-white" style="background-color: {{ $penilaian->hasil === 'Kompeten' ? '#198754' : '#dc3545' }};">
-                                        {{ $penilaian->hasil }}
-                                    </span>
+                                <td class="text-center text-muted">{{ $loop->iteration + ($penilaians->firstItem() ? $penilaians->firstItem() - 1 : 0) }}</td>
+                                <td class="fw-semibold text-dark text-truncate" title="{{ $penilaian->user->name ?? '-' }}">
+                                    {{ $penilaian->user->name ?? '-' }}
+                                </td>
+                                <td class="text-truncate" title="{{ $penilaian->jadwal->skema->nama_skema ?? '-' }}">
+                                    {{ $penilaian->jadwal->skema->nama_skema ?? '-' }}
+                                </td>
+                                <td class="text-truncate" title="{{ $penilaian->jadwal->kode_jadwal ?? '-' }}">
+                                    {{ $penilaian->jadwal->kode_jadwal ?? '-' }}
+                                </td>
+                                <td class="text-truncate" title="{{ $penilaian->asesor->name ?? '-' }}">
+                                    {{ $penilaian->asesor->name ?? '-' }}
+                                </td>
+                                <td class="text-center text-nowrap">
+                                    @if($penilaian->jadwal->tanggal)
+                                        <span class="badge bg-light text-dark fw-normal">{{ \Carbon\Carbon::parse($penilaian->jadwal->tanggal)->format('d M Y') }}</span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if($penilaian->hasil === 'Kompeten')
+                                        <span class="badge bg-success bg-opacity-10 text-success fw-semibold px-2 py-1 rounded-pill">
+                                            <i class="bi bi-check-circle-fill me-1"></i>{{ $penilaian->hasil }}
+                                        </span>
+                                    @else
+                                        <span class="badge bg-danger bg-opacity-10 text-danger fw-semibold px-2 py-1 rounded-pill">
+                                            <i class="bi bi-x-circle-fill me-1"></i>{{ $penilaian->hasil }}
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="text-center">
                                     <div class="dropdown">
-                                        <button class="btn btn-sm btn-primary px-3 shadow-sm rounded-3" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #2b70c9; border-color: #2b70c9;">
-                                            <i class="bi bi-list text-white"></i>
+                                        <button class="btn btn-sm text-white rounded-pill shadow-sm border-0 d-inline-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #1b6ca8; width: 36px; height: 36px;">
+                                            <i class="bi bi-list fs-6"></i>
                                         </button>
-                                        <ul class="dropdown-menu shadow-sm border-0">
-                                            <li><a class="dropdown-item small" href="{{ route('admin.sertifikasi.penilaian.show', $penilaian->id) }}"><i class="bi bi-eye text-info me-2"></i> Detail</a></li>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-2">
+                                            <li><a class="dropdown-item py-2 px-3 small" href="{{ route('admin.sertifikasi.penilaian.show', $penilaian->id) }}"><i class="bi bi-eye text-info me-2"></i> Detail</a></li>
                                         </ul>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">Tidak ada data penilaian.</td>
+                                <td colspan="8" class="text-center text-muted py-5">
+                                    <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+                                    <span>Tidak ada data penilaian.</span>
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>

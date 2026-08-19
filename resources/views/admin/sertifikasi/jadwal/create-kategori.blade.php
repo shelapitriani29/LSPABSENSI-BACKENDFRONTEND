@@ -24,18 +24,20 @@
     <!-- Form Tambah Kategori -->
     <div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-body p-4">
-            <!-- Form disiapkan untuk backend temanmu -->
-            <form action="#" method="POST">
+            <form action="{{ isset($kategori) ? route('admin.sertifikasi.jadwal.kategori.update', [$jadwal->id, $kategori->id]) : route('admin.sertifikasi.jadwal.kategori.store', $jadwal->id) }}" method="POST">
                 @csrf
+                @if(isset($kategori))
+                    @method('PUT')
+                @endif
                 
                 <div class="mb-3">
                     <label for="nama_kategori" class="form-label small fw-bold text-dark">Nama Kategori <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control rounded-3 py-2" id="nama_kategori" name="nama_kategori" placeholder="Contoh: Prinsip Animasi" required>
+                    <input type="text" class="form-control rounded-3 py-2" id="nama_kategori" name="nama_kategori" value="{{ old('nama_kategori', $kategori->nama_kategori ?? '') }}" placeholder="Contoh: Prinsip Animasi" required>
                 </div>
 
                 <div class="mb-4">
                     <label for="deskripsi" class="form-label small fw-bold text-dark">Deskripsi / Materi</label>
-                    <textarea class="form-control rounded-3" id="deskripsi" name="deskripsi" rows="4" placeholder="Contoh: Konsep dasar animasi seperti squash & stretch, anticipation, staging, dll."></textarea>
+                    <textarea class="form-control rounded-3" id="deskripsi" name="deskripsi" rows="4" placeholder="Contoh: Konsep dasar animasi seperti squash & stretch, anticipation, staging, dll.">{{ old('deskripsi', $kategori->deskripsi ?? '') }}</textarea>
                 </div>
 
                 <div class="alert alert-light border small text-secondary rounded-3 p-3 mb-4">

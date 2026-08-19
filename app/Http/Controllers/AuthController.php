@@ -33,10 +33,10 @@ class AuthController extends Controller
         ]);
 
         // Temukan user berdasarkan username case-insensitive atau email
-        $usernameInput = $request->input('username');
+        $usernameInput = trim($request->input('username'));
         $user = User::where('username', $usernameInput)
             ->orWhereRaw('LOWER(username) = ?', [Str::lower($usernameInput)])
-            ->orWhere('email', $usernameInput)
+            ->orWhereRaw('LOWER(email) = ?', [Str::lower($usernameInput)])
             ->first();
 
         if ($user && Hash::check($request->input('password'), $user->password)) {

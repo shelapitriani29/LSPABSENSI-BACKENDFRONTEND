@@ -131,8 +131,8 @@
                         <div class="mb-4">
                             <label class="form-label fw-semibold small">Status Akun Sistem</label>
                             <select name="status" class="form-select">
-                                <option value="Aktif" {{ (old('status', $user->status ?? 'Aktif') == 'Aktif') ? 'selected' : '' }}>Aktif</option>
-                                <option value="Non-Aktif" {{ (old('status', $user->status ?? '') == 'Non-Aktif') ? 'selected' : '' }}>Non-Aktif</option>
+                                <option value="Aktif" {{ (old('status', $user->status ?? 'Aktif') == 'Aktif' || strtolower(old('status', $user->status ?? '')) == 'aktif') ? 'selected' : '' }}>Aktif</option>
+                                <option value="Nonaktif" {{ (old('status', $user->status ?? '') == 'Nonaktif' || strtolower(old('status', $user->status ?? '')) == 'nonaktif') ? 'selected' : '' }}>Nonaktif</option>
                             </select>
                         </div>
 

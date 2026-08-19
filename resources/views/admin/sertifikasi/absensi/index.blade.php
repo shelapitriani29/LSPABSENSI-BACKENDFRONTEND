@@ -282,7 +282,7 @@
 
                         <!-- Kanan: Preview QR Code -->
                         <div class="col-md-6 ps-md-4 d-flex flex-column justify-content-between">
-                            <div class="p-4 bg-light rounded-3 border d-flex flex-column align-items-center justify-content-center flex-grow-1">
+                            <div class="p-4 bg-light rounded-3 border d-flex flex-column align-items-center justify-content-center grow">
                                 <div class="bg-white p-2 border rounded-3 shadow-sm mb-3">
                                     <img id="qrImagePreview" 
                                          src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=Absensi_JWD_{{ date('Ymd') }}" 

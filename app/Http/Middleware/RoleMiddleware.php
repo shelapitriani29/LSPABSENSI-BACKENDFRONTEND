@@ -12,7 +12,7 @@ class RoleMiddleware
     /**
      * Handle an incoming request.
      */
-        public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string $role): Response
     {
         if (!auth()->check()) {
             return redirect()->route('login');
@@ -21,7 +21,14 @@ class RoleMiddleware
         $userRole = User::normalizeRole(auth()->user()->role);
         $requiredRole = User::normalizeRole($role);
 
-        if ($userRole !== $requiredRole) {
+        $allowedRoles = match ($requiredRole) {
+            'admin' => ['admin'],
+            'asesor' => ['asesor', 'admin'],
+            'peserta' => ['peserta', 'admin'],
+            default => [$requiredRole],
+        };
+
+        if (!in_array($userRole, $allowedRoles, true)) {
             abort(403, 'Anda tidak memiliki hak akses ke halaman ini.');
         }
 

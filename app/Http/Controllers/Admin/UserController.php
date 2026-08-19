@@ -130,13 +130,24 @@ class UserController extends Controller
             'bidang_kompetensi'
         ]);
 
-        // 3. Normalisasi Jenis Kelamin jika dikirim saat edit
+        // 3. Normalisasi Status jika dikirim saat edit
+        if ($request->filled('status')) {
+            $status = $request->status;
+            $lowerStatus = strtolower($status);
+            if (in_array($lowerStatus, ['a', 'aktif'], true)) {
+                $data['status'] = 'Aktif';
+            } elseif (in_array($lowerStatus, ['n', 'nonaktif', 'non-aktif', 'tidak aktif'], true)) {
+                $data['status'] = 'Nonaktif';
+            }
+        }
+
+        // 4. Normalisasi Jenis Kelamin jika dikirim saat edit
         if ($request->filled('jenis_kelamin')) {
             $jk = $request->jenis_kelamin;
             $data['jenis_kelamin'] = in_array(strtolower($jk), ['laki-laki', 'l']) ? 'L' : 'P';
         }
 
-        // 4. Jika password diisi, enkripsi dan perbarui
+        // 5. Jika password diisi, enkripsi dan perbarui
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }

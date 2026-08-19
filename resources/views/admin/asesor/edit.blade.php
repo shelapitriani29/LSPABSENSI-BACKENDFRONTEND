@@ -143,11 +143,12 @@
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Status Asesor</label>
                             @php
-                                $statusSelected = strtolower(old('status', $asesor->status ?? 'aktif'));
+                                $statusValue = old('status', $asesor->status ?? 'Aktif');
+                                $statusSelected = in_array(strtolower($statusValue), ['a', 'aktif']) ? 'Aktif' : 'Nonaktif';
                             @endphp
                             <select name="status" class="form-select @error('status') is-invalid @enderror">
-                                <option value="aktif" {{ $statusSelected == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                                <option value="nonaktif" {{ $statusSelected == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                                <option value="Aktif" {{ $statusSelected == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                                <option value="Nonaktif" {{ $statusSelected == 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
                             </select>
                             @error('status')
                                 <div class="invalid-feedback small">{{ $message }}</div>

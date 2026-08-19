@@ -5,7 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use App\Models\KategoriSoal;
 use App\Models\Skema;
+use App\Models\Soal;
+use App\Models\Ujian;
 use App\Models\User;
 
 class Jadwal extends Model
@@ -25,6 +28,8 @@ class Jadwal extends Model
         'lokasi',
         'keterangan',
         'status',
+        'passing_grade',
+        'durasi_ujian',
     ];
 
     public function skema()
@@ -40,6 +45,21 @@ class Jadwal extends Model
     public function pesertas()
     {
         return $this->hasMany(User::class, 'kelas', 'kelas')->where('role', 'peserta');
+    }
+
+    public function kategoris()
+    {
+        return $this->hasMany(KategoriSoal::class, 'jadwal_id');
+    }
+
+    public function soals()
+    {
+        return $this->hasManyThrough(Soal::class, KategoriSoal::class, 'jadwal_id', 'kategori_id');
+    }
+
+    public function ujians()
+    {
+        return $this->hasMany(Ujian::class, 'jadwal_id');
     }
 
     public function getStatusAttribute($value)
