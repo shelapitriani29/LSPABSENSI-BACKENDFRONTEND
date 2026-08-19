@@ -176,7 +176,7 @@
 
                 const span = document.createElement('span');
                 span.style.cssText = 'margin-left: 12px; color: #1f2937; font-size: 14px;';
-                span.textContent = opt + '. ' + pilihan.isi;
+                span.textContent = opt + '. ' + pilihan.teks_jawaban;
 
                 label.setAttribute('data-soal', soal.id);
                 label.appendChild(input);

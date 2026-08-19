@@ -121,8 +121,7 @@
                                             Lihat Detail
                                         </a>
                                     @else
-                                        <!-- Tombol Input Nilai diarahkan ke rute demo frontend -->
-                                        <a href="{{ route('asesor.penilaian-peserta-demo') }}" class="btn btn-sm text-white px-3 fw-semibold shadow-sm rounded-2" style="background-color: #1b6ca8; border-color: #1b6ca8;">
+                                        <a href="{{ route('asesor.penilaian-peserta-demo', ['peserta_id' => $peserta->id, 'jadwal_id' => $jadwal->id]) }}" class="btn btn-sm text-white px-3 fw-semibold shadow-sm rounded-2" style="background-color: #1b6ca8; border-color: #1b6ca8;">
                                             Input Nilai
                                         </a>
                                     @endif

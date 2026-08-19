@@ -410,9 +410,43 @@ Route::middleware(['auth', 'role:asesor'])
         // ==========================================
         // RUTE SEMENTARA (FRONTEND DEMO) - PENILAIAN PESERTA & ESSAY
         // ==========================================
-        Route::get('/penilaian-peserta-demo', function () {
-            $penilaian = Penilaian::first();
-            return view('asesor.penilaian-peserta', ['penilaian' => $penilaian]);
+        Route::get('/penilaian-peserta-demo', function (Request $request) {
+            $asesor = Auth::user();
+            $penilaian = null;
+
+            if ($request->filled(['peserta_id', 'jadwal_id'])) {
+                $user = User::where('role', 'peserta')->findOrFail($request->integer('peserta_id'));
+                $jadwal = Jadwal::with('skema')->findOrFail($request->integer('jadwal_id'));
+                $ujian = Ujian::where('jadwal_id', $jadwal->id)
+                    ->where('peserta_id', $user->id)
+                    ->first();
+
+                $penilaian = Penilaian::firstOrCreate(
+                    ['user_id' => $user->id, 'jadwal_id' => $jadwal->id],
+                    [
+                        'asesor_id' => $asesor->id,
+                        'hasil' => 'Belum Kompeten',
+                        'tanggal' => now()->toDateString(),
+                        'nilai_pilihan_ganda' => $ujian?->nilai_otomatis,
+                    ]
+                );
+            } else {
+                $penilaian = Penilaian::with(['user', 'jadwal.skema'])->latest()->first();
+
+                if (!$penilaian) {
+                    return redirect()->route('asesor.input-penilaian.index')
+                        ->with('error', 'Penilaian peserta belum tersedia.');
+                }
+            }
+
+            $user = $penilaian->user;
+            $jadwal = $penilaian->jadwal;
+
+            if ($penilaian->asesor_id !== $asesor->id) {
+                $penilaian->update(['asesor_id' => $asesor->id]);
+            }
+
+            return view('asesor.penilaian-peserta', compact('penilaian', 'user', 'jadwal'));
         })->name('penilaian-peserta-demo');
 
         Route::post('/penilaian-peserta-demo/store', function (Request $request) {
@@ -430,12 +464,13 @@ Route::middleware(['auth', 'role:asesor'])
                 }
 
                 // Update penilaian
-                $penilaian->update([
-                    'nilai_pilihan_ganda' => $request->nilai_pilihan_ganda,
-                    'catatan_pilihan_ganda' => $request->catatan_pilihan_ganda,
-                ]);
+                $data = $request->only(['nilai_pilihan_ganda', 'catatan_pilihan_ganda']);
+                $penilaian->update(array_filter($data, fn ($value) => $value !== null));
 
-                return redirect()->route('asesor.penilaian-peserta-demo')
+                return redirect()->route('asesor.penilaian-peserta-demo', [
+                    'peserta_id' => $penilaian->user_id,
+                    'jadwal_id' => $penilaian->jadwal_id,
+                ])
                     ->with('success', 'Penilaian berhasil disimpan!');
             } catch (\Exception $e) {
                 return back()
@@ -444,35 +479,11 @@ Route::middleware(['auth', 'role:asesor'])
             }
         })->name('penilaian-peserta-demo.store');
 
-        Route::get('/penilaian-essay-demo', function () {
-            // Cari atau buat penilaian dummy untuk demo
-            $penilaian = Penilaian::first();
-            
-            if (!$penilaian) {
-                // Jika belum ada penilaian, buat yang dummy
-                $jadwal = Jadwal::first();
-                $user = User::where('role', 'peserta')->first();
-                $asesor = User::where('role', 'asesor')->first() ?? Auth::user();
-                
-                if (!$jadwal || !$user || !$asesor) {
-                    // Fallback jika data tidak lengkap
-                    return view('asesor.penilaian-essay', ['penilaian_id' => 1]);
-                }
-                
-                $penilaian = Penilaian::firstOrCreate(
-                    [
-                        'user_id' => $user->id,
-                        'jadwal_id' => $jadwal->id,
-                        'asesor_id' => $asesor->id,
-                    ],
-                    [
-                        'hasil' => 'Kompeten',
-                        'tanggal' => now()->toDateString(),
-                    ]
-                );
-            }
-            
-            return view('asesor.penilaian-essay', ['penilaian_id' => $penilaian->id]);
+        Route::get('/penilaian-essay-demo', function (Request $request) {
+            $penilaian = Penilaian::with(['user', 'jadwal.skema'])
+                ->findOrFail($request->integer('penilaian_id'));
+
+            return view('asesor.penilaian-essay', compact('penilaian'));
         })->name('penilaian-essay-demo');
 
         Route::post('/penilaian-essay/store', function (Request $request) {
@@ -504,7 +515,10 @@ Route::middleware(['auth', 'role:asesor'])
                     'catatan_essay' => $request->catatan_essay ?? null,
                 ]);
 
-                return redirect()->route('asesor.penilaian-peserta-demo')
+                return redirect()->route('asesor.penilaian-peserta-demo', [
+                    'peserta_id' => $penilaian->user_id,
+                    'jadwal_id' => $penilaian->jadwal_id,
+                ])
                     ->with('success', 'Nilai Essay berhasil disimpan!');
             } catch (\Exception $e) {
                 return back()
@@ -713,7 +727,7 @@ Route::middleware(['auth', 'role:peserta'])
         Route::prefix('ujikom')->name('ujikom.')->group(function () {
             Route::get('/', function () {
                 $user = Auth::user();
-                $jadwal = Jadwal::with(['skema', 'asesor'])
+                $jadwal = Jadwal::with(['skema', 'asesor', 'kategoris.soals'])
                     ->where('kelas', $user->kelas)
                     ->orderBy('tanggal', 'desc')
                     ->first();
@@ -837,7 +851,17 @@ Route::middleware(['auth', 'role:peserta'])
             })->name('submit');
 
             Route::get('/selesai', function () {
-                return view('peserta.ujikom.selesai');
+                $user = Auth::user();
+                $jadwal = Jadwal::with('skema')
+                    ->where('kelas', $user->kelas)
+                    ->orderByDesc('tanggal')
+                    ->first();
+                $ujian = $jadwal
+                    ? Ujian::where('jadwal_id', $jadwal->id)->where('peserta_id', $user->id)->first()
+                    : null;
+                $jumlahSoal = $jadwal ? $jadwal->soals()->count() : 0;
+
+                return view('peserta.ujikom.selesai', compact('jadwal', 'ujian', 'jumlahSoal'));
             })->name('selesai');
         });
 

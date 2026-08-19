@@ -1,6 +1,11 @@
 @extends('layouts.asesor')
 
 @section('content')
+@php
+    $nilaiAkhir = $penilaian?->nilai_essay ?? $penilaian?->nilai_pilihan_ganda;
+    $passingGrade = (float) ($jadwal->passing_grade ?? 75);
+    $statusKelulusan = $nilaiAkhir !== null && (float) $nilaiAkhir >= $passingGrade ? 'Kompeten' : 'Belum Kompeten';
+@endphp
 <div class="container-fluid px-0">
     <!-- Error/Success Messages -->
     @if ($errors->any())
@@ -38,7 +43,7 @@
                 <ol class="breadcrumb mb-0" style="font-size: 0.85rem;">
                     <li class="breadcrumb-item"><a href="{{ route('asesor.dashboard') }}" class="text-muted text-decoration-none">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('asesor.input-penilaian.index') }}" class="text-muted text-decoration-none">Input Penilaian</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('asesor.jadwal-asesmen.lihat-peserta', 1) }}" class="text-muted text-decoration-none">Pilih Peserta</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('asesor.jadwal-asesmen.lihat-peserta', $jadwal->id) }}" class="text-muted text-decoration-none">Pilih Peserta</a></li>
                     <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">Penilaian Peserta</li>
                 </ol>
             </nav>
@@ -52,33 +57,33 @@
                 <div class="col-md-6">
                     <div class="row mb-2">
                         <div class="col-4 text-muted fw-semibold">Nama Lengkap</div>
-                        <div class="col-8 text-dark fw-bold">: Jenisa Nurfadillah</div>
+                        <div class="col-8 text-dark fw-bold">: {{ $user->name }}</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-4 text-muted fw-semibold">NISN</div>
-                        <div class="col-8 text-dark">: 0054321876</div>
+                        <div class="col-8 text-dark">: {{ $user->nisn ?? $user->username ?? '-' }}</div>
                     </div>
                     <div class="row mb-0">
                         <div class="col-4 text-muted fw-semibold">Kelas</div>
-                        <div class="col-8 text-dark">: XI DKV 1</div>
+                        <div class="col-8 text-dark">: {{ $user->kelas ?? '-' }}</div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="row mb-2">
                         <div class="col-4 text-muted fw-semibold">Skema Sertifikasi</div>
-                        <div class="col-8 text-dark">: Junior Animator</div>
+                        <div class="col-8 text-dark">: {{ $jadwal->skema->nama_skema ?? '-' }}</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-4 text-muted fw-semibold">Jadwal Uji</div>
-                        <div class="col-8 text-dark">: JA001 - Junior Animator</div>
+                        <div class="col-8 text-dark">: {{ $jadwal->kode_jadwal }} - {{ $jadwal->skema->nama_skema ?? '-' }}</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-4 text-muted fw-semibold">Tanggal Uji</div>
-                        <div class="col-8 text-dark">: 25 Agustus 2026</div>
+                        <div class="col-8 text-dark">: {{ $jadwal->tanggal ? \Carbon\Carbon::parse($jadwal->tanggal)->translatedFormat('d F Y') : '-' }}</div>
                     </div>
                     <div class="row mb-0">
                         <div class="col-4 text-muted fw-semibold">Lokasi Uji</div>
-                        <div class="col-8 text-dark">: Lab Komputer 2</div>
+                        <div class="col-8 text-dark">: {{ $jadwal->lokasi ?? '-' }}</div>
                     </div>
                 </div>
             </div>
@@ -104,8 +109,8 @@
                         <tr>
                             <td class="text-center">1.</td>
                             <td class="fw-semibold text-dark">Pilihan Ganda (Otomatis)</td>
-                            <td class="text-center fw-bold text-dark">{{ $penilaian?->nilai_pilihan_ganda ?? '85.00' }} <span class="text-muted fw-normal small">/ 100</span></td>
-                            <td class="text-muted">{{ $penilaian?->catatan_pilihan_ganda ?? 'Nilai Otomatis Dari Sistem' }}</td>
+                            <td class="text-center fw-bold text-dark">{{ $penilaian?->nilai_pilihan_ganda ?? '-' }} <span class="text-muted fw-normal small">/ 100</span></td>
+                            <td class="text-muted">{{ $penilaian?->catatan_pilihan_ganda ?? 'Nilai otomatis dari sistem' }}</td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm text-white px-3 fw-semibold rounded-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#editNilaiPilihanGandaModal" style="background-color: #1b6ca8; font-size: 0.8rem;">
                                     Edit
@@ -115,10 +120,10 @@
                         <tr>
                             <td class="text-center">2.</td>
                             <td class="fw-semibold text-dark">Essay (Perlu Penilaian)</td>
-                            <td class="text-center fw-bold text-dark">{{ $penilaian?->nilai_essay ?? '85.00' }} <span class="text-muted fw-normal small">/ 100</span></td>
-                            <td class="text-muted">{{ $penilaian?->catatan_essay ?? 'Jawaban sudah cukup baik dan sesuai konsep yang diharapkan.' }}</td>
+                            <td class="text-center fw-bold text-dark">{{ $penilaian?->nilai_essay ?? '-' }} <span class="text-muted fw-normal small">/ 100</span></td>
+                            <td class="text-muted">{{ $penilaian?->catatan_essay ?? '-' }}</td>
                             <td class="text-center">
-                                <a href="{{ route('asesor.penilaian-essay-demo') }}" class="btn btn-sm text-white px-3 fw-semibold rounded-2 shadow-sm" style="background-color: #1b6ca8; font-size: 0.8rem;">
+                                    <a href="{{ route('asesor.penilaian-essay-demo', ['penilaian_id' => $penilaian->id]) }}" class="btn btn-sm text-white px-3 fw-semibold rounded-2 shadow-sm" style="background-color: #1b6ca8; font-size: 0.8rem;">
                                     Nilai Essay
                                 </a>
                             </td>
@@ -136,15 +141,15 @@
             <div class="row align-items-center g-3">
                 <div class="col-md-4">
                     <span class="text-muted small d-block mb-1">Nilai Akhir</span>
-                    <h3 class="fw-bold text-dark mb-0">{{ $penilaian?->nilai_essay ?? '85.00' }} <span class="text-muted fs-6 fw-normal">/ 100</span></h3>
+                    <h3 class="fw-bold text-dark mb-0">{{ $penilaian?->nilai_essay ?? $penilaian?->nilai_pilihan_ganda ?? '-' }} <span class="text-muted fs-6 fw-normal">/ 100</span></h3>
                 </div>
                 <div class="col-md-4">
                     <span class="text-muted small d-block mb-1">Passing Grade</span>
-                    <h4 class="fw-bold text-secondary mb-0">75 <span class="text-muted fs-6 fw-normal">/ 100</span></h4>
+                    <h4 class="fw-bold text-secondary mb-0">{{ $passingGrade }} <span class="text-muted fs-6 fw-normal">/ 100</span></h4>
                 </div>
                 <div class="col-md-4 text-md-end">
                     <span class="text-muted small d-block mb-1">Status Kelulusan</span>
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 fw-bold" style="font-size: 0.95rem;">KOMPETEN</span>
+                    <span class="badge {{ $statusKelulusan === 'Kompeten' ? 'bg-success text-success border-success' : 'bg-danger text-danger border-danger' }} bg-opacity-10 border px-3 py-2 fw-bold" style="font-size: 0.95rem;">{{ strtoupper($statusKelulusan) }}</span>
                 </div>
             </div>
         </div>
@@ -157,7 +162,7 @@
         
         <!-- Tombol Aksi Bawah -->
         <div class="d-flex justify-content-end gap-2 mb-5">
-            <a href="{{ route('asesor.jadwal-asesmen.lihat-peserta', 1) }}" class="btn btn-outline-secondary px-4 fw-semibold shadow-sm rounded-2 bg-white text-secondary py-2" style="font-size: 0.9rem;">
+            <a href="{{ route('asesor.jadwal-asesmen.lihat-peserta', $jadwal->id) }}" class="btn btn-outline-secondary px-4 fw-semibold shadow-sm rounded-2 bg-white text-secondary py-2" style="font-size: 0.9rem;">
                 &times; Batal
             </a>
             <button type="submit" class="btn text-white px-4 fw-semibold shadow-sm rounded-2 py-2" style="background-color: #1b6ca8; border-color: #1b6ca8; font-size: 0.9rem;">
@@ -183,7 +188,7 @@
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark">Nilai Pilihan Ganda <span class="text-danger">*</span></label>
                         <div class="d-flex align-items-center gap-2">
-                            <input type="number" step="0.01" name="nilai_pilihan_ganda" class="form-control form-control-sm text-center fw-bold text-dark shadow-sm py-2" value="{{ $penilaian?->nilai_pilihan_ganda ?? '85.00' }}" min="0" max="100" required>
+                            <input type="number" step="0.01" name="nilai_pilihan_ganda" class="form-control form-control-sm text-center fw-bold text-dark shadow-sm py-2" value="{{ $penilaian?->nilai_pilihan_ganda }}" min="0" max="100" required>
                             <span class="text-muted small text-nowrap">/ 100</span>
                         </div>
                     </div>
@@ -223,18 +228,18 @@
                 <div class="bg-light rounded-3 p-3 mb-4 border-0">
                     <div class="mb-2">
                         <span class="text-muted small d-block mb-1">Nilai akhir peserta:</span>
-                        <h4 class="fw-bold text-dark mb-0" style="font-size: 1.25rem;">85.00 / 100</h4>
+                        <h4 class="fw-bold text-dark mb-0" style="font-size: 1.25rem;">{{ $nilaiAkhir ?? '-' }} / 100</h4>
                     </div>
                     <hr class="my-2 text-muted opacity-25">
                     <div>
                         <span class="text-muted small d-block mb-1">Status Kelulusan :</span>
-                        <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-1 fw-bold" style="font-size: 0.9rem;">KOMPETEN</span>
+                        <span class="badge {{ $statusKelulusan === 'Kompeten' ? 'bg-success text-success border-success' : 'bg-danger text-danger border-danger' }} bg-opacity-10 border px-3 py-1 fw-bold" style="font-size: 0.9rem;">{{ strtoupper($statusKelulusan) }}</span>
                     </div>
                 </div>
 
                 <!-- Tombol Aksi Pop-up -->
                 <div class="d-grid gap-2">
-                    <a href="{{ route('asesor.jadwal-asesmen.lihat-peserta', 1) }}" class="btn btn-outline-primary py-2 fw-semibold rounded-2 shadow-sm bg-white" style="border-color: #1b6ca8; color: #1b6ca8; font-size: 0.9rem;">
+                    <a href="{{ route('asesor.jadwal-asesmen.lihat-peserta', $jadwal->id) }}" class="btn btn-outline-primary py-2 fw-semibold rounded-2 shadow-sm bg-white" style="border-color: #1b6ca8; color: #1b6ca8; font-size: 0.9rem;">
                         Kembali ke Daftar Peserta
                     </a>
                     <button type="button" class="btn text-white py-2 fw-semibold rounded-2 shadow-sm" data-bs-dismiss="modal" style="background-color: #1b6ca8; border-color: #1b6ca8; font-size: 0.9rem;">

@@ -23,19 +23,19 @@
                 <tbody>
                     <tr>
                         <td style="padding: 8px 0; font-size: 14px; color: #6b7280; width: 42%;">Skema Sertifikasi</td>
-                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: Teknisi Instalasi Energi Terbarukan</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ $jadwal->skema->nama_skema ?? '-' }}</td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Jumlah Soal</td>
-                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: 20 Soal</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ $jumlahSoal }} Soal</td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Durasi</td>
-                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: 60 Menit</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ $jadwal->durasi_ujian ?? 120 }} Menit</td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Waktu Selesai</td>
-                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: 17:24 WIB</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ $ujian?->waktu_selesai?->format('H:i') ?? '-' }} WIB</td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Status</td>
