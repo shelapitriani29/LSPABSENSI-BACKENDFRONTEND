@@ -104,7 +104,7 @@
             <div class="body-content my-3">
                 <p class="text-uppercase fw-bold text-secondary mb-1" style="font-family: Arial, sans-serif; letter-spacing: 3px;">Sertifikat Ini Diberikan Kepada:</p>
                 <div class="recipient-name">{{ optional($sertifikat->user)->name ?? 'Nama Peserta' }}</div>
-                <p class="mt-3 fs-5">Telah dinyatakan <strong>{{ strtoupper($sertifikat->status ?? 'KOMPETEN') }}</strong> dalam Skema Sertifikasi:</p>
+                <p class="mt-3 fs-5">Telah dinyatakan <strong>KOMPETEN</strong> dalam Skema Sertifikasi:</p>
                 <h4 class="fw-bold text-dark text-uppercase" style="font-family: Arial, sans-serif; color: #1a365d !important;">{{ optional($sertifikat->skema)->nama_skema ?? $sertifikat->skema ?? 'Skema Sertifikasi' }}</h4>
             </div>
 

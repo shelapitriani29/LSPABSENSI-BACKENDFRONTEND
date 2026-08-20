@@ -28,6 +28,18 @@ class Penilaian extends Model
         'keterangan',
     ];
 
+    public function getHasilAttribute($value)
+    {
+        if ($this->nilai_pilihan_ganda !== null || $this->nilai_essay !== null) {
+            $nilaiAkhir = (float) ($this->nilai_pilihan_ganda ?? 0) + (float) ($this->nilai_essay ?? 0);
+            $passingGrade = (float) ($this->jadwal?->passing_grade ?? 75);
+
+            return $nilaiAkhir >= $passingGrade ? 'Kompeten' : 'Belum Kompeten';
+        }
+
+        return $value;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

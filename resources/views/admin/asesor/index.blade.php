@@ -8,7 +8,7 @@
     }
 </style>
 
-<div class="container-fluid px-2" style="max-width: 1200px;">
+<div class="container-fluid px-4">
     <!-- Header Page -->
     <div class="mb-4">
         <h3 class="fw-bold mb-1" style="color: #212529;">Data Asesor</h3>

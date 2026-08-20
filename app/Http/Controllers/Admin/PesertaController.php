@@ -45,11 +45,21 @@ class PesertaController extends Controller
      */
     public function show($id)
     {
-        $peserta = User::with(['absensis.jadwal.skema'])
+        $peserta = User::with([
+            'absensis.jadwal.skema',
+            'penilaians.jadwal.skema',
+            'jadwal.skema',
+        ])
             ->where('role', 'peserta')
             ->findOrFail($id);
 
-        return view($this->viewPath . '.show', compact('peserta'));
+        $selectedSkema = $peserta->jadwal?->skema
+            ?? $peserta->penilaians->sortByDesc('tanggal')->first()?->jadwal?->skema
+            ?? $peserta->absensis->sortByDesc('created_at')->first()?->jadwal?->skema
+            ?? optional($peserta)->skema_kompetensi
+            ?? null;
+
+        return view($this->viewPath . '.show', compact('peserta', 'selectedSkema'));
     }
 
     /**
@@ -85,12 +95,13 @@ class PesertaController extends Controller
             'email'         => 'required|email|unique:users,email',
             'password'      => ['required','string','min:6','max:255'],
             'nik'           => 'nullable|string|max:50',
+            'nip'           => 'nullable|string|max:50',
             'instansi'      => 'nullable|string|max:255',
             'no_hp'         => 'nullable|string|max:20',
             'alamat'        => 'nullable|string',
             'kelas'         => 'nullable|string|max:100',
             'jurusan'       => 'nullable|string|max:100',
-            'status'        => 'nullable|string|in:aktif,nonaktif,Aktif,Nonaktif',
+            'status'        => ['nullable', 'string', Rule::in(['Aktif', 'Nonaktif', 'aktif', 'nonaktif'])],
         ]);
 
         $status = $request->status ? strtolower($request->status) : 'aktif';
@@ -127,6 +138,7 @@ class PesertaController extends Controller
             'email'            => ['nullable', 'email', Rule::unique('users', 'email')->ignore($peserta->id)],
             'password'         => ['nullable','string','min:6','max:255'],
             'nik'              => 'nullable|string|max:50',
+            'nip'              => 'nullable|string|max:50',
             'tempat_lahir'     => 'nullable|string|max:100',
             'tanggal_lahir'    => 'nullable|date',
             'jenis_kelamin'    => ['nullable', 'string', Rule::in(['L', 'P', 'Laki-laki', 'Perempuan'])],
@@ -135,7 +147,7 @@ class PesertaController extends Controller
             'kelas'            => 'nullable|string|max:100',
             'jurusan'          => 'nullable|string|max:100',
             'skema_kompetensi' => 'nullable|string|max:255',
-            'status'           => 'nullable|string|in:aktif,nonaktif',
+            'status'           => ['nullable', 'string', Rule::in(['Aktif', 'Nonaktif', 'aktif', 'nonaktif'])],
             'instansi'         => 'nullable|string|max:255',
         ]);
 
@@ -167,6 +179,7 @@ class PesertaController extends Controller
             'username'         => $request->username,
             'email'            => $request->email,
             'nik'              => $request->nik,
+            'nip'              => $request->nip,
             'tempat_lahir'     => $request->tempat_lahir,
             'tanggal_lahir'    => $request->tanggal_lahir,
             'jenis_kelamin'    => $jenisKelamin,

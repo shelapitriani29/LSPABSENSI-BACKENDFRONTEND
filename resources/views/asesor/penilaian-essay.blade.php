@@ -57,9 +57,9 @@
         <form action="{{ route('asesor.penilaian-essay.store') }}" method="POST" id="formNilaiEssay">
             @csrf
             <input type="hidden" name="penilaian_id" value="{{ $penilaian->id }}">
-            
+
             <div class="card-body p-4 p-md-5">
-                
+
                 <!-- Header di dalam Card (Judul & Tombol Close) -->
                 <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
                     <h5 class="fw-bold text-dark mb-0">Nilai Essay</h5>
@@ -79,19 +79,24 @@
                 <!-- Jawaban Peserta -->
                 <div class="mb-4">
                     <span class="fw-bold text-dark small d-block mb-2" style="letter-spacing: 0.5px;">Jawaban Peserta</span>
-                    <div class="p-3 rounded-3 bg-light border-0 text-dark" style="font-size: 0.9rem; line-height: 1.6;">
-                        Jawaban essay peserta dinilai secara manual oleh asesor.
-                    </div>
-                </div>
-
-                <!-- Form Input Nilai -->
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark small">Nilai <span class="text-danger">*</span></label>
-                    <div class="d-flex align-items-center gap-2" style="max-width: 180px;">
-                        <input type="number" step="0.01" name="nilai_essay" class="form-control form-control-sm text-center fw-bold text-dark shadow-sm py-2 @error('nilai_essay') is-invalid @enderror" value="{{ old('nilai_essay', $penilaian->nilai_essay) }}" min="0" max="100" required>
-                        <span class="text-muted small text-nowrap">/ 100</span>
-                    </div>
-                    @error('nilai_essay')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    @forelse($jawabanEssay as $index => $jawaban)
+                        <div class="p-3 rounded-3 bg-light border mb-3 text-dark" style="font-size: 0.9rem; line-height: 1.6;">
+                            <div class="fw-semibold mb-2">Soal {{ $index + 1 }}</div>
+                            <div class="text-muted mb-2">{{ $jawaban->soal->pertanyaan ?? '-' }}</div>
+                            <div class="border-top pt-2" style="white-space: pre-wrap;">{{ $jawaban->jawaban ?: 'Peserta tidak mengisi jawaban.' }}</div>
+                            @php $maksimalNilai = (float) ($jawaban->soal->poin ?? 100); @endphp
+                            <div class="d-flex align-items-center gap-2 mt-3" style="max-width: 280px;">
+                                <label class="fw-bold text-dark mb-0">Nilai:</label>
+                                <input type="number" step="0.01" name="nilai_essay[{{ $jawaban->id }}]" class="form-control form-control-sm text-center fw-bold text-dark shadow-sm py-2 @error('nilai_essay.' . $jawaban->id) is-invalid @enderror" value="{{ old('nilai_essay.' . $jawaban->id, $jawaban->nilai) }}" min="0" max="{{ $maksimalNilai }}" required>
+                                <span class="text-muted small text-nowrap">/ {{ $maksimalNilai }}</span>
+                            </div>
+                            @error('nilai_essay.' . $jawaban->id)<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                        </div>
+                    @empty
+                        <div class="p-3 rounded-3 bg-light border-0 text-muted" style="font-size: 0.9rem; line-height: 1.6;">
+                            Jawaban essay peserta belum tersedia.
+                        </div>
+                    @endforelse
                 </div>
 
                 <!-- Form Catatan (Opsional) -->

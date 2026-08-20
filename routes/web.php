@@ -89,22 +89,22 @@ Route::middleware(['auth', 'role:admin'])
                 Route::get('/create', [JadwalController::class, 'create'])->name('create');
                 Route::post('/', [JadwalController::class, 'store'])->name('store');
                 Route::get('/{id}', [JadwalController::class, 'show'])->name('show');
-                
+
                 // Rute khusus kelola soal diarahkan ke method kelolaSoal di JadwalController
                 Route::get('/{id}/kelola-soal', [JadwalController::class, 'kelolaSoal'])->name('soal');
-                
+
                 // Rute Tambahan untuk Kelola Soal Per Kategori
                 Route::get('/{id}/kategori', [JadwalController::class, 'kategoriIndex'])->name('kategori.index');
                 Route::get('/{id}/kategori/{kategoriId}/soal', [JadwalController::class, 'showKategoriSoal'])->name('kategori.soal');
                 Route::get('/{id}/kategori/create', [JadwalController::class, 'createKategoriSoal'])->name('kategori.create');
                 Route::get('/{id}/kategori/{kategoriId}/soal/tambah', [JadwalController::class, 'createSoal'])->name('kategori.soal.tambah');
                 Route::get('/{id}/kategori/{kategoriId}/soal/create', [JadwalController::class, 'createSoal'])->name('kategori.soal.create');
-                
+
                 // Soal routes (Put before single soal routes untuk avoid conflicts)
                 Route::post('/{id}/kategori/{kategoriId}/soal', [JadwalController::class, 'storeSoal'])->name('kategori.soal.store');
                 Route::put('/{id}/kategori/{kategoriId}/soal/{soalId}', [JadwalController::class, 'updateSoal'])->name('kategori.soal.update');
                 Route::delete('/{id}/kategori/{kategoriId}/soal/{soalId}', [JadwalController::class, 'destroySoal'])->name('kategori.soal.destroy');
-                
+
                 // Edit soal route (after PUT/POST/DELETE untuk avoid conflicts)
                 Route::get('/{id}/kategori/{kategoriId}/soal/{soalId}/edit', [JadwalController::class, 'editSoal'])->name('kategori.soal.edit');
 
@@ -215,7 +215,7 @@ Route::middleware(['auth', 'role:asesor'])
     ->prefix('asesor')
     ->name('asesor.')
     ->group(function () {
-        
+
         Route::get('/dashboard', function () {
             $today = now()->toDateString();
 
@@ -277,7 +277,7 @@ Route::middleware(['auth', 'role:asesor'])
             $pesertas = User::where('role', 'peserta')
                 ->where('kelas', $jadwal->kelas)
                 ->with([
-                    'absensis' => fn($q) => $q->where('jadwal_id', $jadwal->id), 
+                    'absensis' => fn($q) => $q->where('jadwal_id', $jadwal->id),
                     'penilaians' => fn($q) => $q->where('jadwal_id', $jadwal->id)
                 ])
                 ->get();
@@ -319,11 +319,12 @@ Route::middleware(['auth', 'role:asesor'])
         })->name('daftar-peserta');
 
         Route::get('/daftar-peserta/{id}/detail', function ($id) {
-            $peserta = User::with('absensis')->where('role', 'peserta')->findOrFail($id);
+            $peserta = User::with(['absensis.jadwal.skema', 'penilaians.jadwal.skema'])->where('role', 'peserta')->findOrFail($id);
             $lastAbsensi = $peserta->absensis->last();
-            $penilaian = Penilaian::where('user_id', $peserta->id)->latest()->first();
+            $penilaian = $peserta->penilaians->sortByDesc('tanggal')->first();
+            $skema = $penilaian?->jadwal?->skema ?? $lastAbsensi?->jadwal?->skema ?? $peserta->jadwal?->skema;
 
-            return view('asesor.daftar-peserta-detail', compact('peserta', 'lastAbsensi', 'penilaian'));
+            return view('asesor.daftar-peserta-detail', compact('peserta', 'lastAbsensi', 'penilaian', 'skema'));
         })->name('daftar-peserta.detail');
 
         Route::prefix('input-penilaian')->name('input-penilaian.')->group(function () {
@@ -390,13 +391,24 @@ Route::middleware(['auth', 'role:asesor'])
                 $request->validate([
                     'user_id' => ['required', 'exists:users,id'],
                     'jadwal_id' => ['required', 'exists:jadwals,id'],
-                    'hasil' => ['required', 'in:Kompeten,Belum Kompeten'],
+                    'hasil' => ['nullable', 'in:Kompeten,Belum Kompeten'],
                     'catatan' => ['nullable', 'string'],
                     'tanggal' => ['nullable', 'date'],
                     'keterangan' => ['nullable', 'string'],
                 ]);
-                $data = $request->only(['user_id', 'jadwal_id', 'hasil', 'catatan', 'tanggal', 'keterangan']);
+
+                $jadwal = Jadwal::find($request->jadwal_id);
+                $nilaiPilihanGanda = (float) ($request->nilai_pilihan_ganda ?? 0);
+                $nilaiEssay = (float) ($request->nilai_essay ?? 0);
+                $nilaiAkhir = $nilaiPilihanGanda + $nilaiEssay;
+                $passingGrade = (float) ($jadwal?->passing_grade ?? 75);
+
+                $data = $request->only(['user_id', 'jadwal_id', 'catatan', 'tanggal', 'keterangan']);
+                $data['hasil'] = $nilaiAkhir >= $passingGrade ? 'Kompeten' : 'Belum Kompeten';
+                $data['nilai_pilihan_ganda'] = $nilaiPilihanGanda;
+                $data['nilai_essay'] = $nilaiEssay;
                 $data['asesor_id'] = Auth::id();
+
                 Penilaian::create($data);
                 return redirect()->route('asesor.input-penilaian.index')->with('success', 'Penilaian berhasil disimpan.');
             })->name('store');
@@ -458,7 +470,7 @@ Route::middleware(['auth', 'role:asesor'])
 
             try {
                 $penilaian = Penilaian::find($request->penilaian_id);
-                
+
                 if (!$penilaian) {
                     return back()->withErrors(['penilaian_id' => 'Penilaian tidak ditemukan']);
                 }
@@ -467,10 +479,19 @@ Route::middleware(['auth', 'role:asesor'])
                 $data = $request->only(['nilai_pilihan_ganda', 'catatan_pilihan_ganda']);
                 $penilaian->update(array_filter($data, fn ($value) => $value !== null));
 
-                return redirect()->route('asesor.penilaian-peserta-demo', [
-                    'peserta_id' => $penilaian->user_id,
-                    'jadwal_id' => $penilaian->jadwal_id,
-                ])
+                $nilaiPilihanGanda = (float) ($penilaian->nilai_pilihan_ganda ?? 0);
+                $nilaiEssay = (float) ($penilaian->nilai_essay ?? 0);
+                $nilaiAkhir = $nilaiPilihanGanda + $nilaiEssay;
+                $passingGrade = (float) ($penilaian->jadwal?->passing_grade ?? 75);
+                $hasil = $nilaiAkhir >= $passingGrade ? 'Kompeten' : 'Belum Kompeten';
+
+                $penilaian->update([
+                    'nilai_pilihan_ganda' => $nilaiPilihanGanda,
+                    'nilai_essay' => $nilaiEssay,
+                    'hasil' => $hasil,
+                ]);
+
+                return redirect()->route('asesor.input-penilaian.index')
                     ->with('success', 'Penilaian berhasil disimpan!');
             } catch (\Exception $e) {
                 return back()
@@ -482,43 +503,78 @@ Route::middleware(['auth', 'role:asesor'])
         Route::get('/penilaian-essay-demo', function (Request $request) {
             $penilaian = Penilaian::with(['user', 'jadwal.skema'])
                 ->findOrFail($request->integer('penilaian_id'));
+            $ujian = Ujian::with(['jawabanUjian.soal'])
+                ->where('peserta_id', $penilaian->user_id)
+                ->where('jadwal_id', $penilaian->jadwal_id)
+                ->latest()
+                ->first();
+            $jawabanEssay = $ujian?->jawabanUjian
+                ->filter(fn ($jawaban) => $jawaban->soal?->tipe_soal === 'Essay')
+                ->values() ?? collect();
 
-            return view('asesor.penilaian-essay', compact('penilaian'));
+            return view('asesor.penilaian-essay', compact('penilaian', 'jawabanEssay'));
         })->name('penilaian-essay-demo');
 
         Route::post('/penilaian-essay/store', function (Request $request) {
             // Validasi input
             $validated = $request->validate([
                 'penilaian_id' => 'required|integer',
-                'nilai_essay' => 'required|numeric|min:0|max:100',
+                'nilai_essay' => 'required|array|min:1',
+                'nilai_essay.*' => 'required|numeric|min:0',
                 'catatan_essay' => 'nullable|string',
             ], [
                 'penilaian_id.required' => 'ID Penilaian tidak boleh kosong',
                 'penilaian_id.integer' => 'ID Penilaian harus berupa angka',
-                'nilai_essay.required' => 'Nilai essay harus diisi',
-                'nilai_essay.numeric' => 'Nilai essay harus berupa angka',
-                'nilai_essay.min' => 'Nilai essay minimal 0',
-                'nilai_essay.max' => 'Nilai essay maksimal 100',
+                'nilai_essay.required' => 'Nilai setiap soal essay harus diisi',
+                'nilai_essay.array' => 'Nilai essay tidak valid',
+                'nilai_essay.*.required' => 'Nilai setiap soal essay harus diisi',
+                'nilai_essay.*.numeric' => 'Nilai essay harus berupa angka',
+                'nilai_essay.*.min' => 'Nilai essay minimal 0',
             ]);
 
             try {
                 // Cek apakah penilaian ada
                 $penilaian = Penilaian::find($request->penilaian_id);
-                
+
                 if (!$penilaian) {
                     return back()->withErrors(['penilaian_id' => 'Penilaian dengan ID ' . $request->penilaian_id . ' tidak ditemukan.']);
                 }
 
-                // Update penilaian
+                $ujian = Ujian::with('jawabanUjian.soal')
+                    ->where('peserta_id', $penilaian->user_id)
+                    ->where('jadwal_id', $penilaian->jadwal_id)
+                    ->latest()
+                    ->first();
+                $nilaiEssay = 0;
+
+                foreach ($validated['nilai_essay'] as $jawabanId => $nilai) {
+                    $jawaban = $ujian?->jawabanUjian->firstWhere('id', $jawabanId);
+
+                    if ($jawaban && $jawaban->soal?->tipe_soal === 'Essay') {
+                        $maksimalNilai = (float) ($jawaban->soal->poin ?? 100);
+                        $request->validate([
+                            'nilai_essay.' . $jawabanId => ['numeric', 'min:0', 'max:' . $maksimalNilai],
+                        ], [
+                            'nilai_essay.' . $jawabanId . '.max' => 'Nilai soal essay maksimal ' . $maksimalNilai . '.',
+                        ]);
+                        $jawaban->update(['nilai' => $nilai, 'dinilai_oleh' => Auth::id(), 'waktu_dinilai' => now()]);
+                        $nilaiEssay += (float) $nilai;
+                    }
+                }
+
+                // Simpan total nilai dari seluruh soal essay
+                $nilaiPilihanGanda = (float) ($penilaian->nilai_pilihan_ganda ?? 0);
+                $nilaiAkhir = $nilaiPilihanGanda + $nilaiEssay;
+                $passingGrade = (float) ($penilaian->jadwal?->passing_grade ?? 75);
+                $hasil = $nilaiAkhir >= $passingGrade ? 'Kompeten' : 'Belum Kompeten';
+
                 $penilaian->update([
-                    'nilai_essay' => $request->nilai_essay,
+                    'nilai_essay' => $nilaiEssay,
                     'catatan_essay' => $request->catatan_essay ?? null,
+                    'hasil' => $hasil,
                 ]);
 
-                return redirect()->route('asesor.penilaian-peserta-demo', [
-                    'peserta_id' => $penilaian->user_id,
-                    'jadwal_id' => $penilaian->jadwal_id,
-                ])
+                return redirect()->route('asesor.input-penilaian.index')
                     ->with('success', 'Nilai Essay berhasil disimpan!');
             } catch (\Exception $e) {
                 return back()
@@ -761,6 +817,10 @@ Route::middleware(['auth', 'role:peserta'])
                     'waktu_selesai' => now()->addMinutes((int) ($jadwal->durasi_ujian ?? 120)),
                 ]);
 
+                if ($ujian->status === 'selesai') {
+                    return redirect()->route('peserta.ujikom.selesai');
+                }
+
                 if ($ujian->status === 'belum_dimulai') {
                     $ujian->update([
                         'status' => 'berlangsung',
@@ -792,6 +852,10 @@ Route::middleware(['auth', 'role:peserta'])
                     'waktu_selesai' => now()->addMinutes((int) ($jadwal->durasi_ujian ?? 120)),
                 ]);
 
+                if ($ujian->status === 'selesai') {
+                    return redirect()->route('peserta.ujikom.selesai');
+                }
+
                 if ($ujian->status === 'belum_dimulai') {
                     $ujian->update([
                         'status' => 'berlangsung',
@@ -812,6 +876,10 @@ Route::middleware(['auth', 'role:peserta'])
 
                 if (! $jadwal || ! $ujian) {
                     return redirect()->route('peserta.jadwal.index')->with('error', 'Ujian tidak ditemukan.');
+                }
+
+                if ($ujian->status === 'selesai') {
+                    return redirect()->route('peserta.ujikom.selesai');
                 }
 
                 $soals = $jadwal->soals()->get();

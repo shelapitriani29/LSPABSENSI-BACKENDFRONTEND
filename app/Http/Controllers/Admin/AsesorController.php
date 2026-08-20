@@ -75,7 +75,7 @@ class AsesorController extends Controller
             'alamat'           => 'nullable|string',
             'no_met'           => 'nullable|string|max:100',
             'skema_kompetensi' => 'nullable|string|max:255',
-            'status'           => 'nullable|string|in:aktif,nonaktif',
+            'status'           => ['nullable', 'string', Rule::in(['Aktif', 'Nonaktif', 'aktif', 'nonaktif'])],
         ]);
 
         // Normalisasi status agar match dengan enum values di database

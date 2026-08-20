@@ -3,13 +3,13 @@
 @section('content')
 <div style="width: 100%; padding: 24px 16px;">
     <div style="max-width: 900px; margin: 0 auto; background: #ffffff; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; padding: 32px; position: relative;">
-        
+
         <!-- Header Top: Judul, Timer & Tombol Akhiri Ujian -->
         <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
             <div>
                 <h2 style="font-size: 20px; font-weight: 700; color: #111827; margin: 0; letter-spacing: -0.025em;">{{ $jadwal->skema->nama_skema ?? 'Ujian Kompetensi' }}</h2>
             </div>
-            
+
             <div style="display: flex; align-items: center; gap: 12px;">
                 <!-- Indikator Waktu -->
                 <div style="display: flex; align-items: center; gap: 8px; background: #f9fafb; border: 1px solid #e5e7eb; padding: 8px 14px; border-radius: 12px;">
@@ -82,16 +82,16 @@
     function initializeGrid() {
         const grid = document.getElementById('question-grid');
         grid.innerHTML = '';
-        
+
         soals.forEach((soal, idx) => {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'question-badge';
             btn.setAttribute('data-index', idx + 1);
             btn.style.cssText = `
-                width: 38px; height: 38px; border-radius: 12px; 
-                font-size: 13px; font-weight: 600; 
-                display: flex; align-items: center; justify-content: center; 
+                width: 38px; height: 38px; border-radius: 12px;
+                font-size: 13px; font-weight: 600;
+                display: flex; align-items: center; justify-content: center;
                 cursor: pointer; transition: all 0.2s;
                 ${idx === 0 ? 'background: #2563eb; color: #ffffff; border: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05);' : 'background: #ffffff; color: #374151; border: 1px solid #e5e7eb;'}
             `;
@@ -111,9 +111,9 @@
             lastBtn.className = 'question-badge';
             lastBtn.setAttribute('data-index', totalQuestions);
             lastBtn.style.cssText = `
-                width: 38px; height: 38px; border-radius: 12px; 
-                font-size: 13px; font-weight: 600; 
-                display: flex; align-items: center; justify-content: center; 
+                width: 38px; height: 38px; border-radius: 12px;
+                font-size: 13px; font-weight: 600;
+                display: flex; align-items: center; justify-content: center;
                 cursor: pointer; transition: all 0.2s;
                 background: #ffffff; color: #374151; border: 1px solid #e5e7eb;
             `;
@@ -125,7 +125,8 @@
 
     function displayQuestion(index) {
         const soal = soals[index - 1];
-        
+        const tipeSoal = soal.tipe_soal || 'Pilihan Ganda';
+
         // Update question text
         document.getElementById('question-number').textContent = index + '.';
         document.getElementById('question-text').textContent = soal.pertanyaan;
@@ -139,51 +140,68 @@
         const optionsContainer = document.getElementById('options-container');
         optionsContainer.innerHTML = '';
 
-        const options = ['A', 'B', 'C', 'D'];
-        options.forEach(opt => {
-            const pilihan = soal.pilihan_jawaban.find(p => p.pilihan === opt);
-            if (pilihan) {
-                const label = document.createElement('label');
-                label.style.cssText = `
-                    display: flex; align-items: center; padding: 14px 16px; 
-                    border: 1px solid #e5e7eb; border-radius: 16px; 
-                    cursor: pointer; transition: all 0.2s;
-                `;
-                
-                const input = document.createElement('input');
-                input.type = 'radio';
-                input.name = `jawaban[${soal.id}]`;
-                input.value = opt;
-                input.style.cssText = 'width: 16px; height: 16px; accent-color: #2563eb; cursor: pointer;';
-                
-                // Restore saved answer
-                if (answers[soal.id] === opt) {
-                    input.checked = true;
-                    label.style.borderColor = '#93c5fd';
-                    label.style.background = '#ebf3fe';
+        if (tipeSoal === 'Pilihan Ganda') {
+            const options = ['A', 'B', 'C', 'D'];
+            options.forEach(opt => {
+                const pilihan = soal.pilihan_jawaban.find(p => p.pilihan === opt);
+                if (pilihan) {
+                    const label = document.createElement('label');
+                    label.style.cssText = `
+                        display: flex; align-items: center; padding: 14px 16px;
+                        border: 1px solid #e5e7eb; border-radius: 16px;
+                        cursor: pointer; transition: all 0.2s;
+                    `;
+
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `jawaban[${soal.id}]`;
+                    input.value = opt;
+                    input.style.cssText = 'width: 16px; height: 16px; accent-color: #2563eb; cursor: pointer;';
+
+                    // Restore saved answer
+                    if (answers[soal.id] === opt) {
+                        input.checked = true;
+                        label.style.borderColor = '#93c5fd';
+                        label.style.background = '#ebf3fe';
+                    }
+
+                    input.onchange = () => {
+                        answers[soal.id] = opt;
+                        // Update all labels styling
+                        document.querySelectorAll('label[data-soal="' + soal.id + '"]').forEach(l => {
+                            l.style.borderColor = '#e5e7eb';
+                            l.style.background = 'transparent';
+                        });
+                        label.style.borderColor = '#93c5fd';
+                        label.style.background = '#ebf3fe';
+                    };
+
+                    const span = document.createElement('span');
+                    span.style.cssText = 'margin-left: 12px; color: #1f2937; font-size: 14px;';
+                    span.textContent = opt + '. ' + pilihan.teks_jawaban;
+
+                    label.setAttribute('data-soal', soal.id);
+                    label.appendChild(input);
+                    label.appendChild(span);
+                    optionsContainer.appendChild(label);
                 }
-
-                input.onchange = () => {
-                    answers[soal.id] = opt;
-                    // Update all labels styling
-                    document.querySelectorAll('label[data-soal="' + soal.id + '"]').forEach(l => {
-                        l.style.borderColor = '#e5e7eb';
-                        l.style.background = 'transparent';
-                    });
-                    label.style.borderColor = '#93c5fd';
-                    label.style.background = '#ebf3fe';
-                };
-
-                const span = document.createElement('span');
-                span.style.cssText = 'margin-left: 12px; color: #1f2937; font-size: 14px;';
-                span.textContent = opt + '. ' + pilihan.teks_jawaban;
-
-                label.setAttribute('data-soal', soal.id);
-                label.appendChild(input);
-                label.appendChild(span);
-                optionsContainer.appendChild(label);
-            }
-        });
+            });
+        } else {
+            const textArea = document.createElement('textarea');
+            textArea.name = `jawaban[${soal.id}]`;
+            textArea.rows = 6;
+            textArea.placeholder = tipeSoal === 'Essay' ? 'Tuliskan jawaban essay Anda di sini...' : 'Tuliskan jawaban singkat Anda di sini...';
+            textArea.value = answers[soal.id] || '';
+            textArea.style.cssText = `
+                width: 100%; min-height: 180px; padding: 14px 16px; border: 1px solid #d1d5db; border-radius: 16px;
+                font-size: 14px; color: #111827; background: #ffffff; resize: vertical;
+                box-sizing: border-box; font-family: inherit;
+            `;
+            textArea.oninput = () => {
+                answers[soal.id] = textArea.value;
+            };
+            optionsContainer.appendChild(textArea);
+        }
 
         // Update button text for last question
         const nextBtn = document.getElementById('next-btn');
@@ -261,7 +279,7 @@
         const updateTimerDisplay = () => {
             const now = new Date();
             const diff = waktuSelesai - now;
-            
+
             if (diff <= 0) {
                 document.getElementById('timer').textContent = '00:00:00';
                 return;
@@ -270,10 +288,10 @@
             let hours = Math.floor(diff / (1000 * 60 * 60));
             let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             let seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            document.getElementById('timer').textContent = 
-                String(hours).padStart(2, '0') + ':' + 
-                String(minutes).padStart(2, '0') + ':' + 
+
+            document.getElementById('timer').textContent =
+                String(hours).padStart(2, '0') + ':' +
+                String(minutes).padStart(2, '0') + ':' +
                 String(seconds).padStart(2, '0');
         };
 

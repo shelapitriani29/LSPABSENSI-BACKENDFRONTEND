@@ -2,9 +2,11 @@
 
 @section('content')
 @php
-    $nilaiAkhir = $penilaian?->nilai_essay ?? $penilaian?->nilai_pilihan_ganda;
+    $nilaiPilihanGanda = (float) ($penilaian?->nilai_pilihan_ganda ?? 0);
+    $nilaiEssay = (float) ($penilaian?->nilai_essay ?? 0);
+    $nilaiAkhir = $nilaiPilihanGanda + $nilaiEssay;
     $passingGrade = (float) ($jadwal->passing_grade ?? 75);
-    $statusKelulusan = $nilaiAkhir !== null && (float) $nilaiAkhir >= $passingGrade ? 'Kompeten' : 'Belum Kompeten';
+    $statusKelulusan = $nilaiAkhir >= $passingGrade ? 'Kompeten' : 'Belum Kompeten';
 @endphp
 <div class="container-fluid px-0">
     <!-- Error/Success Messages -->
@@ -141,7 +143,7 @@
             <div class="row align-items-center g-3">
                 <div class="col-md-4">
                     <span class="text-muted small d-block mb-1">Nilai Akhir</span>
-                    <h3 class="fw-bold text-dark mb-0">{{ $penilaian?->nilai_essay ?? $penilaian?->nilai_pilihan_ganda ?? '-' }} <span class="text-muted fs-6 fw-normal">/ 100</span></h3>
+                    <h3 class="fw-bold text-dark mb-0">{{ number_format($nilaiAkhir, 2, ',', '.') }} <span class="text-muted fs-6 fw-normal">/ 100</span></h3>
                 </div>
                 <div class="col-md-4">
                     <span class="text-muted small d-block mb-1">Passing Grade</span>
@@ -159,7 +161,7 @@
     <form action="{{ route('asesor.penilaian-peserta-demo.store') }}" method="POST" id="formSimpanPenilaian">
         @csrf
         <input type="hidden" name="penilaian_id" value="{{ $penilaian?->id ?? 1 }}">
-        
+
         <!-- Tombol Aksi Bawah -->
         <div class="d-flex justify-content-end gap-2 mb-5">
             <a href="{{ route('asesor.jadwal-asesmen.lihat-peserta', $jadwal->id) }}" class="btn btn-outline-secondary px-4 fw-semibold shadow-sm rounded-2 bg-white text-secondary py-2" style="font-size: 0.9rem;">
@@ -183,7 +185,7 @@
             <form action="{{ route('asesor.penilaian-peserta-demo.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="penilaian_id" value="{{ $penilaian?->id ?? 1 }}">
-                
+
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark">Nilai Pilihan Ganda <span class="text-danger">*</span></label>
@@ -213,7 +215,7 @@
     <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
         <div class="modal-content border-0 shadow-lg rounded-4 p-4 text-center bg-white">
             <div class="modal-body px-2 py-3">
-                
+
                 <!-- Icon Centang Hijau Besar -->
                 <div class="mb-4 d-flex justify-content-center">
                     <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 85px; height: 85px; background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);">

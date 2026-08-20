@@ -7,7 +7,7 @@
         <div>
             <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: 0.5px;">DETAIL PESERTA</h4>
             <small class="text-muted d-block mb-2">LSP P1 – SMK NEGERI 1 GARUT</small>
-            
+
             <!-- Breadcrumb di Bawah Tulisan LSP -->
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0" style="font-size: 0.85rem;">
@@ -38,6 +38,7 @@
                 $genderText = $gender === 'L' || strtolower($gender) === 'laki-laki' ? 'Laki-laki' : ($gender === 'P' || strtolower($gender) === 'perempuan' ? 'Perempuan' : ($gender ?? '-'));
                 $attendanceStatus = $lastAbsensi->status ?? 'Belum Hadir';
                 $assessmentStatus = $penilaian ? ($penilaian->hasil ?? 'Sudah Dinilai') : 'Belum Dinilai';
+                $skemaNama = $skema?->nama_skema ?? $peserta->skema_kompetensi ?? '-';
             @endphp
 
             <div class="row mb-3">
@@ -58,7 +59,7 @@
             </div>
             <div class="row mb-3">
                 <div class="col-md-3 fw-semibold text-muted">Skema</div>
-                <div class="col-md-9 text-dark">: {{ $peserta->skema_kompetensi ?? '-' }}</div>
+                <div class="col-md-9 text-dark">: {{ $skemaNama }}</div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-3 fw-semibold text-muted">Status Kehadiran</div>

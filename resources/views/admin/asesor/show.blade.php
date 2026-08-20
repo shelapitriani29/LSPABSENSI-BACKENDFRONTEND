@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid px-2" style="max-width: 1200px;">
+<div class="container-fluid p-4">
     <!-- Header Halaman & Tombol Kembali Disejajarkan -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>

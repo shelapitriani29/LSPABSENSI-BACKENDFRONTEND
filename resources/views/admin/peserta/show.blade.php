@@ -2,12 +2,12 @@
 
 @section('content')
 <div class="container-fluid p-4" style="font-family: 'Poppins', sans-serif;">
-    
+
     <!-- Top Header & Breadcrumb -->
     <div class="mb-4">
         <h1 class="fw-bold text-dark mb-0" style="font-size: 2.2rem;">Detail Peserta</h1>
         <small class="text-secondary d-block fw-medium mb-3" style="font-size: 0.85rem;">LSP P1 – SMK NEGERI 1 GARUT</small>
-        
+
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-transparent p-0 mb-0" style="font-size: 0.9rem;">
                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" class="text-decoration-none text-muted">Dashboard</a></li>
@@ -21,10 +21,10 @@
     <!-- Main Content Card -->
     <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 12px;">
         <div class="row g-4">
-            
+
             <!-- Kolom Kiri: Profil, Jadwal, Hasil Penilaian -->
             <div class="col-lg-6 d-flex flex-column gap-4">
-                
+
                 <!-- Profil Peserta -->
                 <div>
                     <h5 class="fw-bold text-dark mb-3" style="letter-spacing: 0.5px;">PROFIL PESERTA</h5>
@@ -34,6 +34,10 @@
                                 <tr>
                                     <th class="bg-light fw-bold text-dark" style="width: 35%;">Nama Lengkap</th>
                                     <td>{{ $peserta->name ?? '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light fw-bold text-dark">NISN</th>
+                                    <td>{{ $peserta->nip ?? $peserta->nis ?? $peserta->nik ?? $peserta->username ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">NIK</th>
@@ -71,20 +75,12 @@
                         <table class="table table-bordered align-middle mb-0">
                             <tbody>
                                 <tr>
-                                    <th class="bg-light fw-bold text-dark" style="width: 35%;">Skema Kompetensi</th>
-                                    <td>{{ $peserta->skema_kompetensi ?? '-' }}</td>
-                                </tr>
-                                <tr>
                                     <th class="bg-light fw-bold text-dark">Kelas</th>
                                     <td>{{ $peserta->kelas ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Jurusan</th>
                                     <td>{{ $peserta->jurusan ?? '-' }}</td>
-                                </tr>
-                                <tr>
-                                    <th class="bg-light fw-bold text-dark">No. MET</th>
-                                    <td>{{ $peserta->no_met ?? '-' }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -95,7 +91,7 @@
 
             <!-- Kolom Kanan: Data Instansi, Data Sertifikasi, Riwayat Absensi -->
             <div class="col-lg-6 d-flex flex-column gap-4">
-                
+
                 <!-- Data Instansi -->
                 <div>
                     <h5 class="fw-bold text-dark mb-3">Data Instansi</h5>
@@ -123,15 +119,15 @@
                             <tbody>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark" style="width: 35%;">Skema Sertifikasi</th>
-                                    <td class="fw-bold">{{ $peserta->skema ?? 'Junior Web Developer' }}</td>
+                                    <td class="fw-bold">{{ $selectedSkema?->nama_skema ?? $selectedSkema ?? $peserta->skema_kompetensi ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Kode Skema</th>
-                                    <td>{{ $peserta->kode_skema ?? 'SKM-JWD-001' }}</td>
+                                    <td>{{ $selectedSkema?->kode_skema ?? $peserta->kode_skema ?? '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Tanggal Pendaftaran</th>
-                                    <td>{{ $peserta->created_at ? $peserta->created_at->format('d F Y') : '01 Agustus 2026' }}</td>
+                                    <td>{{ $peserta->created_at ? $peserta->created_at->format('d F Y') : '-' }}</td>
                                 </tr>
                                 <tr>
                                     <th class="bg-light fw-bold text-dark">Status Peserta</th>

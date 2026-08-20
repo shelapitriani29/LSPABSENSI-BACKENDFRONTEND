@@ -1,15 +1,6 @@
 @extends('layouts.peserta')
 
 @section('content')
-@php
-    $soals = $jadwal->soals;
-    $jumlahSoal = $soals->count();
-    $jumlahPilihanGanda = $soals->where('tipe_soal', 'Pilihan Ganda')->count();
-    $jumlahEssay = $soals->where('tipe_soal', 'Essay')->count();
-    $jumlahPraktik = $soals->where('tipe_soal', 'Praktik')->count();
-    $durasiUjian = (int) ($jadwal->durasi_ujian ?? 120);
-    $passingGrade = (int) ($jadwal->passing_grade ?? 75);
-@endphp
 <div class="container-fluid px-4 py-4">
     <!-- Breadcrumb / Header Title -->
     <div class="row mb-4">
@@ -38,7 +29,7 @@
                                 </div>
                                 <div style="flex: 1;">
                                     <span class="text-muted d-block small mb-1">Skema Sertifikasi</span>
-                                    <strong class="text-dark font-weight-bold" style="font-size: 1rem;">{{ $jadwal->skema->nama_skema ?? '-' }}</strong>
+                                    <strong class="text-dark font-weight-bold" style="font-size: 1rem;">{{ optional($jadwal->skema)->nama_skema ?? '-' }}</strong>
                                 </div>
                             </div>
                             <div class="mb-4 d-flex align-items-start">
@@ -47,7 +38,7 @@
                                 </div>
                                 <div style="flex: 1;">
                                     <span class="text-muted d-block small mb-1">Tanggal Uji</span>
-                                    <strong class="text-dark font-weight-bold" style="font-size: 1rem;">{{ $jadwal->tanggal ? \Carbon\Carbon::parse($jadwal->tanggal)->translatedFormat('d F Y') : '-' }}</strong>
+                                    <strong class="text-dark font-weight-bold" style="font-size: 1rem;">{{ optional($jadwal)->tanggal ? \Carbon\Carbon::parse($jadwal->tanggal)->translatedFormat('j F Y') : '-' }}</strong>
                                 </div>
                             </div>
                             <div class="d-flex align-items-start">
@@ -56,7 +47,7 @@
                                 </div>
                                 <div style="flex: 1;">
                                     <span class="text-muted d-block small mb-1">Waktu Ujian</span>
-                                    <strong class="text-dark font-weight-bold" style="font-size: 1rem;">{{ $jadwal->jam_mulai ? \Carbon\Carbon::parse($jadwal->jam_mulai)->format('H.i') : '-' }} – {{ $jadwal->jam_selesai ? \Carbon\Carbon::parse($jadwal->jam_selesai)->format('H.i') : '-' }} WIB</strong>
+                                    <strong class="text-dark font-weight-bold" style="font-size: 1rem;">{{ optional($jadwal)->jam_mulai ? \Carbon\Carbon::parse($jadwal->jam_mulai)->format('H.i') : '-' }} – {{ optional($jadwal)->jam_selesai ? \Carbon\Carbon::parse($jadwal->jam_selesai)->format('H.i') : '-' }} WIB</strong>
                                 </div>
                             </div>
                         </div>
@@ -68,7 +59,7 @@
                                 </div>
                                 <div style="flex: 1;">
                                     <span class="text-muted d-block small mb-1">Asesor</span>
-                                    <strong class="text-dark font-weight-bold" style="font-size: 1rem;">{{ $jadwal->asesor->name ?? '-' }}</strong>
+                                    <strong class="text-dark font-weight-bold" style="font-size: 1rem;">{{ optional($jadwal->asesor)->name ?? '-' }}</strong>
                                 </div>
                             </div>
                             <div class="d-flex align-items-start">
@@ -77,7 +68,7 @@
                                 </div>
                                 <div style="flex: 1;">
                                     <span class="text-muted d-block small mb-1">Lokasi</span>
-                                    <strong class="text-dark font-weight-bold" style="font-size: 1rem;">Lab Komputer 1<br><span class="text-muted font-weight-normal" style="font-size: 0.9rem;">SMK NEGERI 1 GARUT</span></strong>
+                                    <strong class="text-dark font-weight-bold" style="font-size: 1rem;">{{ $jadwal->lokasi ?? '-' }}<br><span class="text-muted font-weight-normal" style="font-size: 0.9rem;">{{ optional($jadwal->skema)->nama_skema ?? '-' }}</span></strong>
                                 </div>
                             </div>
                         </div>
@@ -87,7 +78,7 @@
                 <div class="col-md-4 text-center mt-3 mt-md-0">
                     <div class="p-4 rounded-lg border" style="background-color: #f4fbf7; border-color: #d1e7dd !important;">
                         <span class="text-muted small d-block font-weight-bold text-uppercase mb-2"><strong>Passing Grade</strong></span>
-                        <h2 class="text-success font-weight-bold mb-2" style="font-size: 2.25rem;">{{ $passingGrade }} <span class="text-muted" style="font-size: 1.1rem; font-weight: normal;">/ 100</span></h2>
+                        <h2 class="text-success font-weight-bold mb-2" style="font-size: 2.25rem;">75 <span class="text-muted" style="font-size: 1.1rem; font-weight: normal;">/ 100</span></h2>
                         <p class="text-muted mb-0" style="font-size: 11.5px; line-height: 1.4;">Anda dinyatakan kompeten<br>jika nilai akhir &ge; passing grade.</p>
                     </div>
                 </div>
@@ -110,7 +101,7 @@
     <div class="card shadow-sm mb-4 border-0 rounded-lg">
         <div class="card-body p-4">
             <h4 class="font-weight-bold text-dark mb-4" style="font-weight: 700 !important; font-size: 1.25rem;">Detail Ujian</h4>
-            
+
             <div class="row mb-4">
                 <div class="col-md-4 mb-3 mb-md-0">
                     <div class="p-3 bg-light rounded border d-flex align-items-center">
@@ -119,7 +110,7 @@
                         </div>
                         <div style="flex: 1;">
                             <span class="text-muted small d-block mb-1">Jumlah soal</span>
-                            <h5 class="font-weight-bold text-dark mb-0">{{ $jumlahSoal }} Soal</h5>
+                            <h5 class="font-weight-bold text-dark mb-0">{{ $jadwal->soals()->count() }} Soal</h5>
                         </div>
                     </div>
                 </div>
@@ -130,7 +121,7 @@
                         </div>
                         <div style="flex: 1;">
                             <span class="text-muted small d-block mb-1">Durasi</span>
-                            <h5 class="font-weight-bold text-dark mb-0">{{ $durasiUjian }} Menit</h5>
+                            <h5 class="font-weight-bold text-dark mb-0">{{ optional($jadwal)->durasi_ujian ?? 60 }} Menit</h5>
                         </div>
                     </div>
                 </div>
@@ -141,7 +132,20 @@
                         </div>
                         <div style="flex: 1;">
                             <span class="text-muted small d-block mb-1">Status</span>
-                            <h5 class="font-weight-bold text-success mb-0">Belum Dikerjakan</h5>
+                            @php
+                                $statusUjian = $ujian->status ?? 'belum_dimulai';
+                                if ($statusUjian === 'selesai') {
+                                    $statusLabel = 'Sudah Dikerjakan';
+                                    $statusColor = 'text-success';
+                                } elseif ($statusUjian === 'berlangsung') {
+                                    $statusLabel = 'Sedang Dikerjakan';
+                                    $statusColor = 'text-warning';
+                                } else {
+                                    $statusLabel = 'Belum Dikerjakan';
+                                    $statusColor = 'text-success';
+                                }
+                            @endphp
+                            <h5 class="font-weight-bold {{ $statusColor }} mb-0">{{ $statusLabel }}</h5>
                         </div>
                     </div>
                 </div>
@@ -166,15 +170,15 @@
                         <strong class="text-dark d-block mb-2 small font-weight-bold">Komposisi Soal</strong>
                         <div class="row small text-muted mb-1">
                             <div class="col-7">• Pilihan Ganda</div>
-                            <div class="col-5 font-weight-bold text-dark">: {{ $jumlahPilihanGanda }} Soal</div>
+                            <div class="col-5 font-weight-bold text-dark">: {{ $jadwal->soals()->where('tipe_soal', 'Pilihan Ganda')->count() }} Soal</div>
                         </div>
                         <div class="row small text-muted mb-1">
                             <div class="col-7">• Essay</div>
-                            <div class="col-5 font-weight-bold text-dark">: {{ $jumlahEssay }} Soal</div>
+                            <div class="col-5 font-weight-bold text-dark">: {{ $jadwal->soals()->where('tipe_soal', 'Essay')->count() }} Soal</div>
                         </div>
                         <div class="row small text-muted">
-                            <div class="col-7">• Praktik</div>
-                            <div class="col-5 font-weight-bold text-dark">: {{ $jumlahPraktik }} Soal</div>
+                            <div class="col-7">• Isian Singkat</div>
+                            <div class="col-5 font-weight-bold text-dark">: {{ $jadwal->soals()->where('tipe_soal', 'Isian Singkat')->count() }} Soal</div>
                         </div>
                     </div>
                 </div>
@@ -214,7 +218,7 @@
                                 <span class="text-dark font-weight-bold" style="font-size: 0.95rem;">Jumlah Soal</span>
                             </div>
                             <span class="text-muted font-weight-normal" style="font-size: 0.95rem; margin-right: 6px;">:</span>
-                            <span class="text-dark" style="font-size: 0.95rem; font-weight: 700 !important;">{{ $jumlahSoal }} Soal</span>
+                            <span class="text-dark" style="font-size: 0.95rem; font-weight: 700 !important;">{{ $jadwal->soals()->count() }} Soal</span>
                         </div>
                         <!-- Baris 2: Durasi -->
                         <div class="d-flex align-items-center">
@@ -225,7 +229,7 @@
                                 <span class="text-dark font-weight-bold" style="font-size: 0.95rem;">Durasi</span>
                             </div>
                             <span class="text-muted font-weight-normal" style="font-size: 0.95rem; margin-right: 6px;">:</span>
-                            <span class="text-dark" style="font-size: 0.95rem; font-weight: 700 !important;">{{ $durasiUjian }} Menit</span>
+                            <span class="text-dark" style="font-size: 0.95rem; font-weight: 700 !important;">60 Menit</span>
                         </div>
                     </div>
                 </div>

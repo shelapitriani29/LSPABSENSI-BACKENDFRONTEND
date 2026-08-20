@@ -61,7 +61,7 @@
     <!-- Card Container Daftar Peserta -->
     <div class="card border-0 shadow-sm rounded-3 bg-white">
         <div class="card-body p-4">
-            
+
             <!-- Header Tabel & Search Bar -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
                 <h5 class="fw-bold text-dark mb-0">Daftar Peserta</h5>
@@ -91,7 +91,16 @@
                             @php
                                 $absen = $peserta->absensis->first();
                                 $penilaian = $peserta->penilaians->first();
-                                
+                                $nilaiPilihanGanda = $penilaian?->nilai_pilihan_ganda ?? null;
+                                $nilaiEssay = $penilaian?->nilai_essay ?? null;
+                                $nilaiUjianSistem = null;
+
+                                if ($nilaiPilihanGanda !== null || $nilaiEssay !== null) {
+                                    $nilaiUjianSistem = (float) ($nilaiPilihanGanda ?? 0) + (float) ($nilaiEssay ?? 0);
+                                } else {
+                                    $nilaiUjianSistem = $peserta->ujians()->where('jadwal_id', $jadwal->id)->latest()->first()?->nilai_otomatis ?? '-';
+                                }
+
                                 $isSelesai = $absen && in_array($absen->status, ['Hadir', 'Selesai']);
                             @endphp
                             <tr>
@@ -106,7 +115,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center fw-semibold text-dark">
-                                    {{ $peserta->nilai_sistem ?? '-' }}
+                                    {{ $nilaiUjianSistem === '-' ? '-' : number_format((float) $nilaiUjianSistem, 2, ',', '.') }}
                                 </td>
                                 <td class="text-center">
                                     @if($penilaian)

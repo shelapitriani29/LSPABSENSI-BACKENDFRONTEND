@@ -3,7 +3,7 @@
 @section('content')
 <div style="width: 100%; padding: 24px 16px; display: flex; justify-content: center; align-items: center; min-height: 80vh;">
     <div style="width: 100%; max-width: 900px; background: #ffffff; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; padding: 40px 32px; text-align: center;">
-        
+
         <!-- Icon Centang Sukses -->
         <div style="display: flex; justify-content: center; margin-bottom: 16px;">
             <div style="width: 64px; height: 64px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
@@ -23,19 +23,19 @@
                 <tbody>
                     <tr>
                         <td style="padding: 8px 0; font-size: 14px; color: #6b7280; width: 42%;">Skema Sertifikasi</td>
-                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ $jadwal->skema->nama_skema ?? '-' }}</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ optional($jadwal->skema)->nama_skema ?? '-' }}</td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Jumlah Soal</td>
-                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ $jumlahSoal }} Soal</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ $jumlahSoal ?? 0 }} Soal</td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Durasi</td>
-                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ $jadwal->durasi_ujian ?? 120 }} Menit</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ optional($jadwal)->durasi_ujian ?? 60 }} Menit</td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Waktu Selesai</td>
-                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ $ujian?->waktu_selesai?->format('H:i') ?? '-' }} WIB</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">: {{ optional($ujian)->waktu_selesai ? \Carbon\Carbon::parse($ujian->waktu_selesai)->format('H:i') : '-' }} WIB</td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Status</td>
