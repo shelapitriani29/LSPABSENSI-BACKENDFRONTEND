@@ -19,30 +19,8 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Administrator',
                 'email' => 'admin@lsp.com',
-                'password' => Hash::make('1'),
+                'password' => Hash::make('elespeadmin'),
                 'role' => 'admin',
-            ]
-        );
-
-        // Asesor
-        User::updateOrCreate(
-            ['username' => 'asesor'],
-            [
-                'name' => 'Asesor',
-                'email' => 'asesor@lsp.com',
-                'password' => Hash::make('1'),
-                'role' => 'asesor',
-            ]
-        );
-
-        // Peserta
-        User::updateOrCreate(
-            ['username' => 'peserta'],
-            [
-                'name' => 'Peserta',
-                'email' => 'peserta@lsp.com',
-                'password' => Hash::make('1'),
-                'role' => 'peserta',
             ]
         );
     }

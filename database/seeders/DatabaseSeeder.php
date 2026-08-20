@@ -21,38 +21,13 @@ class DatabaseSeeder extends Seeder
             [
                 'name'     => 'Administrator',
                 'email'    => 'admin@lsp.com',
-                'password' => Hash::make('1'),
+                'password' => Hash::make('elespeadmin'),
                 'role'     => 'admin',
                 'instansi' => 'SMK NEGERI 1 GARUT',
             ]
         );
 
-        // 2. Sample Data Asesor
-        $asesor = User::updateOrCreate(
-            ['username' => 'asesor'],
-            [
-                'name'     => 'Asesor',
-                'email'    => 'asesor@lsp.com',
-                'password' => Hash::make('1'),
-                'role'     => 'asesor',
-                'instansi' => 'SMK NEGERI 1 GARUT',
-            ]
-        );
-
-        // 3. Sample Data Peserta
-        User::updateOrCreate(
-            ['username' => 'peserta'],
-            [
-                'name'     => 'Peserta',
-                'email'    => 'peserta@lsp.com',
-                'password' => Hash::make('1'),
-                'role'     => 'peserta',
-                'kelas'    => 'XI RPL 1',
-                'instansi' => 'SMK NEGERI 1 GARUT',
-            ]
-        );
-
-        // 4. Sample Data Skema Sertifikasi
+        // 2. Sample Data Skema Sertifikasi
         $skema = Skema::updateOrCreate(
             ['kode_skema' => 'SKM-JAN-001'],
             [
@@ -70,13 +45,13 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 5. Create Test Jadwal (Exam Schedule)
+        // 3. Create Test Jadwal (Exam Schedule)
         $jadwal = Jadwal::updateOrCreate(
             ['kode_jadwal' => 'JWD-2026-001'],
             [
                 'skema_id'     => $skema->id,
                 'kelas'        => 'XI RPL 1',
-                'asesor_id'    => $asesor->id,
+                'asesor_id'    => null,
                 'tanggal'      => now()->addDays(7)->toDateString(),
                 'jam_mulai'    => '08:00',
                 'jam_selesai'  => '12:00',

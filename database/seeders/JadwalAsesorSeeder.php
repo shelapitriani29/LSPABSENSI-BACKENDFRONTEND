@@ -17,7 +17,7 @@ class JadwalAsesorSeeder extends Seeder
     {
         // Ambil asesor
         $asesor = User::where('role', 'asesor')->first();
-        
+
         if (!$asesor) {
             echo "No asesor found. Skipping seeder.\n";
             return;
@@ -53,34 +53,6 @@ class JadwalAsesorSeeder extends Seeder
 
         echo "Jadwal created/found with ID: {$jadwal->id}\n";
 
-        // Buat beberapa peserta untuk kelas ini
-        for ($i = 1; $i <= 3; $i++) {
-            $peserta = User::firstOrCreate(
-                ['username' => "peserta_jwdtest_{$i}"],
-                [
-                    'name' => "Peserta JWD Test {$i}",
-                    'email' => "peserta_jwdtest_{$i}@lsp.sch.id",
-                    'password' => bcrypt('password'),
-                    'role' => 'peserta',
-                    'kelas' => 'XI RPL 1',
-                    'status' => 'Aktif',
-                ]
-            );
-
-            // Buat penilaian untuk peserta
-            Penilaian::firstOrCreate(
-                [
-                    'user_id' => $peserta->id,
-                    'jadwal_id' => $jadwal->id,
-                ],
-                [
-                    'asesor_id' => $asesor->id,
-                    'hasil' => $i === 1 ? 'Belum Kompeten' : 'Kompeten',
-                    'tanggal' => now()->toDateString(),
-                ]
-            );
-        }
-
-        echo "Test data for jadwal created successfully!\n";
+        echo "Jadwal created successfully without demo participant accounts.\n";
     }
 }
